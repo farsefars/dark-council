@@ -143,11 +143,24 @@ class BuildTests(unittest.TestCase):
     def test_responsive_print_and_motion_modes_exist(self) -> None:
         css = (Path(build.HERE) / "theme.css").read_text(encoding="utf-8")
         self.assertIn("@media print", css)
-        self.assertIn("@media (max-width: 42rem)", css)
+        self.assertIn("@media (min-width: 42rem)", css)
+        self.assertIn("@media (min-width: 55rem)", css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", css)
         self.assertIn(':root[data-print="quick"]', css)
         self.assertIn("[hidden][hidden]", css)
         self.assertNotIn(".lang-panel {", css)
+
+    def test_balance_status_is_not_published(self) -> None:
+        self.assertNotIn("Balance status", self.markdowns["en"])
+        self.assertNotIn("Стан балансу", self.markdowns["ua"])
+        self.assertNotIn("Balance status", self.page)
+        self.assertNotIn("Стан балансу", self.page)
+
+    def test_player_count_summary_is_rendered(self) -> None:
+        self.assertIn('class="setup-summary"', self.page)
+        self.assertEqual(1, self.page.count("<strong data-selected-player-count>"))
+        self.assertGreaterEqual(self.page.count('data-threshold="factions"'), 3)
+        self.assertIn('<option value="13" selected>', self.page)
 
     def test_language_panels_ship_isolated(self) -> None:
         self.assertEqual(5, len(re.findall(r'data-lang-panel data-lang="ua"(?! hidden)', self.page)))

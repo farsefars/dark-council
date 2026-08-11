@@ -537,13 +537,6 @@ Reformers receive the extra player. Do this before assigning Roles.
 Simply: **Magnates need 16 if there are two of them, or 24 if there are three. The
 Assassin needs roughly 40, a little more at small tables.**
 
-**Balance status:** these thresholds were originally tuned against a simulator
-configuration that charged **-2** for a wrong Guilty vote, while the playable rule above
-correctly says **-1**. After correcting the simulator to match this document, a new
-8,000-game baseline measured Aristocrat 48.1%, Reformer 49.1%, Magnate 40.0%, and
-Syndicate 36.2%. The thresholds remain playable but provisional. See
-`design/simulation-ab-results.md`; do not change them during a game.
-
 ## 12.2 Contract deck
 
 Choose one Contract per round. Do not repeat a Contract in the same game. Only use a

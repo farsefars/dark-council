@@ -569,7 +569,10 @@ def build_html() -> str:
         }
         for language, entries in GLOSSARY.items()
     }
-    count_options = "".join(f'<option value="{count}">{count}</option>' for count in range(8, 16))
+    count_options = "".join(
+        f'<option value="{count}"{" selected" if count == 13 else ""}>{count}</option>'
+        for count in range(8, 16)
+    )
     topbar = f"""
     <header class="topbar">
       <a class="brand-mark" href="#top" aria-label="The Dark Council">
@@ -599,6 +602,30 @@ def build_html() -> str:
         <button class="path-button" type="button" data-reading-path="gm" data-i18n="gm">{html.escape(UI["ua"]["gm"])}</button>
       </div>
     </nav>"""
+    setup_summary = f"""
+    <section class="setup-summary" aria-live="polite" aria-atomic="true">
+      <span class="setup-summary-title" data-i18n="setup_summary">{html.escape(UI["ua"]["setup_summary"])}</span>
+      <div class="setup-stat setup-player-count">
+        <small data-i18n="player_count">{html.escape(UI["ua"]["player_count"])}</small>
+        <strong data-selected-player-count>13</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="factions">{html.escape(UI["ua"]["factions"])}</small>
+        <strong data-threshold="factions">{html.escape(scaling["ua"]["13"]["factions"])}</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="magnate_count">{html.escape(UI["ua"]["magnate_count"])}</small>
+        <strong data-threshold="magnates">{html.escape(scaling["ua"]["13"]["magnates"])}</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="magnates_need">{html.escape(UI["ua"]["magnates_need"])}</small>
+        <strong data-threshold="magnateThreshold">{html.escape(scaling["ua"]["13"]["magnateThreshold"])}</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="syndicate_needs">{html.escape(UI["ua"]["syndicate_needs"])}</small>
+        <strong data-threshold="syndicateThreshold">{html.escape(scaling["ua"]["13"]["syndicateThreshold"])}</strong>
+      </div>
+    </section>"""
     page = f"""<!doctype html>
 <html lang="uk" data-lang="ua" data-theme="dark" data-path="player">
 <head>
@@ -613,6 +640,7 @@ def build_html() -> str:
   {topbar}
   {hero("ua")}{hero("en")}
   {paths}
+  {setup_summary}
   <div class="page-shell">
     {toc("ua", sections["ua"])}{toc("en", sections["en"])}
     <main class="main-column" id="rules">

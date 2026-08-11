@@ -136,10 +136,20 @@
     const count = String(countSelect.value);
     const data = thresholds[count];
     if (!data) return;
+    root.dataset.playerCount = count;
+    document.querySelectorAll("[data-selected-player-count]").forEach((node) => {
+      node.textContent = count;
+    });
+    document.querySelectorAll("[data-threshold]").forEach((node) => {
+      node.textContent = data[node.dataset.threshold];
+    });
     document
-      .querySelectorAll(`[data-lang-panel][data-lang="${currentLanguage()}"] [data-threshold]`)
-      .forEach((node) => {
-        node.textContent = data[node.dataset.threshold];
+      .querySelectorAll('.rule-section[data-section="12"] table:first-of-type tbody tr')
+      .forEach((row) => {
+        row.classList.toggle(
+          "is-selected-count",
+          row.cells[0]?.textContent.trim() === count
+        );
       });
     localStorage.setItem("dark-council-player-count", count);
   }

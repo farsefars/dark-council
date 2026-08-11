@@ -62,7 +62,7 @@ body {
 
 body::before {
   border: 1px solid var(--line);
-  content: "";
+  content: none;
   inset: 0.55rem;
   pointer-events: none;
   position: fixed;
@@ -108,11 +108,11 @@ button {
   backdrop-filter: blur(14px);
   background: color-mix(in srgb, var(--ink) 89%, transparent);
   border-bottom: 1px solid var(--line);
-  display: flex;
-  gap: 0.8rem;
-  justify-content: space-between;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: auto 1fr;
   min-height: 4.4rem;
-  padding: 0.65rem max(1rem, calc((100vw - var(--max)) / 2));
+  padding: 0.55rem 0.7rem;
   position: sticky;
   top: 0;
   z-index: 15;
@@ -138,6 +138,7 @@ button {
 }
 
 .brand-name {
+  display: none;
   font-family: var(--serif);
   font-size: 1.05rem;
   font-weight: 700;
@@ -145,9 +146,9 @@ button {
 
 .top-controls {
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
+  display: grid;
+  gap: 0.3rem;
+  grid-template-columns: auto auto auto;
   justify-content: flex-end;
 }
 
@@ -164,8 +165,9 @@ button {
   background: transparent;
   border: 0;
   cursor: pointer;
-  min-height: 2.35rem;
-  padding: 0.35rem 0.7rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0.45rem 0.65rem;
 }
 
 .segmented button.is-active,
@@ -176,10 +178,10 @@ button {
 
 .count-control {
   align-items: center;
-  border-left: 1px solid var(--line);
+  border-left: 0;
   display: flex;
   gap: 0.45rem;
-  padding-left: 0.8rem;
+  padding-left: 0;
 }
 
 .count-control label {
@@ -187,21 +189,23 @@ button {
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  display: none;
 }
 
 .count-control select {
   background: var(--ink-raised);
   border: 1px solid var(--line);
   color: var(--bone);
-  padding: 0.32rem 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.55rem;
 }
 
 .hero {
   align-items: center;
   display: grid;
-  min-height: min(47rem, calc(100vh - 4.4rem));
+  min-height: min(36rem, calc(100svh - 4.4rem));
   overflow: hidden;
-  padding: clamp(4rem, 9vw, 8rem) 1.25rem;
+  padding: 4.5rem 1rem;
   position: relative;
   text-align: center;
 }
@@ -246,7 +250,7 @@ button {
 }
 
 .hero h1 {
-  font: 700 clamp(3.4rem, 10vw, 8rem)/0.9 var(--serif);
+  font: 700 clamp(3.15rem, 15vw, 5rem)/0.92 var(--serif);
   letter-spacing: -0.055em;
   margin: 0;
   text-wrap: balance;
@@ -274,10 +278,11 @@ button {
 }
 
 .path-switcher {
-  align-items: center;
+  align-items: stretch;
   background: var(--ink-raised);
   border-block: 1px solid var(--line);
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   justify-content: center;
   padding: 1rem;
@@ -291,8 +296,9 @@ button {
 }
 
 .path-buttons {
-  display: flex;
+  display: grid;
   gap: 0.4rem;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .path-button {
@@ -305,7 +311,47 @@ button {
   grid-template-columns: minmax(0, 1fr);
   margin: 0 auto;
   max-width: calc(var(--max) + 18rem);
-  padding: 3rem 1.25rem 8rem;
+  padding: 1.5rem 0.9rem 5rem;
+}
+
+.setup-summary {
+  background: var(--ink-raised);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0 0.75rem 0.75rem;
+}
+
+.setup-summary-title {
+  color: var(--gold-bright);
+  font-size: 0.72rem;
+  font-weight: 700;
+  grid-column: 1 / -1;
+  letter-spacing: 0.12em;
+  padding: 0.8rem 0.35rem 0.45rem;
+  text-transform: uppercase;
+}
+
+.setup-stat {
+  border: 1px solid var(--line);
+  margin: -1px 0 0 -1px;
+  min-width: 0;
+  padding: 0.65rem;
+}
+
+.setup-stat small {
+  color: var(--bone-dim);
+  display: block;
+  font-size: 0.66rem;
+  line-height: 1.25;
+  min-height: 2.5em;
+  text-transform: uppercase;
+}
+
+.setup-stat strong {
+  display: block;
+  font: 1.25rem var(--serif);
+  margin-top: 0.2rem;
 }
 
 .toc {
@@ -375,7 +421,7 @@ button {
 .five-things {
   display: grid;
   gap: 0.8rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 2rem 0 4rem;
 }
 
@@ -407,24 +453,26 @@ button {
 .game-arc {
   display: grid;
   gap: 0;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 1fr;
   margin: 2rem 0 3rem;
 }
 
 .arc-step {
   border-block: 1px solid var(--line);
-  min-height: 8.5rem;
+  min-height: auto;
   padding: 1.1rem 0.8rem;
   position: relative;
-  text-align: center;
+  text-align: left;
 }
 
 .arc-step:not(:last-child)::after {
   color: var(--gold);
   content: "◆";
   position: absolute;
-  right: -0.4rem;
-  top: calc(50% - 0.7rem);
+  bottom: -0.75rem;
+  left: calc(50% - 0.35rem);
+  right: auto;
+  top: auto;
   z-index: 2;
 }
 
@@ -459,7 +507,7 @@ button {
 .economy-board {
   border-block: 1px solid var(--line);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 2rem 0 1rem;
 }
 
@@ -474,11 +522,15 @@ button {
 }
 
 .economy-entry:nth-last-child(-n + 2) {
-  border-bottom: 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .economy-entry:nth-child(odd) {
-  border-right: 1px solid var(--line);
+  border-right: 0;
+}
+
+.economy-entry:last-child {
+  border-bottom: 0;
 }
 
 .economy-value {
@@ -513,7 +565,7 @@ button {
 .goals-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 2rem 0 4rem;
 }
 
@@ -565,7 +617,7 @@ button {
   align-items: stretch;
   border: 1px solid var(--line);
   display: grid;
-  grid-template-columns: 6rem 1fr;
+  grid-template-columns: 1fr;
 }
 
 .round-label {
@@ -573,7 +625,7 @@ button {
   background: var(--ink-soft);
   display: flex;
   font: 700 1.1rem var(--serif);
-  justify-content: center;
+  justify-content: flex-start;
   padding: 1rem 0.5rem;
   text-align: center;
 }
@@ -600,7 +652,7 @@ button {
 .threshold-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 1.5rem 0 3rem;
 }
 
@@ -632,7 +684,7 @@ button {
   align-items: center;
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr;
   margin: 2rem 0 4rem;
 }
 
@@ -663,8 +715,8 @@ button {
 }
 
 .evidence-copy {
-  border-left: 1px solid var(--line);
-  padding-left: 1.5rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
 }
 
 .evidence-copy strong {
@@ -680,7 +732,7 @@ button {
 .final-flow {
   display: grid;
   gap: 0.55rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 2rem 0 4rem;
 }
 
@@ -726,7 +778,7 @@ button {
 }
 
 .faction-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .faction-card {
@@ -873,8 +925,9 @@ button {
 }
 
 .section-heading {
-  align-items: baseline;
+  align-items: flex-start;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -1011,7 +1064,15 @@ td {
 
 .quick-reference .print-button {
   border: 1px solid var(--gold);
-  float: right;
+  float: none;
+  margin-bottom: 1rem;
+}
+
+tr.is-selected-count td {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+  box-shadow: inset 0 1px var(--gold), inset 0 -1px var(--gold);
+  color: var(--bone);
+  font-weight: 700;
 }
 
 footer {
@@ -1058,7 +1119,57 @@ footer {
   }
 }
 
-@media (max-width: 54rem) {
+@media (min-width: 42rem) {
+  body::before {
+    content: "";
+  }
+
+  .topbar {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: space-between;
+    padding: 0.65rem max(1rem, calc((100vw - var(--max)) / 2));
+  }
+
+  .brand-name,
+  .count-control label {
+    display: block;
+  }
+
+  .top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .count-control {
+    border-left: 1px solid var(--line);
+    padding-left: 0.8rem;
+  }
+
+  .hero {
+    min-height: min(42rem, calc(100vh - 4.4rem));
+    padding: clamp(5rem, 9vw, 8rem) 1.25rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(4rem, 10vw, 8rem);
+  }
+
+  .path-switcher {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .path-buttons {
+    display: flex;
+  }
+
+  .setup-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-inline: max(1rem, calc((100vw - var(--max)) / 2));
+  }
+
   .five-things {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1074,122 +1185,82 @@ footer {
   .faction-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .topbar {
-    align-items: flex-start;
-  }
-
-  .brand-name {
-    display: none;
-  }
 }
 
-@media (max-width: 42rem) {
-  body::before {
-    display: none;
-  }
-
-  .topbar {
-    gap: 0.35rem;
-    padding-inline: 0.65rem;
-  }
-
-  .top-controls {
-    gap: 0.3rem;
-  }
-
-  .count-control {
-    padding-left: 0.4rem;
-  }
-
-  .count-control label,
-  .icon-button .button-label {
-    display: none;
-  }
-
-  .hero {
-    min-height: 36rem;
-  }
-
-  .path-switcher {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .path-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+@media (min-width: 55rem) {
+  .setup-summary {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .game-arc,
   .final-flow {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .arc-step {
-    min-height: auto;
-    text-align: left;
+    min-height: 8.5rem;
+    text-align: center;
   }
 
   .arc-step:not(:last-child)::after {
-    bottom: -0.75rem;
-    left: calc(50% - 0.35rem);
-    right: auto;
-    top: auto;
+    bottom: auto;
+    left: auto;
+    right: -0.4rem;
+    top: calc(50% - 0.7rem);
   }
 
   .round-strip {
-    grid-template-columns: 1fr;
+    grid-template-columns: 6rem 1fr;
   }
 
   .round-label {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .outcome-grid,
   .threshold-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .economy-board {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .economy-entry,
-  .economy-entry:nth-child(odd),
-  .economy-entry:nth-last-child(2) {
-    border-bottom: 1px solid var(--line);
-    border-right: 0;
+  .economy-entry:nth-child(odd) {
+    border-right: 1px solid var(--line);
   }
 
-  .economy-entry:last-child {
+  .economy-entry:nth-last-child(-n + 2) {
     border-bottom: 0;
   }
 
-  .goals-grid,
+  .goals-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .faction-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .evidence-board {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto 1fr;
   }
 
   .evidence-copy {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding: 1rem 0 0;
+    border-left: 1px solid var(--line);
+    border-top: 0;
+    padding: 0 0 0 1.5rem;
   }
 
   .section-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.4rem;
+    align-items: baseline;
+    flex-direction: row;
+    gap: 1rem;
   }
 
   .quick-reference .print-button {
-    float: none;
-    margin-bottom: 1rem;
+    float: right;
+    margin-bottom: 0;
   }
 }
 
@@ -1319,7 +1390,7 @@ footer {
         </div>
         <div class="count-control">
           <label for="player-count" data-i18n="choose_count">Гравців</label>
-          <select id="player-count"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option></select>
+          <select id="player-count"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13" selected>13</option><option value="14">14</option><option value="15">15</option></select>
         </div>
         <button class="icon-button" id="theme-toggle" type="button"
           data-i18n-label="theme_toggle" title="Світла / темна тема"
@@ -1336,6 +1407,30 @@ footer {
         <button class="path-button" type="button" data-reading-path="gm" data-i18n="gm">Ведучий</button>
       </div>
     </nav>
+
+    <section class="setup-summary" aria-live="polite" aria-atomic="true">
+      <span class="setup-summary-title" data-i18n="setup_summary">Склад і пороги</span>
+      <div class="setup-stat setup-player-count">
+        <small data-i18n="player_count">Кількість гравців</small>
+        <strong data-selected-player-count>13</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="factions">Аристократи / Реформісти</small>
+        <strong data-threshold="factions">5 / 5</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="magnate_count">Магнатів</small>
+        <strong data-threshold="magnates">3</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="magnates_need">Поріг Магнатів</small>
+        <strong data-threshold="magnateThreshold">24</strong>
+      </div>
+      <div class="setup-stat">
+        <small data-i18n="syndicate_needs">Вбивця + Криївка</small>
+        <strong data-threshold="syndicateThreshold">40</strong>
+      </div>
+    </section>
   <div class="page-shell">
     <nav class="toc" data-lang-panel data-lang="ua" aria-label="Зміст"><h2>Зміст</h2><ol><li><a href="#ua-section-0" data-section-link="0"><span>00</span> Гра за 60 секунд</a></li><li><a href="#ua-section-1" data-section-link="1"><span>01</span> Структура гри</a></li><li><a href="#ua-section-2" data-section-link="2"><span>02</span> Підготовка</a></li><li><a href="#ua-section-3" data-section-link="3"><span>03</span> Раунд</a></li><li><a href="#ua-section-4" data-section-link="4"><span>04</span> Економіка</a></li><li><a href="#ua-section-5" data-section-link="5"><span>05</span> Ваші Цілі</a></li><li><a href="#ua-section-6" data-section-link="6"><span>06</span> Рада</a></li><li><a href="#ua-section-7" data-section-link="7"><span>07</span> Докази</a></li><li><a href="#ua-section-8" data-section-link="8"><span>08</span> Смерть та Привиди</a></li><li><a href="#ua-section-9" data-section-link="9"><span>09</span> Фінал</a></li><li><a href="#ua-section-10" data-section-link="10"><span>10</span> Умови перемоги</a></li><li><a href="#ua-section-11" data-section-link="11"><span>11</span> ▶ Синдикат</a></li><li><a href="#ua-section-12" data-section-link="12"><span>12</span> Довідник Ведучого</a></li><li class="toc-extra"><a href="#quick-ua">◆ Швидка пам&#x27;ятка</a></li><li class="toc-extra"><a href="#diagrams-ua">◆ Схеми</a></li></ol></nav><nav class="toc" data-lang-panel data-lang="en" hidden aria-label="Contents"><h2>Contents</h2><ol><li><a href="#en-section-0" data-section-link="0"><span>00</span> The Game in 60 Seconds</a></li><li><a href="#en-section-1" data-section-link="1"><span>01</span> Game Structure</a></li><li><a href="#en-section-2" data-section-link="2"><span>02</span> Preparation</a></li><li><a href="#en-section-3" data-section-link="3"><span>03</span> The Round</a></li><li><a href="#en-section-4" data-section-link="4"><span>04</span> The Economy</a></li><li><a href="#en-section-5" data-section-link="5"><span>05</span> Your Goals</a></li><li><a href="#en-section-6" data-section-link="6"><span>06</span> The Council</a></li><li><a href="#en-section-7" data-section-link="7"><span>07</span> Evidence</a></li><li><a href="#en-section-8" data-section-link="8"><span>08</span> Death and Ghosts</a></li><li><a href="#en-section-9" data-section-link="9"><span>09</span> The Final</a></li><li><a href="#en-section-10" data-section-link="10"><span>10</span> Victory Conditions</a></li><li><a href="#en-section-11" data-section-link="11"><span>11</span> ▶ The Syndicate</a></li><li><a href="#en-section-12" data-section-link="12"><span>12</span> GM Reference</a></li><li class="toc-extra"><a href="#quick-en">◆ Quick reference</a></li><li class="toc-extra"><a href="#diagrams-en">◆ Diagrams</a></li></ol></nav>
     <main class="main-column" id="rules">
@@ -1493,7 +1588,6 @@ footer {
 <p>Якщо кількість місць у двох великих <button type="button" class="term-ref" data-term="faction" aria-expanded="false">Фракціях</button> непарна, випадково визначте, хто отримає додаткового гравця: Аристократи чи Реформісти. Зробіть це до розподілу Ролей.</p>
 <div class="table-scroll"><table><thead><tr><th>Гравців</th><th>Аристократи / Реформісти</th><th>Магнати</th><th>Поріг Магнатів</th><th>Поріг <button type="button" class="term-ref" data-term="assassin" aria-expanded="false">Вбивці</button> + <button type="button" class="term-ref" data-term="stash" aria-expanded="false">Криївки</button></th></tr></thead><tbody><tr><td>8</td><td>3 / 3</td><td>2</td><td>16</td><td>46</td></tr><tr><td>9</td><td>4 / 3</td><td>2</td><td>16</td><td>44</td></tr><tr><td>10</td><td>4 / 4</td><td>2</td><td>16</td><td>42</td></tr><tr><td>11</td><td>4 / 4</td><td>3</td><td>24</td><td>42</td></tr><tr><td>12</td><td>5 / 4</td><td>3</td><td>24</td><td>40</td></tr><tr><td>13</td><td>5 / 5</td><td>3</td><td>24</td><td>40</td></tr><tr><td>14</td><td>6 / 5</td><td>3</td><td>24</td><td>41</td></tr><tr><td>15</td><td>6 / 6</td><td>3</td><td>24</td><td>39</td></tr></tbody></table></div>
 <p>Простіше кажучи: <strong>Магнатам потрібно 16, якщо їх двоє, або 24, якщо їх троє. <button type="button" class="term-ref" data-term="assassin" aria-expanded="false">Вбивці</button> потрібно приблизно 40, трохи більше за малих столів.</strong></p>
-<p><strong>Стан балансу:</strong> ці пороги спочатку налаштовувалися у симуляторі, де неправильний голос «Винен» коштував <strong>-2</strong>, тоді як у цих ігрових правилах правильно вказано <strong>-1</strong>. Після виправлення симулятора нова базова вибірка з 8 000 партій дала 48,1% для Аристократів, 49,1% для Реформістів, 40,0% для Магнатів і 36,2% для <button type="button" class="term-ref" data-term="syndicate" aria-expanded="false">Синдикату</button>. Пороги залишаються придатними для гри, але попередніми. Див. <code>design/simulation-ab-results.md</code>; не змінюйте їх посеред партії.</p>
 <h3 id="ua-section-12-12-2-колода-контрактів">12.2 Колода Контрактів</h3>
 <p>Вибирайте по одному <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Контракту</button> на раунд. Не повторюйте <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Контракт</button> протягом однієї гри. Використовуйте <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Контракт</button>, лише якщо йому можуть відповідати щонайменше дві чинні цілі для вбивства.</p>
 <p>Відповідність перевіряється наприкінці Приватної фази, якщо на картці не вказано інакше. Протягом трьох раундів не обирайте постійно <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Контракти</button>, які зосереджують тиск на одній <button type="button" class="term-ref" data-term="faction" aria-expanded="false">Фракції</button>.</p>
@@ -1658,7 +1752,6 @@ footer {
 <p>For an odd number of major-faction seats, randomly decide whether the Aristocrats or Reformers receive the extra player. Do this before assigning Roles.</p>
 <div class="table-scroll"><table><thead><tr><th>Players</th><th>Aristocrats / Reformers</th><th>Magnates</th><th>Magnate threshold</th><th><button type="button" class="term-ref" data-term="assassin" aria-expanded="false">Assassin</button> + <button type="button" class="term-ref" data-term="stash" aria-expanded="false">Stash</button> threshold</th></tr></thead><tbody><tr><td>8</td><td>3 / 3</td><td>2</td><td>16</td><td>46</td></tr><tr><td>9</td><td>4 / 3</td><td>2</td><td>16</td><td>44</td></tr><tr><td>10</td><td>4 / 4</td><td>2</td><td>16</td><td>42</td></tr><tr><td>11</td><td>4 / 4</td><td>3</td><td>24</td><td>42</td></tr><tr><td>12</td><td>5 / 4</td><td>3</td><td>24</td><td>40</td></tr><tr><td>13</td><td>5 / 5</td><td>3</td><td>24</td><td>40</td></tr><tr><td>14</td><td>6 / 5</td><td>3</td><td>24</td><td>41</td></tr><tr><td>15</td><td>6 / 6</td><td>3</td><td>24</td><td>39</td></tr></tbody></table></div>
 <p>Simply: <strong>Magnates need 16 if there are two of them, or 24 if there are three. The <button type="button" class="term-ref" data-term="assassin" aria-expanded="false">Assassin</button> needs roughly 40, a little more at small tables.</strong></p>
-<p><strong>Balance status:</strong> these thresholds were originally tuned against a simulator configuration that charged <strong>-2</strong> for a wrong Guilty vote, while the playable rule above correctly says <strong>-1</strong>. After correcting the simulator to match this document, a new 8,000-game baseline measured Aristocrat 48.1%, Reformer 49.1%, Magnate 40.0%, and <button type="button" class="term-ref" data-term="syndicate" aria-expanded="false">Syndicate</button> 36.2%. The thresholds remain playable but provisional. See <code>design/simulation-ab-results.md</code>; do not change them during a game.</p>
 <h3 id="en-section-12-12-2-contract-deck">12.2 Contract deck</h3>
 <p>Choose one <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Contract</button> per round. Do not repeat a <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Contract</button> in the same game. Only use a <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Contract</button> if at least two valid assassination targets can currently qualify.</p>
 <p>Eligibility is checked at the end of the Private Phase unless the card says otherwise. Across the three rounds, avoid repeatedly selecting <button type="button" class="term-ref" data-term="contract" aria-expanded="false">Contracts</button> that concentrate pressure on the same <button type="button" class="term-ref" data-term="faction" aria-expanded="false">Faction</button>.</p>
@@ -1717,7 +1810,7 @@ footer {
   </div>
   <footer data-i18n="title">Темна Рада</footer>
   <script id="threshold-data" type="application/json">{"8": {"factions": "3 / 3", "magnates": "2", "magnateThreshold": "16", "syndicateThreshold": "46"}, "9": {"factions": "4 / 3", "magnates": "2", "magnateThreshold": "16", "syndicateThreshold": "44"}, "10": {"factions": "4 / 4", "magnates": "2", "magnateThreshold": "16", "syndicateThreshold": "42"}, "11": {"factions": "4 / 4", "magnates": "3", "magnateThreshold": "24", "syndicateThreshold": "42"}, "12": {"factions": "5 / 4", "magnates": "3", "magnateThreshold": "24", "syndicateThreshold": "40"}, "13": {"factions": "5 / 5", "magnates": "3", "magnateThreshold": "24", "syndicateThreshold": "40"}, "14": {"factions": "6 / 5", "magnates": "3", "magnateThreshold": "24", "syndicateThreshold": "41"}, "15": {"factions": "6 / 6", "magnates": "3", "magnateThreshold": "24", "syndicateThreshold": "39"}}</script>
-  <script id="ui-data" type="application/json">{"ua": {"title": "Темна Рада", "subtitle": "Три раунди переговорів. Кімната, повна брехні. Усе вирішать фінальні вибори.", "player": "Гравець", "syndicate": "Синдикат", "gm": "Ведучий", "quick": "Швидка пам'ятка", "diagrams": "Схеми", "flow": "Хід гри", "choose_count": "Гравців", "contents": "Зміст", "theme_toggle": "Світла / темна тема", "five_things": "П'ять речей, які треба пам'ятати", "glossary": "Короткий словник", "print": "Друк", "round": "Раунд", "prep": "Підготовка", "final": "Фінал", "contract": "Контракт", "private": "Приватна фаза", "council": "Рада", "leaders": "Топ-3", "auction": "Аукціон", "payout": "+2 кожному живому гравцю", "minutes": "30 хв", "interrogation": "Три наслідки Допиту", "vote_fails": "Голосування не пройшло", "innocent_dies": "Страчено Невинного", "assassin_dies": "Страчено Вбивцю", "evidence": "П'ять Доказів", "false": "2 хибні", "true": "3 правдиві", "auction_truth": "Аукціон: гарантована правда", "final_flow": "Як проходить Фінал", "nominate": "3 висування", "reveal": "Розкриття", "buy": "Купівля голосів", "ballot": "Таємні вибори", "victory": "Перевірка перемоги", "thresholds": "Пороги для цієї кількості гравців", "magnates_need": "Поріг Магнатів", "syndicate_needs": "Вбивця + Криївка", "factions": "Аристократи / Реформісти", "magnates": "Магнати", "start_here": "Почніть тут", "current_path": "Що читати", "skip": "До правил"}, "en": {"title": "The Dark Council", "subtitle": "Three rounds of negotiation. One room full of lies. A final election decides everything.", "player": "Player", "syndicate": "Syndicate", "gm": "GM", "quick": "Quick reference", "diagrams": "Diagrams", "flow": "Game flow", "choose_count": "Players", "contents": "Contents", "theme_toggle": "Light / dark theme", "five_things": "Track only five things", "glossary": "Short glossary", "print": "Print", "round": "Round", "prep": "Preparation", "final": "Final", "contract": "Contract", "private": "Private phase", "council": "Council", "leaders": "Top 3", "auction": "Auction", "payout": "+2 to every living player", "minutes": "30 min", "interrogation": "Three Interrogation outcomes", "vote_fails": "Vote fails", "innocent_dies": "Innocent executed", "assassin_dies": "Assassin executed", "evidence": "Five Evidence statements", "false": "2 false", "true": "3 true", "auction_truth": "Auction: guaranteed truth", "final_flow": "How the Final works", "nominate": "3 nominations", "reveal": "Reveal", "buy": "Buy votes", "ballot": "Secret election", "victory": "Victory check", "thresholds": "Thresholds for this player count", "magnates_need": "Magnate threshold", "syndicate_needs": "Assassin + Stash", "factions": "Aristocrats / Reformers", "magnates": "Magnates", "start_here": "Start here", "current_path": "Reading mode", "skip": "Skip to rules"}}</script>
+  <script id="ui-data" type="application/json">{"ua": {"title": "Темна Рада", "subtitle": "Три раунди переговорів. Кімната, повна брехні. Усе вирішать фінальні вибори.", "player": "Гравець", "syndicate": "Синдикат", "gm": "Ведучий", "quick": "Швидка пам'ятка", "diagrams": "Схеми", "flow": "Хід гри", "choose_count": "Гравців", "setup_summary": "Склад і пороги", "player_count": "Кількість гравців", "magnate_count": "Магнатів", "contents": "Зміст", "theme_toggle": "Світла / темна тема", "five_things": "П'ять речей, які треба пам'ятати", "glossary": "Короткий словник", "print": "Друк", "round": "Раунд", "prep": "Підготовка", "final": "Фінал", "contract": "Контракт", "private": "Приватна фаза", "council": "Рада", "leaders": "Топ-3", "auction": "Аукціон", "payout": "+2 кожному живому гравцю", "minutes": "30 хв", "interrogation": "Три наслідки Допиту", "vote_fails": "Голосування не пройшло", "innocent_dies": "Страчено Невинного", "assassin_dies": "Страчено Вбивцю", "evidence": "П'ять Доказів", "false": "2 хибні", "true": "3 правдиві", "auction_truth": "Аукціон: гарантована правда", "final_flow": "Як проходить Фінал", "nominate": "3 висування", "reveal": "Розкриття", "buy": "Купівля голосів", "ballot": "Таємні вибори", "victory": "Перевірка перемоги", "thresholds": "Пороги для цієї кількості гравців", "magnates_need": "Поріг Магнатів", "syndicate_needs": "Вбивця + Криївка", "factions": "Аристократи / Реформісти", "magnates": "Магнати", "start_here": "Почніть тут", "current_path": "Що читати", "skip": "До правил"}, "en": {"title": "The Dark Council", "subtitle": "Three rounds of negotiation. One room full of lies. A final election decides everything.", "player": "Player", "syndicate": "Syndicate", "gm": "GM", "quick": "Quick reference", "diagrams": "Diagrams", "flow": "Game flow", "choose_count": "Players", "setup_summary": "Setup and thresholds", "player_count": "Player count", "magnate_count": "Magnates", "contents": "Contents", "theme_toggle": "Light / dark theme", "five_things": "Track only five things", "glossary": "Short glossary", "print": "Print", "round": "Round", "prep": "Preparation", "final": "Final", "contract": "Contract", "private": "Private phase", "council": "Council", "leaders": "Top 3", "auction": "Auction", "payout": "+2 to every living player", "minutes": "30 min", "interrogation": "Three Interrogation outcomes", "vote_fails": "Vote fails", "innocent_dies": "Innocent executed", "assassin_dies": "Assassin executed", "evidence": "Five Evidence statements", "false": "2 false", "true": "3 true", "auction_truth": "Auction: guaranteed truth", "final_flow": "How the Final works", "nominate": "3 nominations", "reveal": "Reveal", "buy": "Buy votes", "ballot": "Secret election", "victory": "Victory check", "thresholds": "Thresholds for this player count", "magnates_need": "Magnate threshold", "syndicate_needs": "Assassin + Stash", "factions": "Aristocrats / Reformers", "magnates": "Magnates", "start_here": "Start here", "current_path": "Reading mode", "skip": "Skip to rules"}}</script>
   <script id="glossary-data" type="application/json">{"ua": {"influence": {"term": "Вплив", "definition": "Фізична валюта гри: одна фішка дорівнює одному Впливу."}, "faction": {"term": "Фракція", "definition": "Політичний табір гравця: Аристократи, Реформісти або Магнати."}, "syndicate": {"term": "Синдикат", "definition": "Таємна команда з двох гравців: Вбивці та Спільника."}, "assassin": {"term": "Вбивця", "definition": "Член Синдикату, який обирає одну ціль для вбивства в кожному раунді."}, "accomplice": {"term": "Спільник", "definition": "Другий член Синдикату; після Страти Вбивці перебирає його роль."}, "stash": {"term": "Криївка", "definition": "Таємний запас Впливу Синдикату, який веде Ведучий."}, "contract": {"term": "Контракт", "definition": "Публічно оголошена прикмета жертви, яку Синдикат має вбити цього раунду."}, "bankruptcy": {"term": "Банкрутство", "definition": "Від'ємний баланс спершу поглинає майбутній дохід. Гравець, який завершує гру в мінусі, особисто не отримує перемогу Фракції."}, "intelligence": {"term": "Компромат", "definition": "Правдивий Секрет одного конкретного гравця."}, "evidence": {"term": "Доказ", "definition": "Твердження про Синдикат. У грі їх п'ять, і рівно два з них хибні."}, "interrogation": {"term": "Допит", "definition": "Платне публічне звинувачення гравця в тому, що він є чинним Вбивцею."}, "expose": {"term": "Викриття", "definition": "Публічна спроба правильно назвати Секрет іншого гравця."}, "execution": {"term": "Страта", "definition": "Смерть гравця внаслідок успішного голосування на Допиті."}, "ghost": {"term": "Привид", "definition": "Мертвий гравець, який і далі бере участь у голосуваннях та спільному питанні Привидів."}, "auction": {"term": "Аукціон", "definition": "Торги в Раунді 2 за один гарантовано правдивий Доказ."}, "motive": {"term": "Мотив", "definition": "Мала особиста Ціль, за яку гравець отримує +5 Впливу."}, "ambition": {"term": "Амбіція", "definition": "Велика особиста Ціль, за яку гравець отримує +10 Впливу."}, "reveal": {"term": "Розкриття", "definition": "Фінальне голосування, яке публічно відкриває Фракцію обраного гравця."}}, "en": {"influence": {"term": "Influence", "definition": "The game's physical currency: one chip equals one Influence."}, "faction": {"term": "Faction", "definition": "A player's political camp: Aristocrat, Reformer or Magnate."}, "syndicate": {"term": "Syndicate", "definition": "The hidden two-player team: the Assassin and Accomplice."}, "assassin": {"term": "Assassin", "definition": "The Syndicate member who chooses one assassination target each round."}, "accomplice": {"term": "Accomplice", "definition": "The second Syndicate member, who takes over if the Assassin is Executed."}, "stash": {"term": "Stash", "definition": "The Syndicate's hidden Influence reserve, tracked by the GM."}, "contract": {"term": "Contract", "definition": "A public trait describing whom the Syndicate must kill this round."}, "bankruptcy": {"term": "Bankruptcy", "definition": "A negative balance consumes future income. Ending below zero removes your personal Faction Victory."}, "intelligence": {"term": "Secret Intelligence", "definition": "The true Secret of one named player."}, "evidence": {"term": "Evidence", "definition": "A statement about the Syndicate. There are five, exactly two of them false."}, "interrogation": {"term": "Interrogation", "definition": "A paid public accusation that a player is the current Assassin."}, "expose": {"term": "Expose", "definition": "A public attempt to name another player's Secret correctly."}, "execution": {"term": "Execution", "definition": "A player's death following a successful Interrogation vote."}, "ghost": {"term": "Ghost", "definition": "A dead player who still votes and helps ask one shared private question."}, "auction": {"term": "Auction", "definition": "Round 2 bidding for one guaranteed true Evidence statement."}, "motive": {"term": "Motive", "definition": "A small personal Goal worth +5 Influence."}, "ambition": {"term": "Ambition", "definition": "A large personal Goal worth +10 Influence."}, "reveal": {"term": "Reveal", "definition": "The Final vote that publicly reveals one chosen player's Faction."}}}</script>
   <div id="term-tip" class="term-tooltip" role="tooltip" hidden></div>
   <script>(() => {
@@ -1858,10 +1951,20 @@ footer {
     const count = String(countSelect.value);
     const data = thresholds[count];
     if (!data) return;
+    root.dataset.playerCount = count;
+    document.querySelectorAll("[data-selected-player-count]").forEach((node) => {
+      node.textContent = count;
+    });
+    document.querySelectorAll("[data-threshold]").forEach((node) => {
+      node.textContent = data[node.dataset.threshold];
+    });
     document
-      .querySelectorAll(`[data-lang-panel][data-lang="${currentLanguage()}"] [data-threshold]`)
-      .forEach((node) => {
-        node.textContent = data[node.dataset.threshold];
+      .querySelectorAll('.rule-section[data-section="12"] table:first-of-type tbody tr')
+      .forEach((row) => {
+        row.classList.toggle(
+          "is-selected-count",
+          row.cells[0]?.textContent.trim() === count
+        );
       });
     localStorage.setItem("dark-council-player-count", count);
   }

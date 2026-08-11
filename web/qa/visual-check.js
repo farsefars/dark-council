@@ -34,6 +34,9 @@ async function inspect(page, language, viewport) {
     const shell = document.querySelector(".page-shell");
     const activeToc = document.querySelector(`.toc[data-lang="${lang}"]`);
     const main = document.querySelector(".main-column");
+    const firstPathButton = document.querySelector(".path-button");
+    const gameArc = document.querySelector(`.diagrams[data-lang="${lang}"] .game-arc`);
+    const setupSummary = document.querySelector(".setup-summary");
     const visibleShellChildren = [...shell.children].filter(visible);
     return {
       language: document.documentElement.dataset.lang,
@@ -51,6 +54,9 @@ async function inspect(page, language, viewport) {
         document.querySelector(`#${lang}-section-0`).compareDocumentPosition(
           document.querySelector(`#diagrams-${lang}`)
         ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      pathButtonHeight: firstPathButton.getBoundingClientRect().height,
+      gameArcColumns: getComputedStyle(gameArc).gridTemplateColumns.split(" ").length,
+      setupColumns: getComputedStyle(setupSummary).gridTemplateColumns.split(" ").length,
     };
   }, language);
 
@@ -64,6 +70,11 @@ async function inspect(page, language, viewport) {
   assert.ok(state.overflow <= 0, `${viewport.name}/${language}: horizontal overflow ${state.overflow}px`);
   if (viewport.width >= 1088) {
     assert.ok(state.mainWidth > state.tocWidth * 3, `${viewport.name}/${language}: main is not wider`);
+  }
+  if (viewport.width <= 390) {
+    assert.ok(state.pathButtonHeight >= 44, `${viewport.name}/${language}: touch target too small`);
+    assert.equal(state.gameArcColumns, 1, `${viewport.name}/${language}: game arc must be one column`);
+    assert.equal(state.setupColumns, 2, `${viewport.name}/${language}: setup summary must be two columns`);
   }
 
   const tocLinks = await page.$$eval(
@@ -198,6 +209,55 @@ async function inspectControls(page) {
   assert.equal(state.enVisible, 0);
 }
 
+async function inspectPlayerCount(page) {
+  await page.emulateMediaType("screen");
+  await page.setViewport({ width: 1440, height: 1000 });
+  await page.goto(`${pathToFileURL(pageFile).href}?lang=ua`, { waitUntil: "load" });
+
+  async function selectAndRead(count) {
+    await page.select("#player-count", String(count));
+    await page.waitForFunction(
+      (expected) => document.documentElement.dataset.playerCount === expected,
+      {},
+      String(count)
+    );
+    return page.evaluate(() => {
+      const selected = document.querySelector(
+        '.rulebook[data-lang="ua"] .rule-section[data-section="12"] tr.is-selected-count'
+      );
+      return {
+        count: document.querySelector("[data-selected-player-count]").textContent.trim(),
+        factions: document.querySelector('.setup-summary [data-threshold="factions"]').textContent.trim(),
+        magnates: document.querySelector('.setup-summary [data-threshold="magnates"]').textContent.trim(),
+        magnateThreshold: document.querySelector(
+          '.setup-summary [data-threshold="magnateThreshold"]'
+        ).textContent.trim(),
+        syndicateThreshold: document.querySelector(
+          '.setup-summary [data-threshold="syndicateThreshold"]'
+        ).textContent.trim(),
+        selectedRow: selected?.cells[0]?.textContent.trim(),
+      };
+    });
+  }
+
+  assert.deepEqual(await selectAndRead(10), {
+    count: "10",
+    factions: "4 / 4",
+    magnates: "2",
+    magnateThreshold: "16",
+    syndicateThreshold: "42",
+    selectedRow: "10",
+  });
+  assert.deepEqual(await selectAndRead(15), {
+    count: "15",
+    factions: "6 / 6",
+    magnates: "3",
+    magnateThreshold: "24",
+    syndicateThreshold: "39",
+    selectedRow: "15",
+  });
+}
+
 async function inspectTooltips(page) {
   await page.emulateMediaType("screen");
   await page.setViewport({ width: 1440, height: 1000 });
@@ -293,6 +353,8 @@ async function inspectTooltips(page) {
     }
     await inspectControls(page);
     console.log("PASS language and reading-path controls");
+    await inspectPlayerCount(page);
+    console.log("PASS player-count setup summary and GM table selection");
     await inspectTooltips(page);
     console.log("PASS tooltip hover, focus, tap, Escape and viewport clamping");
     assert.deepEqual(browserErrors, [], `Browser errors: ${browserErrors.join("\n")}`);
