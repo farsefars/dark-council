@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+node_modules/
+web/qa/screenshots/
+.DS_Store
+Thumbs.db

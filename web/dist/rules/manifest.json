@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "defaultLanguage": "uk",
+  "languages": {
+    "uk": {
+      "label": "Українська",
+      "rules": "uk.md",
+      "playerReference": "player-reference-uk.md"
+    },
+    "en": {
+      "label": "English",
+      "rules": "en.md",
+      "playerReference": "player-reference-en.md"
+    }
+  }
+}

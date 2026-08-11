@@ -1,0 +1,12 @@
+{
+  "name": "dark-council-browser-qa",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Headless Edge layout and navigation checks for the generated rules page",
+  "scripts": {
+    "test": "node visual-check.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "24.16.0"
+  }
+}
