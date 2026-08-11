@@ -13,14 +13,14 @@ Run size: 300 games per player count per chaos band,
 
 | Table model | Aristocrat | Reformer | Magnate | Syndicate | Vote exclusions | GM refusals/game |
 |---|---:|---:|---:|---:|---:|---:|
-| Clean | 48.7% | 48.0% | 40.6% | 36.2% | 14.0% | 0.00 |
-| Realistic chaos | 49.2% | 48.2% | 36.9% | 34.2% | 13.9% | 0.77 |
-| Messy chaos | 48.8% | 48.2% | 32.3% | 36.4% | 13.4% | 1.84 |
+| Clean | 47.2% | 49.6% | 41.9% | 35.8% | 14.2% | 0.00 |
+| Realistic chaos | 47.0% | 49.5% | 38.6% | 33.5% | 13.8% | 0.78 |
+| Messy chaos | 48.3% | 47.7% | 34.0% | 34.6% | 13.5% | 1.84 |
 
 ### Robustness reading
 
 - Aristocrat/Reformer results remain stable across the chaos bands.
-- Magnate wins fall from 40.6% to 32.3%. The
+- Magnate wins fall from 41.9% to 34.0%. The
   Magnate economy is substantially more vulnerable to forgotten, irrational and
   grudge-driven behaviour than the election Factions.
 - The Syndicate rate does not move monotonically with chaos; the model does not show a
@@ -28,35 +28,35 @@ Run size: 300 games per player count per chaos band,
 
 ## Eligibility-gate comparison (13 players, matched seeds)
 
-- Published gate Syndicate win rate: 36.8%
-- Gates-off Syndicate win rate: 35.2%
-- **Published gate delta:** +1.7%
-- Correct-Execution accuracy delta: +0.4%
-- Published living-voter exclusion rate: 13.8%
+- Published gate Syndicate win rate: 35.0%
+- Gates-off Syndicate win rate: 32.8%
+- **Published gate delta:** +2.2%
+- Correct-Execution accuracy delta: +0.5%
+- Published living-voter exclusion rate: 14.1%
 
 Important mechanical observation: an initiator who spends their last Influence on the
 Interrogation cost is excluded from the vote that immediately follows.
 
-The gate produces a small +1.7% Syndicate shift in this
+The gate produces a small +2.2% Syndicate shift in this
 sample, not a balance collapse. The much larger concern is participation: roughly
-13.8% of living voter opportunities are
+14.1% of living voter opportunities are
 removed.
 
 ## Debt deterrence
 
-- Honest controlled-seat win rate: 44.7%
-- Debt-squatting win rate: 43.1%
-- **Debt-squatting value:** -1.6%
-- Syndicate-member Bankruptcy incidence: 3.6%
-- Ally rescue transfers/game: 0.057
-- Influence rescued/game: 0.060
-- Debt created by: expose_hit 2062
+- Honest controlled-seat win rate: 46.9%
+- Debt-squatting win rate: 44.2%
+- **Debt-squatting value:** -2.7%
+- Syndicate-member Bankruptcy incidence: 3.0%
+- Ally rescue transfers/game: 0.068
+- Influence rescued/game: 0.070
+- Debt created by: expose_hit 2056
 
 The test asks whether debt is profitable, not whether Bankruptcy is common. Syndicate
 members already lost their personal Faction Victory, so ordinary Bankruptcy adds no
 second personal-victory consequence to them.
 
-Debt squatting is personally deterred in this model (-1.6%).
+Debt squatting is personally deterred in this model (-2.7%).
 The ability-to-pay gates also work as intended: the recorded debt is created by
 involuntary losses, not voluntary spending. Ally rescue is rare, so it does not make
 the consequence disappear.
@@ -65,36 +65,36 @@ the consequence disappear.
 
 | Strategy | Honest | Exploit | Exploit value | Syndicate delta | Applicable samples |
 |---|---:|---:|---:|---:|---:|
-| debt_squatting | 45.6% | 41.8% | -3.8% | +12.0% | 1200 |
-| syndicate_debt_immunity | 39.0% | 36.5% | -2.5% | -0.5% | 200 |
-| expose_vote_stripping | 45.6% | 43.5% | -2.1% | +3.5% | 1200 |
-| interrogation_cost_griefing | 45.6% | 39.8% | -5.8% | +3.0% | 1200 |
-| nomination_cartel | 45.6% | 46.8% | +1.3% | +0.0% | 1200 |
-| blanket_kill_tell | 39.9% | 31.2% | -8.7% | -3.0% | 138 |
-| final_dump | 49.1% | 56.0% | +6.9% | +0.0% | 739 |
-| ghost_bloc | 45.6% | 40.2% | -5.3% | +0.0% | 1200 |
-| stash_shelter | 39.0% | 43.5% | +4.5% | +1.2% | 200 |
+| debt_squatting | 42.7% | 42.7% | +0.0% | +14.0% | 1200 |
+| syndicate_debt_immunity | 30.0% | 32.5% | +2.5% | +1.0% | 200 |
+| expose_vote_stripping | 42.7% | 43.2% | +0.6% | +6.0% | 1200 |
+| interrogation_cost_griefing | 42.7% | 39.9% | -2.8% | +2.5% | 1200 |
+| nomination_cartel | 42.7% | 43.7% | +1.0% | +0.0% | 1200 |
+| blanket_kill_tell | 31.6% | 27.9% | -3.7% | -1.2% | 136 |
+| final_dump | 47.2% | 52.8% | +5.5% | +0.0% | 739 |
+| ghost_bloc | 42.7% | 37.2% | -5.4% | +0.0% | 1200 |
+| stash_shelter | 30.0% | 38.0% | +8.0% | +3.5% | 200 |
 
 Strategies at or above a +3 percentage-point edge: **final_dump, stash_shelter**.
 
 ### Adversarial reading
 
-- **Final dump** is the clearest self-serving exploit: a +6.9%
+- **Final dump** is the clearest self-serving exploit: a +5.5%
   personal edge in the
   full run. Aristocrats/Reformers have no reason to preserve Influence after buying
   votes, so cautious spending is dominated by spending everything.
 - **Stash shelter** gives controlled Syndicate seats a
-  +4.5% edge. Leaving Influence
+  +8.0% edge. Leaving Influence
   in the protected Stash is stronger than the ordinary policy's liquidity reserve.
 - **Debt squatting** hurts the controlled seats but moves the Syndicate win rate by
-  +12.0%. It is not a profitable personal exploit; it is a table-wide sabotage or
+  +14.0%. It is not a profitable personal exploit; it is a table-wide sabotage or
   collusion risk because low-buffer players become easier to silence.
 - **Syndicate debt immunity** is real in the adjudication rules but did not produce a
-  positive edge under the tested strategy (-2.5%).
+  positive edge under the tested strategy (+2.5%).
   It remains a missing consequence, not a demonstrated winning exploit.
 - **Expose vote-stripping** and **Interrogation cost griefing** also hurt the actors
-  while moving Syndicate wins by +3.5% and
-  +3.0% respectively. They are not rational
+  while moving Syndicate wins by +6.0% and
+  +2.5% respectively. They are not rational
   solo strategies, but they are plausible Syndicate-aiding or kingmaking tactics.
 
 ## Rule ambiguities surfaced

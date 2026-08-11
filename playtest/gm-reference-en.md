@@ -18,11 +18,13 @@
 | Round | Opening | Then |
 |---:|---|---|
 | 1 | Announce Hit | Private 30 min → Council → Top 3 |
-| 2 | +2 to each living player; announce Hit; Auction | Private 30 min → Council → Top 3 |
-| 3 | +2 to each living player; announce Hit | Private 30 min → Council → Final |
+| 2 | +2 to each living player; announce Hit; Auction | Private 20 min → Council → Top 3 |
+| 3 | +2 to each living player; announce Hit | Private 15 min → Council → Final |
 
 During each Private Phase: transfers are legal; Assassin submits one target; Accomplice
 may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
+
+Announce when 5 minutes and 1 minute remain in every Private Phase.
 
 ## 3. Council flow
 

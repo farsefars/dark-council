@@ -56,13 +56,13 @@ Hit -> Private Phase (30 minutes) -> Council -> Leaderboard
 
 Each living player receives a **+2 Influence stipend**.
 
-Hit -> Auction -> Private Phase (30 minutes) -> Council -> Leaderboard
+Hit -> Auction -> Private Phase (20 minutes) -> Council -> Leaderboard
 
 ### Round 3
 
 Each living player receives a **+2 Influence stipend**.
 
-Hit -> Private Phase (30 minutes) -> Council -> The Final
+Hit -> Private Phase (15 minutes) -> Council -> The Final
 
 At the start of every round, the GM publicly announces a Hit: an assassination
 order for the Syndicate. It names a trait of the victim the Syndicate must kill, never
@@ -117,6 +117,9 @@ privately, make deals, share or invent information, and transfer Influence.
 
 Influence may be transferred only during the Private Phase. All agreements are
 non-binding.
+
+The Private Phase lasts 30 minutes in Round 1, 20 minutes in Round 2, and 15 minutes
+in Round 3. The GM announces when 5 minutes and 1 minute remain.
 
 ▶ During this phase, the Assassin submits one assassination target to the GM.
 

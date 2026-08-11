@@ -15,9 +15,10 @@ personal Influence plus their Stash. More than one group can win.”
 
 ## 1:00–1:45 — The loop
 
-“Each round starts with a public Hit, then a 30-minute Private Phase, then Council.
-Rounds 1 and 2 reveal the Top 3. Living players receive +2 at the start of Rounds 2 and 3.
-Round 2 also has an Auction; I will explain it then.”
+“Each round starts with a public Hit, then a Private Phase, then Council. The Private
+Phases last 30, 20 and 15 minutes; I will warn you with 5 minutes and 1 minute
+remaining. Rounds 1 and 2 reveal the Top 3. Living players receive +2 at the start of
+Rounds 2 and 3. Round 2 also has an Auction; I will explain it then.”
 
 ## 1:45–2:30 — Private Phase and Influence
 

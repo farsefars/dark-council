@@ -239,7 +239,7 @@ def hero(language: str) -> str:
     meta = (
         ("8–15", "гравців" if language == "ua" else "players"),
         ("3", "раунди" if language == "ua" else "rounds"),
-        ("30", "хв приватної фази" if language == "ua" else "min private phase"),
+        ("30/20/15", "хв приватної фази" if language == "ua" else "min private phases"),
     )
     return (
         f'<section class="hero" {language_panel(language)}><div class="hero-inner">'
@@ -265,7 +265,11 @@ def five_things(language: str) -> str:
 
 def game_flow(language: str) -> str:
     ui = UI[language]
-    private = f'{ui["private"]} · {ui["minutes"]}'
+    private_times = {
+        1: f'{ui["private"]} · {"30 хв" if language == "ua" else "30 min"}',
+        2: f'{ui["private"]} · {"20 хв" if language == "ua" else "20 min"}',
+        3: f'{ui["private"]} · {"15 хв" if language == "ua" else "15 min"}',
+    }
     arc = [
         (ui["prep"], "", "картки" if language == "ua" else "cards"),
         (f'{ui["round"]} 1', "", f'{ui["hit"]} · {ui["private"]} · {ui["council"]} · {ui["leaders"]}'),
@@ -279,12 +283,12 @@ def game_flow(language: str) -> str:
         for title, badge, copy in arc
     )
     rounds = [
-        (f'{ui["round"]} 1', [ui["hit"], private, ui["council"], ui["leaders"]]),
+        (f'{ui["round"]} 1', [ui["hit"], private_times[1], ui["council"], ui["leaders"]]),
         (
             f'{ui["round"]} 2',
-            [ui["payout"], ui["hit"], ui["auction"], private, ui["council"], ui["leaders"]],
+            [ui["payout"], ui["hit"], ui["auction"], private_times[2], ui["council"], ui["leaders"]],
         ),
-        (f'{ui["round"]} 3', [ui["payout"], ui["hit"], private, ui["council"], ui["final"]]),
+        (f'{ui["round"]} 3', [ui["payout"], ui["hit"], private_times[3], ui["council"], ui["final"]]),
     ]
     round_html = []
     for label, steps in rounds:

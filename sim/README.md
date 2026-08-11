@@ -89,3 +89,13 @@ python -m sim.exploits
 ```
 
 Generated reports and ledgers are intentionally ignored by Git.
+
+## Satisfaction diagnostics
+
+```powershell
+python -m sim.satisfaction
+```
+
+This produces `sim/satisfaction-report.md`, covering execution accuracy by round,
+death timing, per-Goal completion, zero-agency players, wealth concentration, the
+30/20/15 pacing clock, and the tested Round 3 Ambition deadline.

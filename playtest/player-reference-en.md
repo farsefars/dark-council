@@ -11,14 +11,15 @@
 ## Game flow
 
 - **Round 1:** Hit → Private 30 min → Council → Top 3.
-- **Round 2:** living players +2 → Hit → Auction → Private → Council → Top 3.
-- **Round 3:** living players +2 → Hit → Private → Council → Final.
+- **Round 2:** living players +2 → Hit → Auction → Private 20 min → Council → Top 3.
+- **Round 3:** living players +2 → Hit → Private 15 min → Council → Final.
 
 ## Private Phase
 
 - Move around, talk, lie, bargain, and transfer Influence.
 - Influence may be transferred **only now**.
 - Deals are not binding.
+- The GM gives warnings with 5 minutes and 1 minute remaining.
 - An ally may transfer Influence to clear your debt. Received Influence repays debt
   first.
 

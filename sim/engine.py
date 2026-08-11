@@ -103,6 +103,8 @@ class Config:
     espionage_full_profile: bool = False
     commerce_partners: int = 3
     motive_deadline: int = 1      # last round in which a Motive may be claimed
+    ambition_deadline: int = 2
+    private_phase_minutes: tuple[int, int, int] = (30, 30, 30)
     # --- F7: make catching the Assassin matter ---
     bounty_mode: str = "none"     # none | all_living | prosecutor_faction
     bounty_amount: int = 3
@@ -281,6 +283,13 @@ class GameResult:
     debt_rescue_transfers: int = 0
     debt_rescued: int = 0
     debt_by_cause: dict[str, int] | None = None
+    executions_by_round: dict[int, int] | None = None
+    correct_executions_by_round: dict[int, int] | None = None
+    deaths_by_round: dict[int, int] | None = None
+    motive_completion_by_goal: dict[str, int] | None = None
+    ambition_completion_by_goal: dict[str, int] | None = None
+    zero_agency_players: int = 0
+    wealth_top_share: float = 0.0
 
     def innocent_win_rate(self) -> float:
         """Share of non-Syndicate players who personally won."""
@@ -323,6 +332,8 @@ class Game:
         self.interrogation_cost = self.cfg.interrogation_base
         self.interrogation_count = 0
         self.executions_by_round: dict[int, int] = {}
+        self.correct_executions_by_round: dict[int, int] = {}
+        self.deaths_by_round: dict[int, int] = {}
         self.used_hits: list[str] = []
         self.hit: str | None = None
         self.hits_met = 0
@@ -818,6 +829,10 @@ class Game:
         for p in living:
             others = [q for q in living if q.seat != p.seat]
             n = self.pol.conversation_count(p.knowledge, p.archetype, self.cfg)
+            minutes = self.cfg.private_phase_minutes[
+                min(self.round - 1, len(self.cfg.private_phase_minutes) - 1)
+            ]
+            n *= minutes / 30
             n = max(0, min(int(n), len(others)))
             for q in self.rng.sample(others, n):
                 p.knowledge.spoke_with.add(q.seat)
@@ -1010,6 +1025,7 @@ class Game:
                 heir = self.pol.choose_heir(victim.knowledge, heirs)
                 self.move(victim.seat, heir, victim.influence, f"{cause.lower()}_bequest")
         victim.alive = False
+        self.deaths_by_round[self.round] = self.deaths_by_round.get(self.round, 0) + 1
         self.events.append((self.game_id, self.round, cause, victim.seat, amount, victim.faction))
 
     def ghost_question(self) -> None:
@@ -1163,6 +1179,9 @@ class Game:
             self.settle_guilty_votes(guilty_voters, was_assassin)
             if was_assassin:
                 self.correct_executions += 1
+                self.correct_executions_by_round[self.round] = (
+                    self.correct_executions_by_round.get(self.round, 0) + 1
+                )
                 p.reputation += 2.0
                 for q in self.players:
                     q.knowledge.feel(p.seat, 0.6)
@@ -1307,7 +1326,7 @@ class Game:
                 if self._motive_met(p, board) and self.rng.random() < band:
                     p.motive_done = True
                     self.move(BANK, p.seat, self.cfg.motive_reward, "motive_claim")
-            if not p.ambition_done and self.round <= 2:
+            if not p.ambition_done and self.round <= self.cfg.ambition_deadline:
                 if self._ambition_met(p) and self.rng.random() < band:
                     p.ambition_done = True
                     if p.ambition == DIPLOMAT:
@@ -1578,6 +1597,28 @@ class Game:
 
         wf = getattr(self, "winning_faction", None)
         personal = self.adjudicate(wf, magnate_win, syndicate_win)
+        motive_completion = {
+            motive: sum(1 for p in self.players if p.motive == motive and p.motive_done)
+            for motive in MOTIVES
+        }
+        ambition_completion = {
+            ambition: sum(
+                1 for p in self.players if p.ambition == ambition and p.ambition_done
+            )
+            for ambition in AMBITIONS
+        }
+        zero_agency = sum(
+            1 for p in self.players
+            if not p.successful_exposes
+            and not p.initiated_interrogation
+            and not p.knowledge.traded_with
+            and not p.motive_done
+            and not p.ambition_done
+        )
+        positive = sorted(
+            (max(0, p.influence) for p in self.living()), reverse=True
+        )
+        top_share = positive[0] / sum(positive) if positive and sum(positive) else 0.0
         return GameResult(
             game_id=self.game_id, n_players=self.n, seed=self.seed,
             aristocrat_win=(wf == ARISTOCRAT), reformer_win=(wf == REFORMER),
@@ -1606,6 +1647,13 @@ class Game:
             debt_rescue_transfers=self.debt_rescue_transfers,
             debt_rescued=self.debt_rescued,
             debt_by_cause=dict(self.debt_by_cause),
+            executions_by_round=dict(self.executions_by_round),
+            correct_executions_by_round=dict(self.correct_executions_by_round),
+            deaths_by_round=dict(self.deaths_by_round),
+            motive_completion_by_goal=motive_completion,
+            ambition_completion_by_goal=ambition_completion,
+            zero_agency_players=zero_agency,
+            wealth_top_share=top_share,
         )
 
     def adjudicate(self, wf: str | None, magnate_win: bool,

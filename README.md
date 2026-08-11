@@ -56,7 +56,8 @@ python -m sim.experiments
 ```
 
 Read `sim/README.md` for the plain-language explanation, `sim/METHODOLOGY.md` for the
-testing contract, and `sim/report.md` for the latest findings.
+testing contract, `sim/report.md` for the latest exploit findings, and
+`sim/satisfaction-report.md` for the individual/group satisfaction diagnostics.
 
 ## Browser QA
 

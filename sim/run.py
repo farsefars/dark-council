@@ -115,6 +115,37 @@ def summarise(results: list) -> dict:
         return statistics.fmean(getattr(r, attr) for r in results)
 
     execs = sum(r.executions for r in results)
+    execution_by_round = {
+        rnd: sum((r.executions_by_round or {}).get(rnd, 0) for r in results)
+        for rnd in (1, 2, 3)
+    }
+    correct_by_round = {
+        rnd: sum((r.correct_executions_by_round or {}).get(rnd, 0) for r in results)
+        for rnd in (1, 2, 3)
+    }
+    deaths_by_round = {
+        rnd: statistics.fmean(
+            (r.deaths_by_round or {}).get(rnd, 0) for r in results
+        )
+        for rnd in (1, 2, 3)
+    }
+    motives = sorted({p.motive for r in results for p in r.players})
+    ambitions = sorted({p.ambition for r in results for p in r.players})
+    motive_rates = {
+        goal: (
+            sum(1 for r in results for p in r.players if p.motive == goal and p.motive_done)
+            / sum(1 for r in results for p in r.players if p.motive == goal)
+        )
+        for goal in motives
+    }
+    ambition_rates = {
+        goal: (
+            sum(1 for r in results for p in r.players
+                if p.ambition == goal and p.ambition_done)
+            / sum(1 for r in results for p in r.players if p.ambition == goal)
+        )
+        for goal in ambitions
+    }
     return {
         "games": n,
         "aristocrat": rate("aristocrat_win"),
@@ -150,6 +181,23 @@ def summarise(results: list) -> dict:
         "ambitions_claimed": mean("ambitions_claimed"),
         "execution_accuracy": (sum(r.correct_executions for r in results) / execs
                                if execs else 0.0),
+        "execution_accuracy_by_round": {
+            rnd: (correct_by_round[rnd] / execution_by_round[rnd]
+                  if execution_by_round[rnd] else 0.0)
+            for rnd in (1, 2, 3)
+        },
+        "executions_by_round": {
+            rnd: execution_by_round[rnd] / n for rnd in (1, 2, 3)
+        },
+        "deaths_by_round": deaths_by_round,
+        "motive_completion_by_goal": motive_rates,
+        "ambition_completion_by_goal": ambition_rates,
+        "zero_agency_players": mean("zero_agency_players"),
+        "zero_agency_rate": (
+            sum(r.zero_agency_players for r in results)
+            / sum(r.n_players for r in results)
+        ),
+        "wealth_top_share": mean("wealth_top_share"),
     }
 
 
