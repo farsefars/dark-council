@@ -5,7 +5,7 @@ Print the sections separately. The observer should not also be the GM.
 ## A. Pre-game comprehension check
 
 Give this after private role/Faction briefings and before Round 1. Do not coach.
-Target: **11/13 or better per player** and **90% or better table average**. Any question
+Target: **10/12 or better per player** and **90% or better table average**. Any question
 missed by more than 20% of players is a Level 1 failure.
 
 1. When may living players transfer Influence?
@@ -23,7 +23,6 @@ missed by more than 20% of players is a Level 1 failure.
 10. Name two things a Ghost may still do and one thing a Ghost may not do.
 11. In the Final, which happens first: the Bankruptcy check, nominations, or Reveal?
 12. Explain your Faction's victory condition in one sentence.
-13. Which agreement is binding, and how many Contracts are allowed in one game?
 
 ### Answer key
 
@@ -40,11 +39,10 @@ missed by more than 20% of players is a Level 1 failure.
    not hold, receive, spend, transfer Influence, or initiate an Interrogation.
 11. The GM fixes Bankruptcy first, then nominations happen, then Reveal.
 12. Compare with the player's Faction card/rules.
-13. Only a Contract registered with the GM; one per player and no more than two per game.
 
 Record only the score and missed question numbers:
 
-| Player | Score /13 | Missed questions | Needed explanation? |
+| Player | Score /12 | Missed questions | Needed explanation? |
 |---|---:|---|---|
 | | | | |
 | | | | |

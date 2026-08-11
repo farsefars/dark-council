@@ -129,7 +129,6 @@ GLOSSARY = {
         {"id": "accomplice", "term": "Спільник", "pattern": r"Спільник(?:а|у|ом|ові|и|ів|ам|ами|ах)?", "definition": "Другий член Синдикату; після Страти Вбивці перебирає його роль."},
         {"id": "stash", "term": "Криївка", "pattern": r"(?:Криївк(?:а|и|у|ою|ам|ами|ах)|Криївці)", "definition": "Таємний запас Впливу Синдикату, який веде Ведучий."},
         {"id": "hit", "term": "Замовлення", "pattern": r"Замовленн(?:я|ю|ям|ями|ях)", "definition": "На початку кожного раунду Ведучий публічно оголошує Замовлення на вбивство для Синдикату. Воно називає прикмету жертви, яку Синдикат має вбити, але ніколи не вказує на конкретного гравця."},
-        {"id": "contract", "term": "Контракт", "pattern": r"Контракт(?:у|ом|і|и|ів|ам|ами|ах)?", "definition": "Обов'язкова домовленість двох живих гравців, зареєстрована у Ведучого. Кожна сторона залишає 1 Впливу застави. Один Контракт на гравця, не більше двох за гру."},
         {"id": "bankruptcy", "term": "Банкрутство", "pattern": r"Банкрутств(?:о|а|у|ом|і)", "definition": "Від'ємний баланс до Фіналу є боргом. На початку Фіналу Ведучий оголошує Банкрутами всіх, хто досі має борг. Вони не можуть бути Кандидатами й особисто не отримують Перемогу Фракції."},
         {"id": "intelligence", "term": "Компромат", "pattern": r"Компромат(?:у|ом|і)?", "definition": "Правдивий Секрет одного конкретного гравця."},
         {"id": "evidence", "term": "Доказ", "pattern": r"Доказ(?:у|ом|і|и|ів|ам|ами|ах)?", "definition": "Твердження про Синдикат. У грі їх п'ять, і рівно два з них хибні."},
@@ -150,7 +149,6 @@ GLOSSARY = {
         {"id": "accomplice", "term": "Accomplice", "pattern": r"Accomplices?", "definition": "The second Syndicate member, who takes over if the Assassin is Executed."},
         {"id": "stash", "term": "Stash", "pattern": r"Stash", "definition": "The Syndicate's hidden Influence reserve, tracked by the GM."},
         {"id": "hit", "term": "Hit", "pattern": r"Hits?", "definition": "At the start of each round, the GM announces a Hit: an assassination order for the Syndicate. It names a trait of the required victim and never a specific player."},
-        {"id": "contract", "term": "Contract", "pattern": r"Contracts?", "definition": "A binding agreement between two living players, registered with the GM. Each party stakes 1 Influence. One Contract per player, no more than two per game."},
         {"id": "bankruptcy", "term": "Bankruptcy", "pattern": r"Bankrupt(?:cy)?", "definition": "A negative balance before the Final is debt. At the start of the Final, the GM declares every player still in debt Bankrupt. They cannot be Candidates and do not personally receive a Faction Victory."},
         {"id": "intelligence", "term": "Secret Intelligence", "pattern": r"Secret Intelligence", "definition": "The true Secret of one named player."},
         {"id": "evidence", "term": "Evidence", "pattern": r"Evidence", "definition": "A statement about the Syndicate. There are five, exactly two of them false."},
@@ -207,7 +205,6 @@ RULE_ASSERTIONS = {
         (6, r"щонайменше 2 Впливу"),
         (6, r"живі гравці.*щонайменше 1 Впливу"),
         (9, r"фіксує Банкрутство"),
-        (3, r"один Контракт за гру"),
     ],
     "en": [
         (1, r"\+2 Influence"),
@@ -234,7 +231,6 @@ RULE_ASSERTIONS = {
         (6, r"at least 2 Influence"),
         (6, r"living player.*at least 1 Influence"),
         (9, r"fixes Bankruptcy"),
-        (3, r"one Contract per game"),
     ],
 }
 

@@ -18,18 +18,10 @@
 
 - Move around, talk, lie, bargain, and transfer Influence.
 - Influence may be transferred **only now**.
-- Only a Contract registered with the GM is binding; other deals are non-binding.
+- Deals are not binding.
 - The GM gives warnings with 5 minutes and 1 minute remaining.
 - An ally may transfer Influence to clear your debt. Received Influence repays debt
   first.
-
-## Contract
-
-- Two living players approach the GM together and stake 1 Influence each.
-- One Contract per player; no more than two per game.
-- Rounds 1–2: your partner defends you with a Not Guilty vote.
-- Round 3: your partner nominates you if able and votes for you if you are a Candidate.
-- Stakes return after the Council or Final.
 
 ## Ability to Pay and Bankruptcy
 

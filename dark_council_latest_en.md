@@ -115,40 +115,15 @@ It names a trait of the victim, such as "a Magnate" or "a player in the current 
 During the Private Phase, players are allowed to move throughout the house, speak
 privately, make deals, share or invent information, and transfer Influence.
 
-Influence may be transferred only during the Private Phase. An agreement is binding
-only if it is registered as a Contract under the rules below. Every other promise and
-agreement is non-binding.
+Influence may be transferred only during the Private Phase. All agreements are
+non-binding.
 
 The Private Phase lasts 30 minutes in Round 1, 45 minutes in Round 2, and 60 minutes
 in Round 3. The GM announces when 5 minutes and 1 minute remain.
 
 ▶ During this phase, the Assassin submits one assassination target to the GM.
 
-### 3.3 Contract
-
-Two living players may sign a Contract during a Private Phase:
-
-1. Both players approach the GM together.
-2. Each gives the GM 1 Influence as a stake. Stakes are kept separately from the Bank.
-3. The GM records both parties and the Contract type.
-4. A Contract cannot be cancelled. It never permits an action that another rule
-   prohibits.
-
-Each player may sign only one Contract per game. No more than two Contracts may be
-signed during the game.
-
-The available type depends on the round:
-
-- **Rounds 1–2 — Council Defence:** if one party is accused in an Interrogation, the
-  other votes Not Guilty if eligible to vote.
-- **Round 3 — Final Support:** if a party receives a nomination right, they nominate
-  the other party if that player is an eligible Candidate; if the other party is
-  already a Candidate, they cast all their Final Election votes for that Candidate.
-
-After the relevant Council or Final Election, the GM returns each party's stake. The
-stake is also returned if the required action was impossible.
-
-### 3.4 Council
+### 3.3 Council
 
 Everyone gathers in the Council area.
 
@@ -160,7 +135,7 @@ Resolve the Council in this order:
    Interrogations.
 4. The GM closes the Council.
 
-### 3.5 Leaderboard
+### 3.4 Leaderboard
 
 At the end of Rounds 1 and 2, the GM publicly announces the names and current
 Influence totals of the Top 3 living players.
@@ -632,6 +607,5 @@ other Syndicate member.
 - [ ] Tell the Assassin and Accomplice each other's identities.
 - [ ] Announce Faction counts, Syndicate placement, and the Evidence noise budget.
 - [ ] Prepare three eligible Hits.
-- [ ] Prepare a separate stake area and a register for two Contracts.
 - [ ] Track the Interrogation cost, Stash, debts, Goals, and private Influence totals.
 - [ ] At the start of the Final, fix who is Bankrupt once.

@@ -69,7 +69,7 @@ def check_game(label: str, g: Game, res, n: int) -> None:
     a, r, m, _, _ = SCALING[n]
 
     # 1. Influence conservation.
-    total = sum(p.influence for p in g.players) + g.bank + g.stash + g.escrow
+    total = sum(p.influence for p in g.players) + g.bank + g.stash
     check("conservation", total == 0, f"{tag} sum={total}")
 
     # 2. Faction sizes (the extra seat may fall to either major faction).
@@ -418,58 +418,13 @@ def check_chaos_and_exploit_plumbing() -> None:
     for exploit in EXPLOITS:
         changed = 0
         for i in range(30):
-            exploit_cfg = (
-                recommended_config(13, binding_contracts_enabled=True)
-                if exploit == "contract_abuse" else cfg
-            )
-            base = run_game(13, 100_000 + i, exploit_cfg)
+            base = run_game(13, 100_000 + i, cfg)
             attacked = run_game(
-                13, 100_000 + i, exploit_cfg,
-                ExploitPolicies(exploit, (0, 1, 2)))
+                13, 100_000 + i, cfg, ExploitPolicies(exploit, (0, 1, 2)))
             changed += int(base.ledger != attacked.ledger
                            or base.personal_wins != attacked.personal_wins)
         check("exploit_strategy_reaches_engine", changed > 0,
               f"{exploit} changed no simulated game")
-
-
-def check_binding_contracts() -> None:
-    disabled = [
-        run_game(
-            13, 120_000 + i,
-            recommended_config(13, binding_contracts_enabled=False))
-        for i in range(30)
-    ]
-    check("contracts_disabled_by_default",
-          all(result.contracts_signed == 0 for result in disabled),
-          f"signed={sum(r.contracts_signed for r in disabled)}")
-
-    cfg = recommended_config(
-        13,
-        binding_contracts_enabled=True,
-        binding_contract_fee=1,
-        binding_contract_stake=1,
-        binding_contract_limit=2,
-        binding_contract_table_limit=3,
-        binding_contract_sign_rate=1.0,
-    )
-    for seed in range(30):
-        game = Game(13, 121_000 + seed, cfg)
-        result = game.run()
-        check("contract_cap",
-              all(p.contracts_signed <= 2 for p in game.players),
-              f"seed={seed} counts={[p.contracts_signed for p in game.players]}")
-        check("contract_table_cap", len(game.binding_contracts) <= 3,
-              f"seed={seed} contracts={len(game.binding_contracts)}")
-        check("contract_escrow_resolved", game.escrow == 0,
-              f"seed={seed} escrow={game.escrow}")
-        check("contract_conservation",
-              sum(p.influence for p in game.players)
-              + game.bank + game.stash + game.escrow == 0,
-              f"seed={seed}")
-        check("contract_metrics",
-              result.contracts_signed == len(game.binding_contracts)
-              and result.contract_fees_paid >= 0,
-              f"seed={seed}")
 
 
 # --------------------------------------------------------------------------
@@ -482,7 +437,6 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
     check_published_rule_gates()
     check_chaos_zero_equivalence()
     check_chaos_and_exploit_plumbing()
-    check_binding_contracts()
 
     # Canonical parity: these values are stated in both playable rulebooks.
     for n in counts:
@@ -510,13 +464,6 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("canonical_private_phase_clock",
               cfg.private_phase_minutes == (30, 45, 60),
               f"n={n} minutes={cfg.private_phase_minutes}")
-        check("canonical_binding_contracts",
-              cfg.binding_contracts_enabled
-              and cfg.binding_contract_fee == 0
-              and cfg.binding_contract_stake == 1
-              and cfg.binding_contract_limit == 1
-              and cfg.binding_contract_table_limit == 2,
-              f"n={n}")
 
     for n in counts:
         for label, cfg in config_matrix(n).items():

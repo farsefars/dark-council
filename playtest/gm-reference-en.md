@@ -26,19 +26,6 @@ may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
 
 Announce when 5 minutes and 1 minute remain in every Private Phase.
 
-### Contract register
-
-- No more than two Contracts per game; each player may be party to one.
-- Both parties arrive together and stake 1 Influence each, kept outside the Bank.
-- Record the parties, round and type: Council Defence or Final Support.
-- A Contract cannot be cancelled and never permits a prohibited action.
-- Return stakes after the relevant Council or Final.
-
-| # | Round | Party A | Party B | Type | Stakes returned |
-|---:|---:|---|---|---|---|
-| | | | | | |
-| | | | | | |
-
 ## 3. Council flow
 
 1. Validate kill tell against the private register.

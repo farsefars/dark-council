@@ -23,9 +23,7 @@ Rounds 2 and 3. Round 2 also has an Auction; I will explain it then.”
 ## 1:45–2:30 — Private Phase and Influence
 
 “Only during the Private Phase may you physically transfer Influence. You can lie,
-bargain, promise, and betray. Only a Contract is binding: two players approach me
-together and stake 1 Influence each. One Contract per player, no more than two per
-game.
+bargain, promise, and betray; agreements are not enforced.
 
 Negative balances are debt. Future income repays debt first, and an ally may transfer
 Influence to clear it during a Private Phase. At the start of the Final, the GM

@@ -58,8 +58,6 @@ python -m sim.experiments
 Read `sim/README.md` for the plain-language explanation, `sim/METHODOLOGY.md` for the
 testing contract, `sim/report.md` for the latest exploit findings, and
 `sim/satisfaction-report.md` for the individual/group satisfaction diagnostics.
-`sim/contract-report.md` records the fee, stake, per-player-cap and table-cap tests
-behind the published Contract configuration.
 
 ## Browser QA
 

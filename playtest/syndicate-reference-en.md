@@ -13,8 +13,6 @@ Give only to the Assassin and Accomplice.
 - **Accomplice:** may Launder up to 2 into Stash once per round.
 - **Current Assassin:** may withdraw up to 2 from Stash once per round.
 - **Inheritance:** Stash survives Promotion and is split only if both of you die.
-- **Contract:** you may sign Contracts under the normal rules. A Contract does not
-  replace your Syndicate objective or permit a prohibited action.
 - **Promotion:** if Assassin is Executed, Accomplice becomes Assassin; GM gives the
   room one true lead about the successor.
 - **Victory:** current Assassin must be alive; personal Influence + Stash must reach
