@@ -10,9 +10,9 @@
 
 ## Game flow
 
-- **Round 1:** Contract → Private 30 min → Council → Top 3.
-- **Round 2:** living players +2 → Contract → Auction → Private → Council → Top 3.
-- **Round 3:** living players +2 → Contract → Private → Council → Final.
+- **Round 1:** Hit → Private 30 min → Council → Top 3.
+- **Round 2:** living players +2 → Hit → Auction → Private → Council → Top 3.
+- **Round 3:** living players +2 → Hit → Private → Council → Final.
 
 ## Private Phase
 
@@ -33,7 +33,7 @@
 
 ## Council
 
-1. GM resolves assassination and Contract.
+1. GM resolves assassination and Hit.
 2. Ghosts ask one shared private Yes/No question.
 3. Open discussion, Expose, and Interrogations.
 

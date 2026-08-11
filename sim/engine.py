@@ -51,7 +51,7 @@ SCALING = {
     15: (6, 6, 3, 50, 30),
 }
 
-CONTRACTS = [
+HITS = [
     "HIGH_SOCIETY", "GOLDEN_GOOSE", "OLD_GUARD", "NEW_ORDER",
     "PURSE_STRINGS", "BURN_EVIDENCE", "SILENCE_ACCUSED", "UNTOUCHABLE",
 ]
@@ -62,7 +62,7 @@ class Config:
     """Every tunable number in the ruleset, so sweeps can vary one axis at a time."""
     starting_influence: int = 4
     stipend: int = 2
-    contracts_enabled: bool = True
+    hits_enabled: bool = True
     private_transfers_enabled: bool = True
     goals_enabled: bool = True
     auction_enabled: bool = True
@@ -77,8 +77,8 @@ class Config:
     interrogation_step: int = 1
     survivor_bonus: int = 3
     prosecutor_reward: int = 5
-    contract_payout: int = 3
-    contract_penalty: int = 3
+    hit_payout: int = 3
+    hit_penalty: int = 3
     launder_cap: int = 2
     kill_share: float = 0.5
     execution_share: float = 0.5
@@ -263,7 +263,7 @@ class GameResult:
     interrogations: int
     correct_executions: int
     bankruptcies: int
-    contracts_met: int
+    hits_met: int
     motives_claimed: int
     ambitions_claimed: int
     winning_faction: str | None
@@ -323,9 +323,9 @@ class Game:
         self.interrogation_cost = self.cfg.interrogation_base
         self.interrogation_count = 0
         self.executions_by_round: dict[int, int] = {}
-        self.used_contracts: list[str] = []
-        self.contract: str | None = None
-        self.contracts_met = 0
+        self.used_hits: list[str] = []
+        self.hit: str | None = None
+        self.hits_met = 0
         self.promoted = False
         self.assassinations = 0
         self.executions = 0
@@ -580,7 +580,7 @@ class Game:
             "living": [p.seat for p in self.living()],
             "round": self.round,
             "interrogation_cost": self.interrogation_cost,
-            "contract": self.contract,
+            "hit": self.hit,
             "leaderboard": self.leaderboard(),
             "n_players": self.n,
             "influence": {p.seat: p.influence for p in self.players if p.alive},
@@ -611,10 +611,10 @@ class Game:
                 self.phase = "STIPEND"
                 for p in self.living():
                     self.move(BANK, p.seat, self.cfg.stipend, "stipend")
-            if self.cfg.contracts_enabled:
-                self.select_contract()
+            if self.cfg.hits_enabled:
+                self.select_hit()
             else:
-                self.contract = None
+                self.hit = None
             if rnd == 2 and self.cfg.auction_enabled:
                 self.auction()
             self.private_phase()
@@ -625,34 +625,34 @@ class Game:
         self.check_conservation()
         return self.result()
 
-    def select_contract(self) -> None:
-        self.phase = "CONTRACT"
-        available = [c for c in CONTRACTS if c not in self.used_contracts]
+    def select_hit(self) -> None:
+        self.phase = "HIT"
+        available = [c for c in HITS if c not in self.used_hits]
         valid = [c for c in available
                  if sum(1 for p in self.living()
                         if p.seat != self.assassin_seat
                         and p.seat != self.accomplice_seat
-                        and self.contract_matches(c, p)) >= 2]
-        self.contract = self.rng.choice(valid) if valid else self.rng.choice(available)
-        self.used_contracts.append(self.contract)
-        self.events.append((self.game_id, self.round, "CONTRACT", self.contract, 0, ""))
+                        and self.hit_matches(c, p)) >= 2]
+        self.hit = self.rng.choice(valid) if valid else self.rng.choice(available)
+        self.used_hits.append(self.hit)
+        self.events.append((self.game_id, self.round, "HIT", self.hit, 0, ""))
 
-    def contract_matches(self, contract: str, victim: Player) -> bool:
-        if contract == "HIGH_SOCIETY":
+    def hit_matches(self, hit: str, victim: Player) -> bool:
+        if hit == "HIGH_SOCIETY":
             return victim.seat in self.leaderboard()
-        if contract == "GOLDEN_GOOSE":
+        if hit == "GOLDEN_GOOSE":
             return victim.influence >= 10
-        if contract == "OLD_GUARD":
+        if hit == "OLD_GUARD":
             return victim.faction == ARISTOCRAT
-        if contract == "NEW_ORDER":
+        if hit == "NEW_ORDER":
             return victim.faction == REFORMER
-        if contract == "PURSE_STRINGS":
+        if hit == "PURSE_STRINGS":
             return victim.faction == MAGNATE
-        if contract == "BURN_EVIDENCE":
+        if hit == "BURN_EVIDENCE":
             return victim.holds_evidence
-        if contract == "SILENCE_ACCUSED":
+        if hit == "SILENCE_ACCUSED":
             return victim.interrogated
-        if contract == "UNTOUCHABLE":
+        if hit == "UNTOUCHABLE":
             return not victim.interrogated and not victim.secret_exposed
         return False
 
@@ -708,7 +708,7 @@ class Game:
             if candidates:
                 target, spray = self.pol.assassin_plan(
                     assassin.knowledge, assassin.influence,
-                    [(q.seat, q.influence, self.contract_matches(self.contract, q),
+                    [(q.seat, q.influence, self.hit_matches(self.hit, q),
                       self.threat_level(q))
                      for q in candidates],
                     self.public_view(), self.cfg)
@@ -976,7 +976,7 @@ class Game:
         met = False
         if target is not None and self.players[target].alive:
             victim = self.players[target]
-            met = self.contract_matches(self.contract, victim)
+            met = self.hit_matches(self.hit, victim)
             donors = self.donor_set(target)
             self.kill(victim, to=STASH, share=self.cfg.kill_share, cause="ASSASSINATED")
             self.assassinations += 1
@@ -984,21 +984,21 @@ class Game:
             self.broadcast(lambda k, d=donors: [k.suspect(s, 1.0 / max(1, len(d)))
                                                 for s in d if s != k.seat])
             self.events.append((self.game_id, self.round, "ASSASSINATION", target,
-                                len(donors), self.contract))
-        if not self.cfg.contracts_enabled:
+                                len(donors), self.hit))
+        if not self.cfg.hits_enabled:
             return
         if met:
-            self.contracts_met += 1
-            self.move(BANK, STASH, self.cfg.contract_payout, "contract_success")
+            self.hits_met += 1
+            self.move(BANK, STASH, self.cfg.hit_payout, "hit_success")
         else:
-            penalty = self.cfg.contract_penalty
+            penalty = self.cfg.hit_penalty
             from_stash = min(self.stash, penalty)
             if from_stash:
-                self.move(STASH, BANK, from_stash, "contract_failure")
+                self.move(STASH, BANK, from_stash, "hit_failure")
             shortfall = penalty - from_stash
             a = self.players[self.assassin_seat]
             if shortfall and a.alive:
-                self.move(a.seat, BANK, shortfall, "contract_failure_personal")
+                self.move(a.seat, BANK, shortfall, "hit_failure_personal")
 
     def kill(self, victim: Player, to, share: float, cause: str) -> None:
         amount = victim.influence
@@ -1591,7 +1591,7 @@ class Game:
             interrogations=self.interrogation_count,
             correct_executions=self.correct_executions,
             bankruptcies=sum(1 for p in self.players if self.is_bankrupt(p)),
-            contracts_met=self.contracts_met,
+            hits_met=self.hits_met,
             motives_claimed=sum(1 for p in self.players if p.motive_done),
             ambitions_claimed=sum(1 for p in self.players if p.ambition_done),
             winning_faction=wf, personal_wins=personal, ledger=self.ledger,

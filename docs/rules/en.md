@@ -50,21 +50,21 @@ The game has five parts:
 
 ### Round 1
 
-Contract -> Private Phase (30 minutes) -> Council -> Leaderboard
+Hit -> Private Phase (30 minutes) -> Council -> Leaderboard
 
 ### Round 2
 
 Each living player receives a **+2 Influence stipend**.
 
-Contract -> Auction -> Private Phase (30 minutes) -> Council -> Leaderboard
+Hit -> Auction -> Private Phase (30 minutes) -> Council -> Leaderboard
 
 ### Round 3
 
 Each living player receives a **+2 Influence stipend**.
 
-Contract -> Private Phase (30 minutes) -> Council -> The Final
+Hit -> Private Phase (30 minutes) -> Council -> The Final
 
-At the start of every round, the GM publicly announces a Contract: an assassination
+At the start of every round, the GM publicly announces a Hit: an assassination
 order for the Syndicate. It names a trait of the victim the Syndicate must kill, never
 a specific player.
 
@@ -104,9 +104,9 @@ The following information is public:
 
 ## 3. The Round
 
-### 3.1 Contract
+### 3.1 Hit
 
-The GM publicly reads the round's Contract: an assassination order for the Syndicate.
+The GM publicly reads the round's Hit: an assassination order for the Syndicate.
 It names a trait of the victim, such as "a Magnate" or "a player in the current Top
 3." It never names a specific player.
 
@@ -126,7 +126,7 @@ Everyone gathers in the Council area.
 
 Resolve the Council in this order:
 
-1. The GM announces the assassination result and whether the Contract succeeded.
+1. The GM announces the assassination result and whether the Hit succeeded.
 2. Ghosts ask their question.
 3. The floor opens for accusations, negotiation, Exposing Secrets, and
    Interrogations.
@@ -272,7 +272,7 @@ Then resolve the mandatory Evidence disclosure in Section 7.
 
 ### 6.3 Auction
 
-The Auction happens at the start of Round 2, after the stipend and Contract but before
+The Auction happens at the start of Round 2, after the stipend and Hit but before
 the Private Phase.
 
 The prize is one piece of **guaranteed truthful Evidence**.
@@ -466,18 +466,18 @@ Influence in the Stash:
 - **passes intact to the promoted Accomplice** if the Assassin is Executed; and
 - is confiscated and split among the living **only if both Syndicate members are dead**.
 
-## 11.3 Contracts
+## 11.3 Hits
 
-At the start of every round, the GM publicly reads one Contract. A Contract describes
+At the start of every round, the GM publicly reads one Hit. A Hit describes
 the required victim by a trait, never by name.
 
-- **Success:** if the assassination victim meets the Contract, add 3 Influence from
+- **Success:** if the assassination victim meets the Hit, add 3 Influence from
   the Bank to the Stash.
 - **Failure:** remove 3 Influence from the Stash. If the Stash contains less than 3,
   the current Assassin pays the shortfall from their personal Influence.
 
-Killing a player who does not match the Contract still resolves the assassination, but
-the Contract fails. Submitting no valid target also fails the Contract.
+Killing a player who does not match the Hit still resolves the assassination, but
+the Hit fails. Submitting no valid target also fails the Hit.
 
 ## 11.4 Assassin: Assassinate
 
@@ -497,11 +497,11 @@ At the beginning of the Council:
 1. The GM announces the victim.
 2. Half of the victim's Influence, rounded down, enters the Stash.
 3. Resolve the rest of Death and Ghosts.
-4. The GM announces whether the Contract succeeded.
+4. The GM announces whether the Hit succeeded.
 
 If the Assassin submits no target, targets themselves or the Accomplice, names an
 already dead player, or neither Syndicate member has ever given the target any
-Influence, no one is Assassinated and the Contract fails.
+Influence, no one is Assassinated and the Hit fails.
 
 ## 11.5 Accomplice: Launder
 
@@ -553,16 +553,16 @@ Reformers receive the extra player. Do this before assigning Roles.
 Simply: **Magnates need 16 if there are two of them, or 24 if there are three. The
 Assassin needs roughly 40, a little more at small tables.**
 
-## 12.2 Contract deck
+## 12.2 Hit deck
 
-Choose one Contract per round. Do not repeat a Contract in the same game. Only use a
-Contract if at least two valid assassination targets can currently qualify.
+Choose one Hit per round. Do not repeat a Hit in the same game. Only use a
+Hit if at least two valid assassination targets can currently qualify.
 
 Eligibility is checked at the end of the Private Phase unless the card says otherwise.
-Across the three rounds, avoid repeatedly selecting Contracts that concentrate pressure
+Across the three rounds, avoid repeatedly selecting Hits that concentrate pressure
 on the same Faction.
 
-| Contract | Valid victim |
+| Hit | Valid victim |
 |---|---|
 | **High Society** | A player in the current Top 3 by Influence, as privately verified by the GM |
 | **Golden Goose** | A player holding at least 10 Influence |
@@ -573,7 +573,7 @@ on the same Faction.
 | **Silence the Accused** | A player who has previously been the target of an Interrogation |
 | **Untouchable** | A player who has never been Interrogated and whose Secret has never been correctly Exposed |
 
-For Round 1, remove any Contract that cannot yet have a valid target.
+For Round 1, remove any Hit that cannot yet have a valid target.
 
 ## 12.3 Evidence setup
 
@@ -603,6 +603,6 @@ other Syndicate member.
 - [ ] Give every player 4 Influence.
 - [ ] Tell the Assassin and Accomplice each other's identities.
 - [ ] Announce Faction counts, Syndicate placement, and the Evidence noise budget.
-- [ ] Prepare three eligible Contracts.
+- [ ] Prepare three eligible Hits.
 - [ ] Track the Interrogation cost, Stash, debts, Goals, and private Influence totals.
 - [ ] At the start of the Final, fix who is Bankrupt once.

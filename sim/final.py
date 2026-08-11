@@ -95,7 +95,7 @@ def main() -> None:
     focus = [13, 14, 15]
     axes = {
         "stipend": [1, 2, 3, 4],
-        "contract_payout": [1, 2, 3, 4, 5],
+        "hit_payout": [1, 2, 3, 4, 5],
         "launder_cap": [0, 1, 2, 3, 4],
         "kill_share": [0.25, 0.4, 0.5, 0.6],
         "expose_penalty": [2, 3, 4, 5],

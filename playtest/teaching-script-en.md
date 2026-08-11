@@ -1,6 +1,6 @@
 # The Dark Council — Six-Minute Teaching Script
 
-Use the player reference while speaking. Do not explain the Contract deck, Evidence
+Use the player reference while speaking. Do not explain the Hit deck, Evidence
 templates, full Goal list, Final tie procedures, or Syndicate operations yet.
 
 ## 0:00–1:00 — What this game is
@@ -15,7 +15,7 @@ personal Influence plus their Stash. More than one group can win.”
 
 ## 1:00–1:45 — The loop
 
-“Each round starts with a public Contract, then a 30-minute Private Phase, then Council.
+“Each round starts with a public Hit, then a 30-minute Private Phase, then Council.
 Rounds 1 and 2 reveal the Top 3. Living players receive +2 at the start of Rounds 2 and 3.
 Round 2 also has an Auction; I will explain it then.”
 

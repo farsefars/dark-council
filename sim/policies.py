@@ -167,7 +167,7 @@ def transfers(k, archetype, influence, targets, public, cfg):
 def assassin_plan(k, influence, candidates, public, cfg):
     """Pick a victim and a camouflage spray.
 
-    candidates = [(seat, influence, meets_contract, threat)]. A real Assassin removes
+    candidates = [(seat, influence, meets_hit, threat)]. A real Assassin removes
     the people who are closing in, not just the richest body in the room.
     """
     if not candidates:

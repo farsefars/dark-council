@@ -43,7 +43,7 @@ def build(n_players: int, seed: int, upto_round: int = 2) -> dict:
             g.phase = "STIPEND"
             for p in g.living():
                 g.move("BANK", p.seat, cfg.stipend, "stipend")
-        g.select_contract()
+        g.select_hit()
         if rnd == 2:
             g.auction()
         g.private_phase()

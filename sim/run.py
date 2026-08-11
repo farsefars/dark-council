@@ -46,7 +46,7 @@ CREATE TABLE sim_outcomes (game_id TEXT, n_players INT, seed INT, tier TEXT,
     magnate_total INT, magnate_threshold INT, assassin_total INT,
     assassin_threshold INT, assassin_alive INT, stash INT, circulating INT,
     deaths INT, executions INT, assassinations INT, interrogations INT,
-    correct_executions INT, bankruptcies INT, contracts_met INT,
+    correct_executions INT, bankruptcies INT, hits_met INT,
     motives_claimed INT, ambitions_claimed INT, winning_faction TEXT);
 """
 
@@ -75,7 +75,7 @@ def persist(conn: sqlite3.Connection, res, tier: str) -> None:
                   res.assassin_total, res.assassin_threshold, int(res.assassin_alive),
                   res.stash, res.circulating, res.deaths, res.executions,
                   res.assassinations, res.interrogations, res.correct_executions,
-                  res.bankruptcies, res.contracts_met, res.motives_claimed,
+                  res.bankruptcies, res.hits_met, res.motives_claimed,
                   res.ambitions_claimed, res.winning_faction or ""))
 
 
@@ -145,7 +145,7 @@ def summarise(results: list) -> dict:
         "gm_refusals": mean("gm_refusals"),
         "debt_rescue_transfers": mean("debt_rescue_transfers"),
         "debt_rescued": mean("debt_rescued"),
-        "contracts_met": mean("contracts_met"),
+        "hits_met": mean("hits_met"),
         "motives_claimed": mean("motives_claimed"),
         "ambitions_claimed": mean("ambitions_claimed"),
         "execution_accuracy": (sum(r.correct_executions for r in results) / execs
@@ -208,12 +208,12 @@ def cmd_sweep(args) -> None:
 
 def cmd_detail(args) -> None:
     stats = sweep(COUNTS, args.games)
-    print(f"{'n':>3} {'circ':>7} {'bankrupt':>9} {'contracts':>10} {'motives':>8} "
+    print(f"{'n':>3} {'circ':>7} {'bankrupt':>9} {'hits':>10} {'motives':>8} "
           f"{'ambitions':>10} {'interrog':>9} {'assassin':>9}")
     for n in COUNTS:
         s = stats[n]
         print(f"{n:>3} {s['circulating']:>7.1f} {s['bankruptcies']:>9.2f} "
-              f"{s['contracts_met']:>10.2f} {s['motives_claimed']:>8.1f} "
+              f"{s['hits_met']:>10.2f} {s['motives_claimed']:>8.1f} "
               f"{s['ambitions_claimed']:>10.1f} {s['interrogations']:>9.2f} "
               f"{s['assassinations']:>9.2f}")
 
@@ -223,7 +223,7 @@ def cmd_sensitivity(args) -> None:
     axes = {
         "magnate_threshold": [-12, -8, -4, 0, 4],
         "assassin_threshold": [0, 5, 10, 15, 20],
-        "contract_payout": [1, 2, 3, 4, 5],
+        "hit_payout": [1, 2, 3, 4, 5],
         "stipend": [1, 2, 3, 4],
         "launder_cap": [0, 1, 2, 3],
         "kill_share": [0.25, 0.4, 0.5, 0.6],

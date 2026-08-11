@@ -15,7 +15,7 @@ COUNTS = [10, 11, 12, 13, 14, 15]
 # These are removal or weakening probes, not recommendations.
 PROBES = {
     "No stipends": {"stipend": 0},
-    "No Contract system": {"contracts_enabled": False},
+    "No Hit system": {"hits_enabled": False},
     "No ordinary private transfers": {"private_transfers_enabled": False},
     "No Goal completion or payouts": {"goals_enabled": False},
     "No Auction": {"auction_enabled": False},

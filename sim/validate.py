@@ -47,7 +47,7 @@ def config_matrix(n: int) -> dict[str, Config]:
         "escalating_votes": recommended_config(
             n, vote_purchase_mode="escalating"),
         "minimal_systems": recommended_config(
-            n, contracts_enabled=False, private_transfers_enabled=False,
+            n, hits_enabled=False, private_transfers_enabled=False,
             goals_enabled=False, auction_enabled=False, expose_enabled=False,
             interrogation_enabled=False, reveal_enabled=False,
             evidence_disclosure_enabled=False, promotion_enabled=False,

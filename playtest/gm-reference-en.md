@@ -10,16 +10,16 @@
   4 Influence.
 - Collector no more than once; Vanity no more than three times.
 - Publicly announce Faction counts, Syndicate placement, and the five/two Evidence budget.
-- Prepare three eligible non-repeating Contracts.
+- Prepare three eligible non-repeating Hits.
 - Prepare the private Influence/debt sheet, qualifying-transfer register, and Stash ledger.
 
 ## 2. Round flow
 
 | Round | Opening | Then |
 |---:|---|---|
-| 1 | Announce Contract | Private 30 min → Council → Top 3 |
-| 2 | +2 to each living player; announce Contract; Auction | Private 30 min → Council → Top 3 |
-| 3 | +2 to each living player; announce Contract | Private 30 min → Council → Final |
+| 1 | Announce Hit | Private 30 min → Council → Top 3 |
+| 2 | +2 to each living player; announce Hit; Auction | Private 30 min → Council → Top 3 |
+| 3 | +2 to each living player; announce Hit | Private 30 min → Council → Final |
 
 During each Private Phase: transfers are legal; Assassin submits one target; Accomplice
 may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
@@ -27,7 +27,7 @@ may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
 ## 3. Council flow
 
 1. Validate kill tell against the private register.
-2. Resolve assassination, death split/bequest, Contract success/failure.
+2. Resolve assassination, death split/bequest, Hit success/failure.
 3. Ghosts agree on one Yes/No question in 60 seconds; answer privately.
 4. Open accusations, Expose, and Interrogations.
 5. After every Execution: announce only whether the victim was current Assassin;
@@ -71,7 +71,7 @@ may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
 After private interviews, narrate the complete story:
 
 1. original Assassin and Accomplice;
-2. each assassination target, qualifying payment, and Contract result;
+2. each assassination target, qualifying payment, and Hit result;
 3. Stash deposits/withdrawals and succession;
 4. which Evidence was true/false;
 5. key Secrets and completed Goals;

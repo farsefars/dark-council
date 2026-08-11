@@ -157,12 +157,24 @@ class BuildTests(unittest.TestCase):
         self.assertIn("Живий гравець із меншим балансом не подає голосу", ua)
         self.assertIn("A living player with less does not cast a vote", en)
 
-    def test_contract_tooltip_matches_public_rule(self) -> None:
-        ua_contract = next(
-            entry["definition"] for entry in build.GLOSSARY["ua"] if entry["id"] == "contract"
+    def test_hit_tooltip_matches_public_rule(self) -> None:
+        ua_hit = next(
+            entry["definition"] for entry in build.GLOSSARY["ua"] if entry["id"] == "hit"
         )
-        self.assertIn("замовлення на вбивство для Синдикату", ua_contract)
-        self.assertIn("ніколи не вказує на конкретного гравця", ua_contract)
+        self.assertIn("Замовлення на вбивство для Синдикату", ua_hit)
+        self.assertIn("ніколи не вказує на конкретного гравця", ua_hit)
+        self.assertEqual("Замовлення", next(
+            entry["term"] for entry in build.GLOSSARY["ua"] if entry["id"] == "hit"
+        ))
+        self.assertEqual("Hit", next(
+            entry["term"] for entry in build.GLOSSARY["en"] if entry["id"] == "hit"
+        ))
+
+    def test_reserved_contract_term_is_not_used_for_hit(self) -> None:
+        self.assertNotRegex(self.markdowns["ua"], r"\bКонтракт")
+        self.assertNotRegex(self.markdowns["en"], r"\bContracts?\b")
+        self.assertIn("### 3.1 Замовлення", self.markdowns["ua"])
+        self.assertIn("### 3.1 Hit", self.markdowns["en"])
 
     def test_rulebook_excludes_pruned_editorial_prose(self) -> None:
         retired = (

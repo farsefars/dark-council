@@ -268,9 +268,9 @@ def game_flow(language: str) -> str:
     private = f'{ui["private"]} · {ui["minutes"]}'
     arc = [
         (ui["prep"], "", "картки" if language == "ua" else "cards"),
-        (f'{ui["round"]} 1', "", f'{ui["contract"]} · {ui["private"]} · {ui["council"]} · {ui["leaders"]}'),
-        (f'{ui["round"]} 2', ui["payout"], f'{ui["contract"]} · {ui["auction"]} · {ui["private"]} · {ui["council"]} · {ui["leaders"]}'),
-        (f'{ui["round"]} 3', ui["payout"], f'{ui["contract"]} · {ui["private"]} · {ui["council"]}'),
+        (f'{ui["round"]} 1', "", f'{ui["hit"]} · {ui["private"]} · {ui["council"]} · {ui["leaders"]}'),
+        (f'{ui["round"]} 2', ui["payout"], f'{ui["hit"]} · {ui["auction"]} · {ui["private"]} · {ui["council"]} · {ui["leaders"]}'),
+        (f'{ui["round"]} 3', ui["payout"], f'{ui["hit"]} · {ui["private"]} · {ui["council"]}'),
         (ui["final"], "", f'{ui["nominate"]} · {ui["reveal"]} · {ui["ballot"]}'),
     ]
     arc_html = "".join(
@@ -279,12 +279,12 @@ def game_flow(language: str) -> str:
         for title, badge, copy in arc
     )
     rounds = [
-        (f'{ui["round"]} 1', [ui["contract"], private, ui["council"], ui["leaders"]]),
+        (f'{ui["round"]} 1', [ui["hit"], private, ui["council"], ui["leaders"]]),
         (
             f'{ui["round"]} 2',
-            [ui["payout"], ui["contract"], ui["auction"], private, ui["council"], ui["leaders"]],
+            [ui["payout"], ui["hit"], ui["auction"], private, ui["council"], ui["leaders"]],
         ),
-        (f'{ui["round"]} 3', [ui["payout"], ui["contract"], private, ui["council"], ui["final"]]),
+        (f'{ui["round"]} 3', [ui["payout"], ui["hit"], private, ui["council"], ui["final"]]),
     ]
     round_html = []
     for label, steps in rounds:
@@ -315,9 +315,9 @@ def council_visual(language: str) -> str:
         for css, title, amount, copy in outcomes
     )
     order = (
-        ["Вбивство + Контракт", "Питання Привидів", "Обговорення / Викриття / Допит", "Кінець Ради"]
+        ["Вбивство + Замовлення", "Питання Привидів", "Обговорення / Викриття / Допит", "Кінець Ради"]
         if language == "ua"
-        else ["Assassination + Contract", "Ghost question", "Discussion / Expose / Interrogation", "Council closes"]
+        else ["Assassination + Hit", "Ghost question", "Discussion / Expose / Interrogation", "Council closes"]
     )
     sequence = '<span class="arrow">→</span>'.join(
         f"<span>{html.escape(step)}</span>" for step in order

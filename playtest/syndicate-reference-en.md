@@ -7,7 +7,7 @@ Give only to the Assassin and Accomplice.
 - **Assassin:** attempt one assassination each round during the Private Phase.
 - **Payment tell:** either member must have physically given the victim at least
   1 Influence at any earlier point in the game.
-- **Contract:** success adds 3 to Stash; failure removes 3, and the Assassin pays
+- **Hit:** success adds 3 to Stash; failure removes 3, and the Assassin pays
   any shortfall.
 - **Death income:** half the victim's positive Influence, rounded down, enters Stash.
 - **Accomplice:** may Launder up to 2 into Stash once per round.
@@ -19,4 +19,4 @@ Give only to the Assassin and Accomplice.
   the player-count threshold. You win together.
 
 Invalid target, no qualifying payment, self/Accomplice/dead target, or no submitted
-target: no assassination; Contract fails.
+target: no assassination; Hit fails.
