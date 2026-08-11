@@ -24,8 +24,8 @@ Bankruptcy fixed at the start of the Final and Syndicate membership **make a pla
 personally ineligible for a Faction Victory**. The rest of that player's Faction
 remains eligible to win.
 
-Catching the Assassin pays: everyone who voted Guilty on a real Assassin is rewarded,
-and the room learns a true lead on whoever replaces them.
+If the real Assassin is Executed, everyone who voted Guilty gains +5 Influence, and
+the GM announces a true lead about the surviving Syndicate member.
 
 ### What should I read?
 
@@ -109,8 +109,6 @@ The following information is public:
 The GM publicly reads the round's Contract: an assassination order for the Syndicate.
 It names a trait of the victim, such as "a Magnate" or "a player in the current Top
 3." It never names a specific player.
-
-Everyone knows the Contract. Only the Syndicate knows who intends to fulfil it.
 
 ### 3.2 Private Phase
 
@@ -239,8 +237,8 @@ Publicly name a player and guess their Secret.
 - **Correct:** the target loses 4 Influence; you gain 1 Influence.
 - **Incorrect:** you lose 2 Influence.
 
-**Each Secret can only be Exposed once.** Once a Secret has been correctly Exposed it
-is public knowledge, and no one may Expose it again.
+**Each Secret can be correctly Exposed only once.** It then becomes public knowledge
+and is no longer a valid Expose target.
 
 Any Influence lost but not awarded to another player goes to the Bank. The GM confirms
 only whether the guess was correct.
@@ -265,15 +263,12 @@ Interrogation costs 1 more than the previous one.
 | The vote passes; the accused is not the Assassin | The accused is Executed. The initiator's cost is not refunded and there is no reward. Everyone who voted Guilty loses **1 Influence**. |
 | The vote passes; the accused is the Assassin | The accused is Executed. The initiator's cost is refunded and the initiator gains +5 Influence. Everyone who voted Guilty gains **+5 Influence**. |
 
-Being right about the Assassin pays; being part of a mob does not. Every living voter
-has already shown enough Influence to pay the wrongful-Execution penalty. Ghosts vote
-without the 1-Influence requirement and neither gain nor lose Influence.
+Ghosts neither gain nor lose Influence for their vote.
 
 After an Execution, the GM publicly states only whether the executed player was the
 current Assassin.
 
-Every Evidence holder must then read their Evidence statement aloud exactly as it was
-given to them. This includes Ghosts and players who have disclosed it before.
+Then resolve the mandatory Evidence disclosure in Section 7.
 
 ### 6.3 Auction
 
@@ -362,14 +357,7 @@ Each nomination must create a different Candidate. If players are tied for a
 nominating position, all players make a single public vote among the tied contenders to
 decide who receives the nomination right. The GM resolves another tie randomly.
 
-Three Candidates rather than two matters: with only two, both could come from the same
-Faction, and a whole Faction would be locked out before a vote was cast.
-
 ### 9.2 Reveal
-
-Now that the Candidates are known, the room has one Reveal to spend — and a real choice
-about what it most wants to know. Unmask a Candidate to learn who the election actually
-serves, or unmask a suspect to hunt the Syndicate.
 
 1. Every player, including Ghosts, privately gives the GM the name of one player whose
    Faction they want revealed. It may be a Candidate or anyone else.
@@ -478,10 +466,6 @@ Influence in the Stash:
 - **passes intact to the promoted Accomplice** if the Assassin is Executed; and
 - is confiscated and split among the living **only if both Syndicate members are dead**.
 
-The Stash is the Syndicate's inheritance. Executing the Assassin does not touch it, so
-the successor takes over a working operation — which is exactly why Laundering early is
-worth doing.
-
 ## 11.3 Contracts
 
 At the start of every round, the GM publicly reads one Contract. A Contract describes
@@ -524,13 +508,7 @@ Influence, no one is Assassinated and the Contract fails.
 Once per round during the Private Phase, the Accomplice may secretly give the GM up to
 2 personal Influence. Add it to the Stash.
 
-**The Stash is two-way.** Once per round the current Assassin may also take up to
-2 Influence **out** of the Stash to spend. Stash Influence counts toward victory but
-cannot buy anything, so withdrawing trades victory progress for live spending power —
-bribes, Auction bids, votes — and Laundering converts it back.
-
-Because the Stash survives the Assassin's execution, Laundering is the Syndicate's
-insurance policy: it turns spending power now into wealth that outlives your partner.
+Once per round, the current Assassin may withdraw up to 2 Influence from the Stash.
 
 ## 11.6 Promotion
 
@@ -543,16 +521,14 @@ The new Assassin:
 - inherits the Stash **in full** and the Syndicate Victory condition; and
 - keeps their original Faction, Motive, Ambition, Secret, and Evidence.
 
-**The room earns a lead.** When an Assassin is Executed, the GM immediately announces
-one **true** statement about the surviving Syndicate member — their Motive, Ambition,
-Secret, or Starting Advantage. This statement is always truthful and does not count
-toward the five Evidence pieces.
+When an Assassin is Executed, the GM immediately announces one **true** statement
+about the surviving Syndicate member — their Motive, Ambition, Secret, or Starting
+Advantage. This statement does not count toward the five Evidence pieces.
 
 The original Assassin becomes a Ghost and now shares the Accomplice's objective: they
 win if the new Assassin wins.
 
-Existing Evidence does not change. Because Evidence describes either Syndicate member,
-it remains relevant after Promotion.
+Existing Evidence does not change after Promotion.
 
 ---
 

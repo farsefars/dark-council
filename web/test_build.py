@@ -164,6 +164,23 @@ class BuildTests(unittest.TestCase):
         self.assertIn("замовлення на вбивство для Синдикату", ua_contract)
         self.assertIn("ніколи не вказує на конкретного гравця", ua_contract)
 
+    def test_rulebook_excludes_pruned_editorial_prose(self) -> None:
+        retired = (
+            "Лише Синдикат знає, хто має намір його виконати",
+            "Only the Syndicate knows who intends to fulfil it",
+            "Троє Кандидатів замість двох мають значення",
+            "Three Candidates rather than two matters",
+            "Криївка — це спадок Синдикату",
+            "The Stash is the Syndicate's inheritance",
+            "страховий поліс Синдикату",
+            "Syndicate's insurance policy",
+            "кімната має одне Розкриття — і справжній вибір",
+            "room has one Reveal to spend — and a real choice",
+        )
+        combined = self.markdowns["ua"] + self.markdowns["en"]
+        for phrase in retired:
+            self.assertNotIn(phrase, combined)
+
     def test_responsive_print_and_motion_modes_exist(self) -> None:
         css = (Path(build.HERE) / "theme.css").read_text(encoding="utf-8")
         self.assertIn("@media print", css)
