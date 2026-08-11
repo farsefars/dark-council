@@ -194,11 +194,11 @@ class BuildTests(unittest.TestCase):
             self.assertNotIn(phrase, combined)
 
     def test_private_phase_clock_is_explicit(self) -> None:
-        self.assertIn("30 хвилин у Раунді 1, 20 хвилин у Раунді 2", self.markdowns["ua"])
-        self.assertIn("15 хвилин у Раунді 3", self.markdowns["ua"])
+        self.assertIn("30 хвилин у Раунді 1, 45 хвилин у Раунді 2", self.markdowns["ua"])
+        self.assertIn("60 хвилин у Раунді 3", self.markdowns["ua"])
         self.assertIn("залишається 5 хвилин і 1 хвилина", self.markdowns["ua"])
-        self.assertIn("30 minutes in Round 1, 20 minutes in Round 2", self.markdowns["en"])
-        self.assertIn("15 minutes\nin Round 3", self.markdowns["en"])
+        self.assertIn("30 minutes in Round 1, 45 minutes in Round 2", self.markdowns["en"])
+        self.assertIn("60 minutes\nin Round 3", self.markdowns["en"])
         self.assertIn("5 minutes and 1 minute remain", self.markdowns["en"])
 
     def test_responsive_print_and_motion_modes_exist(self) -> None:

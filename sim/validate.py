@@ -462,7 +462,7 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("canonical_debt_rescue", cfg.debt_rescue_enabled,
               f"n={n}")
         check("canonical_private_phase_clock",
-              cfg.private_phase_minutes == (30, 20, 15),
+              cfg.private_phase_minutes == (30, 45, 60),
               f"n={n} minutes={cfg.private_phase_minutes}")
 
     for n in counts:

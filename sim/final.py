@@ -39,7 +39,7 @@ def recommended_config(n: int, **overrides) -> Config:
                 reveal_after_nomination=True,
                 magnate_threshold=MAGNATE_BY_COUNT[magnates],
                 assassin_threshold=ASSASSIN_BY_PLAYERS[n],
-                private_phase_minutes=(30, 20, 15),
+                private_phase_minutes=(30, 45, 60),
                 **GOALS_V2, **F7_FIX, **PERSONA_FIXES)
     base.update(overrides)
     return Config(**base)

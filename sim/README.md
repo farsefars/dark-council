@@ -98,4 +98,4 @@ python -m sim.satisfaction
 
 This produces `sim/satisfaction-report.md`, covering execution accuracy by round,
 death timing, per-Goal completion, zero-agency players, wealth concentration, the
-30/20/15 pacing clock, and the tested Round 3 Ambition deadline.
+30/45/60 social-phase schedule, and the tested Round 3 Ambition deadline.

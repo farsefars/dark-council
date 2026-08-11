@@ -183,8 +183,8 @@ RULE_ASSERTIONS = {
     "ua": [
         (1, r"\+2 Впливу"),
         (1, r"30 хвилин"),
-        (1, r"20 хвилин"),
-        (1, r"15 хвилин"),
+        (1, r"45 хвилин"),
+        (1, r"60 хвилин"),
         (3, r"залишається 5 хвилин і 1 хвилина"),
         (2, r"4 стартові фішки"),
         (6, r"перший Допит.*4 Впливу"),
@@ -209,8 +209,8 @@ RULE_ASSERTIONS = {
     "en": [
         (1, r"\+2 Influence"),
         (1, r"30 minutes"),
-        (1, r"20 minutes"),
-        (1, r"15 minutes"),
+        (1, r"45 minutes"),
+        (1, r"60 minutes"),
         (3, r"5 minutes and 1 minute remain"),
         (2, r"4 starting Influence"),
         (6, r"first Interrogation.*4 Influence"),

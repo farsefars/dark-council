@@ -52,9 +52,9 @@ state-changing personal action.
 | Variant | Ambitions/game | Zero-agency | Richest share | Syndicate |
 |---|---:|---:|---:|---:|
 | Prior 30/30/30, deadline R2 | 3.39 | 0.8% | 35.6% | 35.4% |
-| Published 30/20/15, deadline R2 | 3.41 | 0.8% | 35.2% | 35.2% |
+| Published 30/45/60, deadline R2 | 3.49 | 0.8% | 35.4% | 35.4% |
 | 30/30/30, deadline R3 | 4.61 | 0.7% | 34.2% | 40.0% |
-| Shrinking + deadline R3 | 4.62 | 0.7% | 33.9% | 39.5% |
+| Extended phases + deadline R3 | 4.64 | 0.7% | 34.1% | 39.6% |
 
 ## Interpretation
 
@@ -64,16 +64,17 @@ state-changing personal action.
 3. **Goal vacuum:** extending the Ambition deadline changes completion from
    3.39 to
    4.61 per game.
-4. **Pacing:** shrinking phases changes zero-agency from
+4. **Longer social time:** 30/45/60 phases change zero-agency from
    0.8% to
-   0.8%. The simulator can test lost interaction
-   opportunities, but not whether the shorter phase feels energising.
+   0.8%. The simulator can model more
+   conversation opportunities, but not whether the longer phase feels necessary or slow.
 
 ## Recommendation
 
-1. **Pacing clock adopted:** 30/20/15-minute Private Phases with 5-minute and
-   1-minute warnings. The mechanical results are effectively neutral. The next live
-   test must measure whether this creates urgency without making players feel rushed.
+1. **Extended social phases:** 30/45/60-minute Private Phases with 5-minute and
+   1-minute warnings. This reflects the observed need for more interaction as the
+   15-player information network grows denser. The next live test must measure whether
+   the added time produces more useful conversations rather than repetition.
 2. **Do not simply extend Ambitions to Round 3.** It raises Ambition completion by
    1.22
    per game but also raises the Syndicate rate from

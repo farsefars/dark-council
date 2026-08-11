@@ -239,7 +239,7 @@ def hero(language: str) -> str:
     meta = (
         ("8–15", "гравців" if language == "ua" else "players"),
         ("3", "раунди" if language == "ua" else "rounds"),
-        ("30/20/15", "хв приватної фази" if language == "ua" else "min private phases"),
+        ("30/45/60", "хв приватної фази" if language == "ua" else "min private phases"),
     )
     return (
         f'<section class="hero" {language_panel(language)}><div class="hero-inner">'
@@ -267,8 +267,8 @@ def game_flow(language: str) -> str:
     ui = UI[language]
     private_times = {
         1: f'{ui["private"]} · {"30 хв" if language == "ua" else "30 min"}',
-        2: f'{ui["private"]} · {"20 хв" if language == "ua" else "20 min"}',
-        3: f'{ui["private"]} · {"15 хв" if language == "ua" else "15 min"}',
+        2: f'{ui["private"]} · {"45 хв" if language == "ua" else "45 min"}',
+        3: f'{ui["private"]} · {"60 хв" if language == "ua" else "60 min"}',
     }
     arc = [
         (ui["prep"], "", "картки" if language == "ua" else "cards"),

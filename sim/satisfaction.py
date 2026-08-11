@@ -62,7 +62,7 @@ def weighted_goal_rates(by_count: dict, key: str) -> dict[str, float]:
 
 def build_report(data: dict) -> str:
     base = data["baseline"]
-    shrink = data["shrinking_phases"]
+    extended_phases = data["extended_phases"]
     extended = data["ambition_to_round3"]
     both = data["combined"]
     accuracy = {
@@ -86,13 +86,13 @@ def build_report(data: dict) -> str:
         f"| Prior 30/30/30, deadline R2 | {average(base, 'ambitions_claimed'):.2f} | "
         f"{average(base, 'zero_agency_rate'):.1%} | {average(base, 'wealth_top_share'):.1%} | "
         f"{statistics.fmean(r['syndicate']['rate'] for r in base.values()):.1%} |",
-        f"| Published 30/20/15, deadline R2 | {average(shrink, 'ambitions_claimed'):.2f} | "
-        f"{average(shrink, 'zero_agency_rate'):.1%} | {average(shrink, 'wealth_top_share'):.1%} | "
-        f"{statistics.fmean(r['syndicate']['rate'] for r in shrink.values()):.1%} |",
+        f"| Published 30/45/60, deadline R2 | {average(extended_phases, 'ambitions_claimed'):.2f} | "
+        f"{average(extended_phases, 'zero_agency_rate'):.1%} | {average(extended_phases, 'wealth_top_share'):.1%} | "
+        f"{statistics.fmean(r['syndicate']['rate'] for r in extended_phases.values()):.1%} |",
         f"| 30/30/30, deadline R3 | {average(extended, 'ambitions_claimed'):.2f} | "
         f"{average(extended, 'zero_agency_rate'):.1%} | {average(extended, 'wealth_top_share'):.1%} | "
         f"{statistics.fmean(r['syndicate']['rate'] for r in extended.values()):.1%} |",
-        f"| Shrinking + deadline R3 | {average(both, 'ambitions_claimed'):.2f} | "
+        f"| Extended phases + deadline R3 | {average(both, 'ambitions_claimed'):.2f} | "
         f"{average(both, 'zero_agency_rate'):.1%} | {average(both, 'wealth_top_share'):.1%} | "
         f"{statistics.fmean(r['syndicate']['rate'] for r in both.values()):.1%} |",
     ])
@@ -156,16 +156,17 @@ state-changing personal action.
 3. **Goal vacuum:** extending the Ambition deadline changes completion from
    {average(base, 'ambitions_claimed'):.2f} to
    {average(extended, 'ambitions_claimed'):.2f} per game.
-4. **Pacing:** shrinking phases changes zero-agency from
+4. **Longer social time:** 30/45/60 phases change zero-agency from
    {average(base, 'zero_agency_rate'):.1%} to
-   {average(shrink, 'zero_agency_rate'):.1%}. The simulator can test lost interaction
-   opportunities, but not whether the shorter phase feels energising.
+   {average(extended_phases, 'zero_agency_rate'):.1%}. The simulator can model more
+   conversation opportunities, but not whether the longer phase feels necessary or slow.
 
 ## Recommendation
 
-1. **Pacing clock adopted:** 30/20/15-minute Private Phases with 5-minute and
-   1-minute warnings. The mechanical results are effectively neutral. The next live
-   test must measure whether this creates urgency without making players feel rushed.
+1. **Extended social phases:** 30/45/60-minute Private Phases with 5-minute and
+   1-minute warnings. This reflects the observed need for more interaction as the
+   15-player information network grows denser. The next live test must measure whether
+   the added time produces more useful conversations rather than repetition.
 2. **Do not simply extend Ambitions to Round 3.** It raises Ambition completion by
    {average(extended, 'ambitions_claimed') - average(base, 'ambitions_claimed'):.2f}
    per game but also raises the Syndicate rate from
@@ -201,13 +202,13 @@ def main() -> None:
     data = {
         "games_per_count": args.games,
         "baseline": run_variant(args.games, seed0=seed),
-        "shrinking_phases": run_variant(
-            args.games, seed0=seed, private_phase_minutes=(30, 20, 15)),
+        "extended_phases": run_variant(
+            args.games, seed0=seed, private_phase_minutes=(30, 45, 60)),
         "ambition_to_round3": run_variant(
             args.games, seed0=seed, ambition_deadline=3),
         "combined": run_variant(
             args.games, seed0=seed,
-            private_phase_minutes=(30, 20, 15), ambition_deadline=3),
+            private_phase_minutes=(30, 45, 60), ambition_deadline=3),
     }
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "satisfaction-results.json").write_text(

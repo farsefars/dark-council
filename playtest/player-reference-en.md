@@ -11,8 +11,8 @@
 ## Game flow
 
 - **Round 1:** Hit → Private 30 min → Council → Top 3.
-- **Round 2:** living players +2 → Hit → Auction → Private 20 min → Council → Top 3.
-- **Round 3:** living players +2 → Hit → Private 15 min → Council → Final.
+- **Round 2:** living players +2 → Hit → Auction → Private 45 min → Council → Top 3.
+- **Round 3:** living players +2 → Hit → Private 60 min → Council → Final.
 
 ## Private Phase
 
