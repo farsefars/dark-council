@@ -3,15 +3,10 @@
 Bilingual rules and a generated consumer-facing website for **The Dark Council /
 Темна Рада**.
 
-**Intended Pages URL:**
-<https://vibadarl_microsoft.github.io/personalproject_darkcouncil/>
+**Live site:** <https://farsefars.github.io/dark-council/>
 
-**Intended rules endpoint:**
-<https://vibadarl_microsoft.github.io/personalproject_darkcouncil/rules/manifest.json>
-
-> GitHub Pages is not currently active. This Enterprise Managed User cannot create a
-> public repository, and the current GitHub plan does not support Pages for this
-> private repository. The complete deployment-ready site is committed under `docs/`.
+**Rules endpoint:**
+<https://farsefars.github.io/dark-council/rules/manifest.json>
 
 ## Source of truth
 
@@ -44,21 +39,11 @@ The same build publishes static, cache-friendly rule endpoints:
    ```
 
 3. Commit the Markdown changes and regenerated `web/dist/` and `docs/` outputs.
-4. Push to `main`. A Pages-capable repository can serve the updated `docs/`
-   directory directly.
+4. Push to `main`. GitHub Pages serves the updated `docs/` directory.
 
 The generator has no Python package dependencies. It validates section parity,
 player-count thresholds, numeric rules, translation keys, Ukrainian copy guards, and
 glossary annotation.
-
-## Enable hosting
-
-The repository is already arranged for branch-based GitHub Pages (`main` / `docs`).
-To make it public, either:
-
-1. move/fork it to a GitHub account that permits public repositories, then select
-   **Settings → Pages → Deploy from a branch → main / docs**; or
-2. enable private-repository Pages for this managed account's plan.
 
 ## Browser QA
 
