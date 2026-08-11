@@ -24,21 +24,28 @@ Round 2 also has an Auction; I will explain it then.”
 “Only during the Private Phase may you physically transfer Influence. You can lie,
 bargain, promise, and betray; agreements are not enforced.
 
-Negative balances are real. Future income repays them first. If you finish negative,
-you cannot be a Candidate and do not personally share your Faction's victory.”
+Negative balances are debt. Future income repays debt first, and an ally may transfer
+Influence to clear it during a Private Phase. At the start of the Final, the GM
+declares every player still in debt Bankrupt. They cannot be Candidates and do not
+personally receive a Faction Victory.
+
+A voluntary action is allowed only if you can pay its largest possible penalty.
+Exposing requires 2 Influence; participating in an Interrogation vote requires 1.
+Ghosts vote without this requirement.”
 
 ## 2:30–3:45 — Council
 
 “Council begins with the assassination result and the Ghost question. Then the floor
 opens.
 
-To Expose, name a player and Secret: right means they lose 4 and you gain 1; wrong
-means you lose 2. A Secret scores only once.
+To Expose, you must first have at least 2 Influence. Name a player and Secret: right
+means they lose 4 and you gain 1; wrong means you lose 2. A Secret scores only once.
 
 An Interrogation accuses the current Assassin. Cost starts at 4 and rises by 1.
-Strict majority Executes. Failed vote gives the accused +3. Wrong Execution costs each
-living Guilty voter 1. Catching the Assassin rewards the initiator and each living
-Guilty voter with 5. The outcome table stays visible.”
+Every Ghost and every living player with at least 1 Influence votes. A strict
+majority Executes. A failed vote gives the accused +3. If an Innocent is Executed,
+every living Guilty voter loses 1. If the Assassin is Executed, the initiator and
+every living Guilty voter gain 5. The outcome table stays visible.”
 
 ## 3:45–4:30 — Information
 

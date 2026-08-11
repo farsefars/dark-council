@@ -347,7 +347,11 @@ def economy_visual(language: str) -> str:
             ("4, далі +1", "Почати Допит", spend),
             ("1 / 3", "Додатковий голос за Розкриття / на Фінальних Виборах", spend),
         ]
-        warning = "Передавати Вплив іншим гравцям можна лише під час Приватної фази."
+        warning = (
+            "Добровільна дія дозволена лише за наявності Впливу на найбільший "
+            "можливий штраф: 2 для Викриття, 1 для голосування на Допиті. "
+            "Передавати Вплив можна лише під час Приватної фази."
+        )
     else:
         title = "Influence: what comes in and goes out"
         income = "Gain"
@@ -364,7 +368,11 @@ def economy_visual(language: str) -> str:
             ("4, then +1", "Initiate an Interrogation", spend),
             ("1 / 3", "Extra Reveal vote / Final vote", spend),
         ]
-        warning = "You may transfer Influence to other players only during the Private Phase."
+        warning = (
+            "A voluntary action requires enough Influence for its largest possible "
+            "penalty: 2 to Expose, 1 to vote in an Interrogation. Influence may be "
+            "transferred only during the Private Phase."
+        )
     entries = "".join(
         f'<div class="economy-entry {"gain" if group == income else "cost"}">'
         f'<span class="economy-value">{html.escape(value)}</span><span class="economy-copy">'

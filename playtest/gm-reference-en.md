@@ -38,21 +38,32 @@ may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
 ### Interrogation
 
 - Cost starts at 4 and rises by 1 after every attempt.
+- Every Ghost and every living player with at least 1 Influence votes. Other living
+  players do not cast a vote.
 - Strict majority of votes cast; tie fails.
 - Failed: accused +3.
 - Wrong Execution: each living Guilty voter -1.
 - Assassin Execution: refund initiator's cost; initiator +5; each living Guilty voter +5.
 - Executed Influence: half rounded down to Bank, remainder bequeathed.
 
+### Expose
+
+- Only a living player with at least 2 Influence may attempt it.
+- Correct: target -4, initiator +1. Wrong: initiator -2.
+- The target's involuntary loss applies in full and creates debt if necessary.
+
 ## 4. Final
 
-1. Top three living players by Influence each nominate a different living,
+1. Immediately after the Round 3 Council, fix Bankruptcy: every player below zero is
+   Bankrupt for the entire Final.
+2. Top three living players by Influence each nominate a different living,
    non-Bankrupt Candidate.
-2. All players privately choose one Reveal target; living players may publicly buy
+3. All players privately choose one Reveal target; living players may publicly buy
    extra Reveal votes for 1 each; reveal all tied leaders.
-3. All players receive one secret Election vote; living players may buy extras for 3 each.
-4. Resolve tie with another secret ballot among tied Candidates; purchased votes remain.
-5. Check in order: Assassin+Stash; living Magnate Influence; winning Candidate's
+4. Every player, including Bankrupt players and Ghosts, receives one secret Election
+   vote; living players may buy extras for 3 each.
+5. Resolve tie with another secret ballot among tied Candidates; purchased votes remain.
+6. Check in order: Assassin+Stash; living Magnate Influence; winning Candidate's
    Faction; personal ineligibility.
 
 ## 5. Full end narration

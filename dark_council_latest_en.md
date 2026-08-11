@@ -20,8 +20,9 @@ one Aristocrat and one Reformer. Magnates are never Syndicate members.
 - **Syndicate:** the current Assassin survives and finishes with enough personal
   Influence plus Influence in the Syndicate Stash.
 
-Bankruptcy and Syndicate membership can make a player personally ineligible for a
-Faction Victory. They do not prevent the rest of that player's faction from winning.
+Bankruptcy fixed at the start of the Final and Syndicate membership **make a player
+personally ineligible for a Faction Victory**. The rest of that player's Faction
+remains eligible to win.
 
 Catching the Assassin pays: everyone who voted Guilty on a real Assassin is rewarded,
 and the room learns a true lead on whoever replaces them.
@@ -31,6 +32,9 @@ and the room learns a true lead on whoever replaces them.
 - **Innocent player:** read Sections 0-10. Section 11 is optional.
 - **Assassin or Accomplice:** read the entire document, including Section 11.
 - **Game Master (GM):** also read Section 12.
+
+In this document, **must** means required, **may** means optional, and **cannot /
+must not** means prohibited. A consequence stated without "may" always applies.
 
 ---
 
@@ -60,9 +64,9 @@ Each living player receives a **+2 Influence stipend**.
 
 Contract -> Private Phase (30 minutes) -> Council -> The Final
 
-At the start of every round, the GM publicly announces that round's Syndicate
-Contract. The Contract describes the kind of person the Syndicate has been ordered to
-kill, never a specific player.
+At the start of every round, the GM publicly announces a Contract: an assassination
+order for the Syndicate. It names a trait of the victim the Syndicate must kill, never
+a specific player.
 
 ---
 
@@ -102,15 +106,16 @@ The following information is public:
 
 ### 3.1 Contract
 
-The GM publicly reads the round's Contract. It identifies a target by a trait, such as
-"a Magnate" or "a player in the current Top 3."
+The GM publicly reads the round's Contract: an assassination order for the Syndicate.
+It names a trait of the victim, such as "a Magnate" or "a player in the current Top
+3." It never names a specific player.
 
 Everyone knows the Contract. Only the Syndicate knows who intends to fulfil it.
 
 ### 3.2 Private Phase
 
-Players may move throughout the house, speak privately, make deals, share or invent
-information, and transfer Influence.
+During the Private Phase, players are allowed to move throughout the house, speak
+privately, make deals, share or invent information, and transfer Influence.
 
 Influence may be transferred only during the Private Phase. All agreements are
 non-binding.
@@ -123,7 +128,7 @@ Everyone gathers in the Council area.
 
 Resolve the Council in this order:
 
-1. The GM resolves the assassination and the Contract.
+1. The GM announces the assassination result and whether the Contract succeeded.
 2. Ghosts ask their question.
 3. The floor opens for accusations, negotiation, Exposing Secrets, and
    Interrogations.
@@ -146,18 +151,43 @@ Influence totals of the Top 3 living players.
 - **Ghosts:** cannot hold, receive, spend, or transfer Influence. Any future income is
   discarded.
 
+### Ability to pay
+
+A living player may voluntarily take an action only if their personal Influence can
+cover the **largest immediate penalty** that action could cause. Borrowing Influence
+or promising to pay later is not allowed.
+
+In particular:
+
+- attempting to Expose a Secret requires at least 2 Influence; and
+- participating in an Interrogation vote requires at least 1 Influence.
+
+Ghosts are exempt: they vote but never pay or receive Influence. An involuntary loss
+that the player did not choose still applies in full and may create debt.
+
 ### Bankruptcy
 
-A player's balance can fall below zero because of penalties. The GM records the
-shortfall; any Influence that player later receives first pays it off.
+If an involuntary loss exceeds a player's personal Influence, the GM records the
+negative balance as **debt**. Any Influence that player later receives immediately
+repays the debt; the player receives only the remainder after the debt is cleared.
 
-A player who is still below zero at the Final is **Bankrupt**. That player:
+During a Private Phase, another living player may transfer Influence to a player in
+debt. The transferred Influence immediately repays that debt. Allies can therefore
+clear a debt during the Round 3 Private Phase before the Final begins.
+
+**Debt before the Final is not yet Bankruptcy and does not itself remove victory
+eligibility.**
+
+Immediately after the Round 3 Council and before Candidate nominations, the GM checks
+every balance once. A player below zero at that moment is **Bankrupt** for the entire
+Final. That player:
 
 - cannot be nominated as a Candidate; and
 - does not personally receive a Faction Victory, even if their Faction wins.
 
-The rest of the Faction can still win normally. A player may repay Bankruptcy to the
-Bank at any time before the Final Election.
+The rest of the Faction remains eligible to win. A Bankrupt player still participates
+in the Reveal and Final Election and retains one free vote in each. Bankruptcy status
+does not change after the Final begins.
 
 ---
 
@@ -201,6 +231,9 @@ Tell the GM as soon as you complete a Goal. The GM pays its reward after verifyi
 
 **Cost:** free
 
+Only a living player who has at least 2 Influence before declaring the guess may
+attempt to Expose a Secret.
+
 Publicly name a player and guess their Secret.
 
 - **Correct:** the target loses 4 Influence; you gain 1 Influence.
@@ -221,7 +254,9 @@ Interrogation costs 1 more than the previous one.
 
 1. The initiator names the accused and pays the current cost.
 2. The accused may make a final statement.
-3. Every player, including the accused and all Ghosts, votes publicly.
+3. Every Ghost and every living player who has at least 1 Influence when voting begins
+   votes publicly. A living player with less does not cast a vote. This rule also
+   applies to the accused.
 4. A strict majority of all votes cast is required for Execution. A tie fails.
 
 | Result | Consequence |
@@ -230,8 +265,9 @@ Interrogation costs 1 more than the previous one.
 | The vote passes; the accused is not the Assassin | The accused is Executed. The initiator's cost is not refunded and there is no reward. Everyone who voted Guilty loses **1 Influence**. |
 | The vote passes; the accused is the Assassin | The accused is Executed. The initiator's cost is refunded and the initiator gains +5 Influence. Everyone who voted Guilty gains **+5 Influence**. |
 
-Being right about the Assassin pays; being part of a mob does not. Ghosts vote but
-cannot hold Influence, so they neither gain nor lose.
+Being right about the Assassin pays; being part of a mob does not. Every living voter
+has already shown enough Influence to pay the wrongful-Execution penalty. Ghosts vote
+without the 1-Influence requirement and neither gain nor lose Influence.
 
 After an Execution, the GM publicly states only whether the executed player was the
 current Assassin.
@@ -314,7 +350,8 @@ immediately rephrase.
 
 ## 9. The Final
 
-The Final begins after the Round 3 Council.
+The Final begins after the Round 3 Council. Before any other Final action, the GM
+fixes Bankruptcy under Section 4.
 
 ### 9.1 Candidates
 
@@ -344,7 +381,8 @@ If there is a tie, reveal every tied player's Faction.
 
 ### 9.3 Buy Votes
 
-Every player, including each Ghost, has one free Final Election vote.
+Every player, including each Ghost and each Bankrupt player, has one free Final
+Election vote.
 
 Living players may buy extra votes for **3 Influence per vote**. Influence spent on
 votes is removed before victory totals are checked.
@@ -389,10 +427,11 @@ matter.
 
 You do not personally receive a Faction Victory if either of the following is true:
 
-- you are Bankrupt at the Final; or
+- the GM declared you Bankrupt at the start of the Final; or
 - you are the Assassin or Accomplice.
 
-Your Faction can still win, and other eligible members win normally.
+Your Faction remains eligible to win. If it wins, every other member who has not lost
+personal victory eligibility also wins.
 
 ### Syndicate
 
@@ -422,8 +461,9 @@ The GM announces this structure during Preparation. Magnates are never Syndicate
 members.
 
 Your Faction is real for all public rules: you count in its announced size, may claim
-it truthfully, and may vote for its Candidate. However, neither Syndicate member can
-personally receive a Faction Victory. Your shared objective is the Syndicate Victory.
+it truthfully, and may vote for its Candidate. However, Syndicate membership removes
+your personal Faction Victory eligibility. Your shared objective is the Syndicate
+Victory.
 
 ## 11.2 The Syndicate Stash
 
@@ -588,5 +628,5 @@ other Syndicate member.
 - [ ] Tell the Assassin and Accomplice each other's identities.
 - [ ] Announce Faction counts, Syndicate placement, and the Evidence noise budget.
 - [ ] Prepare three eligible Contracts.
-- [ ] Track the Interrogation cost, Stash, Bankruptcy, Goals, and private Influence
-      totals.
+- [ ] Track the Interrogation cost, Stash, debts, Goals, and private Influence totals.
+- [ ] At the start of the Final, fix who is Bankrupt once.

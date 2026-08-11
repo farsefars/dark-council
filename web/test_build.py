@@ -122,7 +122,12 @@ class BuildTests(unittest.TestCase):
         )
         expected = [
             r"лише під час Приватної фази",
-            r"спершу погашає цю нестачу",
+            r"негайно погашає борг",
+            r"найбільший негайний штраф",
+            r"для спроби Викриття потрібно мати щонайменше 2 Впливу",
+            r"для участі в голосуванні на Допиті потрібно мати щонайменше 1 Впливу",
+            r"перед висуванням Кандидатів",
+            r"стає \*\*Банкрутом\*\* на весь",
             r"особисто не отримує Перемогу Фракції",
             r"Ви втрачаєте 2 Впливу",
             r"отримує \+3 Впливу",
@@ -139,6 +144,25 @@ class BuildTests(unittest.TestCase):
         wins = find_section(self.sections["ua"], 10).body
         for faction in ("Аристократи", "Реформісти", "Магнати", "Синдикат"):
             self.assertIn(faction, wins)
+
+    def test_eligibility_wording_is_deterministic(self) -> None:
+        ua = self.markdowns["ua"]
+        en = self.markdowns["en"]
+        self.assertNotIn("можуть позбавити", ua)
+        self.assertNotIn("can make a player personally ineligible", en)
+        self.assertIn("позбавляють\nгравця особистого права", ua)
+        self.assertIn("make a player\npersonally ineligible", en)
+        self.assertIn("Наслідок, описаний без слова «може», застосовується завжди", ua)
+        self.assertIn('A consequence stated without "may" always applies', en)
+        self.assertIn("Живий гравець із меншим балансом не подає голосу", ua)
+        self.assertIn("A living player with less does not cast a vote", en)
+
+    def test_contract_tooltip_matches_public_rule(self) -> None:
+        ua_contract = next(
+            entry["definition"] for entry in build.GLOSSARY["ua"] if entry["id"] == "contract"
+        )
+        self.assertIn("замовлення на вбивство для Синдикату", ua_contract)
+        self.assertIn("ніколи не вказує на конкретного гравця", ua_contract)
 
     def test_responsive_print_and_motion_modes_exist(self) -> None:
         css = (Path(build.HERE) / "theme.css").read_text(encoding="utf-8")

@@ -2,7 +2,7 @@
 
 ## Track only five things
 
-1. **Influence:** your chips plus any negative balance recorded by the GM.
+1. **Influence:** your chips plus any debt recorded by the GM.
 2. **Faction:** Aristocrat, Reformer, or Magnate.
 3. **Goals:** your Motive (+5) and Ambition (+10), claim by end of Round 2.
 4. **Secret:** can be Exposed once.
@@ -19,6 +19,17 @@
 - Move around, talk, lie, bargain, and transfer Influence.
 - Influence may be transferred **only now**.
 - Deals are not binding.
+- An ally may transfer Influence to clear your debt. Received Influence repays debt
+  first.
+
+## Ability to Pay and Bankruptcy
+
+- Exposing is allowed only with at least 2 Influence.
+- A living player may vote in an Interrogation only with at least 1 Influence. Ghosts
+  vote regardless of balance.
+- A negative balance before the Final is debt, not Bankruptcy.
+- After the Round 3 Council, the GM declares every player still below zero Bankrupt.
+  Only that status removes personal Faction Victory eligibility.
 
 ## Council
 
@@ -63,7 +74,7 @@ all Evidence holders read their exact original statements.
 
 - **Aristocrat/Reformer:** your Faction's Candidate wins.
 - **Magnate:** living Magnates finish with the required combined Influence.
-- **Bankrupt or Syndicate:** you cannot personally receive a cover-Faction victory;
-  the rest of that Faction may still win.
+- **Declared Bankrupt or Syndicate:** you do not personally receive a Faction Victory;
+  the rest of that Faction remains eligible to win.
 
 > The Syndicate reference is optional for Innocents.

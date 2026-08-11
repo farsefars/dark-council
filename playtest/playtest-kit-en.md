@@ -5,38 +5,44 @@ Print the sections separately. The observer should not also be the GM.
 ## A. Pre-game comprehension check
 
 Give this after private role/Faction briefings and before Round 1. Do not coach.
-Target: **8/10 or better per player** and **90% or better table average**. Any question
+Target: **10/12 or better per player** and **90% or better table average**. Any question
 missed by more than 20% of players is a Level 1 failure.
 
 1. When may living players transfer Influence?
 2. You have -2 Influence when the Round 2 stipend is paid. What is your balance after
    the +2 stipend?
-3. If you are Bankrupt at the Final and your Faction wins, do you personally win?
-4. What happens to you if you guess a Secret incorrectly?
-5. An Interrogation vote fails. What does the accused receive?
-6. An Innocent is Executed. What happens to each living player who voted Guilty?
-7. How many Evidence statements exist, and how many are false?
-8. Name two things a Ghost may still do and one thing a Ghost may not do.
-9. In the Final, which happens first: nominations or the Reveal?
-10. Explain your Faction's victory condition in one sentence.
+3. During the Round 3 Private Phase you are at -2. An ally gives you 2 Influence.
+   What is your balance, and will you be Bankrupt when the Final begins?
+4. You have 1 Influence. May you attempt to Expose a Secret?
+5. You have 0 Influence. May you vote in an Interrogation? What if you are a Ghost?
+6. If the GM declares you Bankrupt at the start of the Final and your Faction wins,
+   do you personally win?
+7. An Interrogation vote fails. What does the accused receive?
+8. An Innocent is Executed. What happens to each living player who voted Guilty?
+9. How many Evidence statements exist, and how many are false?
+10. Name two things a Ghost may still do and one thing a Ghost may not do.
+11. In the Final, which happens first: the Bankruptcy check, nominations, or Reveal?
+12. Explain your Faction's victory condition in one sentence.
 
 ### Answer key
 
 1. Only during a Private Phase.
-2. 0; later income first repays a negative balance.
-3. No. The rest of the Faction may still win.
-4. You lose 2 Influence.
-5. +3 Influence.
-6. They lose 1 Influence; Ghosts cannot hold Influence and are not charged.
-7. Five total; exactly two false. Auction Evidence is truthful.
-8. May vote in Interrogations/Final and join the shared private Ghost question; may
+2. 0; later income first repays debt.
+3. Balance 0; no, only players below zero at the start of the Final are Bankrupt.
+4. No. Exposing requires at least 2 Influence.
+5. A living player at 0 does not vote. A Ghost votes regardless of balance.
+6. No. The rest of the Faction remains eligible to win.
+7. +3 Influence.
+8. They lose 1 Influence; Ghosts are not charged.
+9. Five total; exactly two false. Auction Evidence is truthful.
+10. May vote in Interrogations/Final and join the shared private Ghost question; may
    not hold, receive, spend, transfer Influence, or initiate an Interrogation.
-9. Nominations.
-10. Compare with the player's Faction card/rules.
+11. The GM fixes Bankruptcy first, then nominations happen, then Reveal.
+12. Compare with the player's Faction card/rules.
 
 Record only the score and missed question numbers:
 
-| Player | Score /10 | Missed questions | Needed explanation? |
+| Player | Score /12 | Missed questions | Needed explanation? |
 |---|---:|---|---|
 | | | | |
 | | | | |

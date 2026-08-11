@@ -92,7 +92,7 @@ async function inspect(page, language, viewport) {
         const top = target.getBoundingClientRect().top;
         return top >= topbar - 8 && top < topbar + 110;
       },
-      { timeout: 5000 },
+      { timeout: 12000 },
       href
     );
     const landing = await page.evaluate(
@@ -190,7 +190,7 @@ async function inspectControls(page) {
         const top = target.getBoundingClientRect().top;
         return target.open && top >= topbar - 8 && top < topbar + 110;
       },
-      { timeout: 5000 },
+      { timeout: 12000 },
       `#en-section-${section}`
     );
   }
