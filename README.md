@@ -45,6 +45,19 @@ The generator has no Python package dependencies. It validates section parity,
 player-count thresholds, numeric rules, translation keys, Ukrainian copy guards, and
 glossary annotation.
 
+## Mechanical and exploit testing
+
+The version-controlled simulator plays the published rules with sensible, chaotic and
+strictly legal exploit-seeking policies:
+
+```powershell
+python -m sim.validate
+python -m sim.experiments
+```
+
+Read `sim/README.md` for the plain-language explanation, `sim/METHODOLOGY.md` for the
+testing contract, and `sim/report.md` for the latest findings.
+
 ## Browser QA
 
 Optional browser tests reuse an installed Microsoft Edge:
@@ -65,6 +78,7 @@ table-of-contents link; and exercise glossary hover, keyboard and touch behaviou
 ├── dark_council_latest_en.md
 ├── Темна Рада_latest_ua.md
 ├── playtest/
+├── sim/                          # mechanical, chaos, and exploit testing
 ├── web/
 │   ├── build.py
 │   ├── presentation.py

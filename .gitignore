@@ -2,5 +2,8 @@ __pycache__/
 *.py[cod]
 node_modules/
 web/qa/screenshots/
+sim/output/
+sim/*.db
+sim/ledgers/
 .DS_Store
 Thumbs.db
