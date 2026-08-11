@@ -198,6 +198,9 @@ def summarise(results: list) -> dict:
             / sum(r.n_players for r in results)
         ),
         "wealth_top_share": mean("wealth_top_share"),
+        "contracts_signed": mean("contracts_signed"),
+        "contract_fees_paid": mean("contract_fees_paid"),
+        "contract_parties_syndicate": mean("contract_parties_syndicate"),
     }
 
 

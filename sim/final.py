@@ -39,6 +39,12 @@ def recommended_config(n: int, **overrides) -> Config:
                 reveal_after_nomination=True,
                 magnate_threshold=MAGNATE_BY_COUNT[magnates],
                 assassin_threshold=ASSASSIN_BY_PLAYERS[n],
+                binding_contracts_enabled=True,
+                binding_contract_fee=0,
+                binding_contract_stake=1,
+                binding_contract_limit=1,
+                binding_contract_table_limit=2,
+                binding_contract_sign_rate=0.30,
                 private_phase_minutes=(30, 45, 60),
                 **GOALS_V2, **F7_FIX, **PERSONA_FIXES)
     base.update(overrides)

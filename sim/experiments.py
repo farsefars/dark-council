@@ -165,6 +165,7 @@ def render_report(data: dict) -> str:
     debt_squatting = by_exploit["debt_squatting"]
     vote_stripping = by_exploit["expose_vote_stripping"]
     cost_griefing = by_exploit["interrogation_cost_griefing"]
+    contract_abuse = by_exploit.get("contract_abuse")
     flags = [item for item in exploits if item["exploit_value"] >= 0.03]
 
     exploit_rows = "\n".join(
@@ -267,6 +268,11 @@ Strategies at or above a +3 percentage-point edge: **{', '.join(item['name'] for
   while moving Syndicate wins by {vote_stripping['syndicate_win_delta']:+.1%} and
   {cost_griefing['syndicate_win_delta']:+.1%} respectively. They are not rational
   solo strategies, but they are plausible Syndicate-aiding or kingmaking tactics.
+{(
+f"- **Aggressive Contract use** produced {contract_abuse['exploit_value']:+.1%} "
+f"personal value and moved Syndicate wins {contract_abuse['syndicate_win_delta']:+.1%}. "
+"The selected cap does not create a demonstrated credibility exploit in this model."
+) if contract_abuse else ""}
 
 ## Rule ambiguities surfaced
 

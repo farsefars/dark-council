@@ -171,10 +171,19 @@ class BuildTests(unittest.TestCase):
         ))
 
     def test_reserved_contract_term_is_not_used_for_hit(self) -> None:
-        self.assertNotRegex(self.markdowns["ua"], r"\bКонтракт")
-        self.assertNotRegex(self.markdowns["en"], r"\bContracts?\b")
         self.assertIn("### 3.1 Замовлення", self.markdowns["ua"])
         self.assertIn("### 3.1 Hit", self.markdowns["en"])
+        self.assertIn("### 3.3 Контракт", self.markdowns["ua"])
+        self.assertIn("### 3.3 Contract", self.markdowns["en"])
+        self.assertNotIn("### 3.1 Контракт", self.markdowns["ua"])
+        self.assertNotIn("### 3.1 Contract", self.markdowns["en"])
+
+    def test_binding_contract_limits_are_explicit(self) -> None:
+        self.assertIn("лише один Контракт за гру", self.markdowns["ua"])
+        self.assertIn("не\nбільше двох Контрактів", self.markdowns["ua"])
+        self.assertIn("only one Contract per game", self.markdowns["en"])
+        self.assertIn("No more than two Contracts", self.markdowns["en"])
+        self.assertIn("1 Influence as a stake", self.markdowns["en"])
 
     def test_rulebook_excludes_pruned_editorial_prose(self) -> None:
         retired = (

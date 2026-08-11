@@ -56,6 +56,25 @@ def debt_rescues(k, persona, influence, debtors, public, cfg):
     return out
 
 
+def binding_contract_partner(k, persona, influence, candidates, public, cfg):
+    """Choose a counterpart for a limited binding support agreement."""
+    total_cost = cfg.binding_contract_fee + cfg.binding_contract_stake
+    if influence < total_cost or not candidates:
+        return None
+    chance = cfg.binding_contract_sign_rate * (
+        1.25 if persona in ("POLITICIAN", "MERCHANT") else 0.75
+    )
+    if _rng.random() >= min(1.0, chance):
+        return None
+    verified_allies = [
+        seat for seat in candidates if k.known_faction.get(seat) == k.faction
+    ]
+    if verified_allies:
+        return max(verified_allies, key=k.regard)
+    trusted = [seat for seat in candidates if k.regard(seat) > 0]
+    return max(trusted, key=k.regard) if trusted else _rng.choice(candidates)
+
+
 # --------------------------------------------------------------------------
 # Personas
 #

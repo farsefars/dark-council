@@ -37,7 +37,7 @@ SECRETS = ["BLACKMAIL", "TREASON", "CORRUPTION", "HERESY"]
 
 ADV_EVIDENCE, ADV_INTEL = "EVIDENCE", "SECRET_INTEL"
 
-BANK, STASH = "BANK", "STASH"
+BANK, STASH, ESCROW = "BANK", "STASH", "ESCROW"
 
 # players -> (aristocrats, reformers, magnates, magnate_threshold, assassin_threshold)
 SCALING = {
@@ -105,6 +105,12 @@ class Config:
     motive_deadline: int = 1      # last round in which a Motive may be claimed
     ambition_deadline: int = 2
     private_phase_minutes: tuple[int, int, int] = (30, 30, 30)
+    binding_contracts_enabled: bool = False
+    binding_contract_fee: int = 1
+    binding_contract_stake: int = 1
+    binding_contract_limit: int = 2
+    binding_contract_table_limit: int = 99
+    binding_contract_sign_rate: float = 0.30
     # --- F7: make catching the Assassin matter ---
     bounty_mode: str = "none"     # none | all_living | prosecutor_faction
     bounty_amount: int = 3
@@ -203,6 +209,16 @@ class Knowledge:
 
 
 @dataclass
+class BindingContract:
+    party_a: int
+    party_b: int
+    kind: str
+    signed_round: int
+    stake_each: int
+    resolved: bool = False
+
+
+@dataclass
 class Player:
     seat: int
     faction: str
@@ -231,6 +247,7 @@ class Player:
     vote_exclusions: int = 0
     expose_refusals: int = 0
     debt_rescued: int = 0
+    contracts_signed: int = 0
     knowledge: Knowledge = None  # type: ignore
 
     @property
@@ -290,6 +307,9 @@ class GameResult:
     ambition_completion_by_goal: dict[str, int] | None = None
     zero_agency_players: int = 0
     wealth_top_share: float = 0.0
+    contracts_signed: int = 0
+    contract_fees_paid: int = 0
+    contract_parties_syndicate: int = 0
 
     def innocent_win_rate(self) -> float:
         """Share of non-Syndicate players who personally won."""
@@ -323,6 +343,7 @@ class Game:
 
         self.bank = 0
         self.stash = 0
+        self.escrow = 0
         self.round = 0
         self.phase = "SETUP"
         self.ledger: list[tuple] = []
@@ -356,6 +377,9 @@ class Game:
         self.debt_rescued = 0
         self.debt_by_cause: dict[str, int] = {}
         self.excluded_rounds: dict[int, set[int]] = {}
+        self.binding_contracts: list[BindingContract] = []
+        self.contract_fees_paid = 0
+        self.contract_parties_syndicate = 0
 
         self.players = self._setup(a, r, m)
 
@@ -368,6 +392,8 @@ class Game:
             return self.bank
         if holder == STASH:
             return self.stash
+        if holder == ESCROW:
+            return self.escrow
         return self.players[holder].influence
 
     def move(self, src, dst, amount: int, reason: str) -> int:
@@ -385,12 +411,16 @@ class Game:
             self.bank -= amount
         elif src == STASH:
             self.stash -= amount
+        elif src == ESCROW:
+            self.escrow -= amount
         if isinstance(dst, int):
             self.players[dst].influence += amount
         elif dst == BANK:
             self.bank += amount
         elif dst == STASH:
             self.stash += amount
+        elif dst == ESCROW:
+            self.escrow += amount
         self.ledger.append(
             (self.game_id, self.round, self.phase, str(src), str(dst), amount, reason))
         if isinstance(src, int) and before is not None:
@@ -401,7 +431,10 @@ class Game:
         return amount
 
     def check_conservation(self) -> None:
-        total = sum(p.influence for p in self.players) + self.bank + self.stash
+        total = (
+            sum(p.influence for p in self.players)
+            + self.bank + self.stash + self.escrow
+        )
         if total != 0:
             raise AssertionError(
                 f"conservation broken in {self.game_id}: {total} != 0")
@@ -709,6 +742,8 @@ class Game:
             self.extortion_phase()
             if self.cfg.debt_rescue_enabled:
                 self.debt_rescue_phase()
+            if self.cfg.binding_contracts_enabled:
+                self.binding_contract_phase()
 
         # Assassin acts last so camouflage can reflect the round state.
         assassin = self.players[self.assassin_seat]
@@ -818,6 +853,87 @@ class Game:
                 amount = min(max(0, amount), max(0, p.influence), debt)
                 if amount:
                     self._pay(p.seat, dst, amount, "debt_rescue")
+
+    def binding_contract_phase(self) -> None:
+        total_cost = self.cfg.binding_contract_fee + self.cfg.binding_contract_stake
+        kind = "FINAL_SUPPORT" if self.round == 3 else "COUNCIL_DEFENCE"
+        already_paired = {
+            frozenset((c.party_a, c.party_b))
+            for c in self.binding_contracts if not c.resolved
+        }
+        for proposer in self.living():
+            if len(self.binding_contracts) >= self.cfg.binding_contract_table_limit:
+                break
+            if proposer.contracts_signed >= self.cfg.binding_contract_limit:
+                continue
+            if proposer.influence < total_cost:
+                continue
+            candidates = [
+                q.seat for q in self.living()
+                if q.seat != proposer.seat
+                and q.contracts_signed < self.cfg.binding_contract_limit
+                and q.influence >= total_cost
+                and frozenset((proposer.seat, q.seat)) not in already_paired
+            ]
+            if not candidates:
+                continue
+            choose = getattr(self.pol, "binding_contract_partner", None)
+            if choose is None:
+                continue
+            partner_seat = choose(
+                proposer.knowledge, proposer.archetype, proposer.influence,
+                candidates, self.public_view(), self.cfg)
+            if partner_seat not in candidates:
+                continue
+            partner = self.players[partner_seat]
+            for party in (proposer, partner):
+                if self.cfg.binding_contract_fee:
+                    self.move(
+                        party.seat, BANK, self.cfg.binding_contract_fee,
+                        "binding_contract_fee")
+                    self.contract_fees_paid += self.cfg.binding_contract_fee
+                if self.cfg.binding_contract_stake:
+                    self.move(
+                        party.seat, ESCROW, self.cfg.binding_contract_stake,
+                        "binding_contract_stake")
+                party.contracts_signed += 1
+            proposer.knowledge.feel(partner.seat, 1.0)
+            partner.knowledge.feel(proposer.seat, 1.0)
+            if proposer.role in (ASSASSIN, ACCOMPLICE) or partner.role in (
+                    ASSASSIN, ACCOMPLICE):
+                self.contract_parties_syndicate += 1
+            contract = BindingContract(
+                proposer.seat, partner.seat, kind, self.round,
+                self.cfg.binding_contract_stake)
+            self.binding_contracts.append(contract)
+            already_paired.add(frozenset((proposer.seat, partner.seat)))
+            self.events.append((
+                self.game_id, self.round, "BINDING_CONTRACT",
+                proposer.seat, partner.seat, kind))
+
+    def contract_partner(self, seat: int, kind: str) -> int | None:
+        for contract in self.binding_contracts:
+            if contract.resolved or contract.kind != kind:
+                continue
+            if seat == contract.party_a:
+                return contract.party_b
+            if seat == contract.party_b:
+                return contract.party_a
+        return None
+
+    def resolve_binding_contracts(self, kind: str) -> None:
+        for contract in self.binding_contracts:
+            if contract.resolved or contract.kind != kind:
+                continue
+            for party in (contract.party_a, contract.party_b):
+                if contract.stake_each:
+                    self.move(
+                        ESCROW, party, contract.stake_each,
+                        "binding_contract_stake_return")
+            contract.resolved = True
+            self.events.append((
+                self.game_id, self.round, "BINDING_CONTRACT_RESOLVED",
+                contract.party_a, contract.party_b, kind))
 
     # ---------------- information trading ----------------
 
@@ -985,6 +1101,8 @@ class Game:
             self.resolve_interrogations()
         if self.cfg.goals_enabled:
             self.claim_goals()
+        if self.cfg.binding_contracts_enabled:
+            self.resolve_binding_contracts("COUNCIL_DEFENCE")
 
     def resolve_assassination(self) -> None:
         target = getattr(self, "pending_kill", None)
@@ -1146,8 +1264,17 @@ class Game:
                     self.events.append((self.game_id, self.round, "GHOST_VOTE",
                                         voter.seat, accused, "interrogation"))
                 total += 1
-                if self.pol.vote_guilty(voter.knowledge, voter.archetype, accused,
-                                        self.public_view(), self.cfg):
+                bound_partner = (
+                    self.contract_partner(voter.seat, "COUNCIL_DEFENCE")
+                    if self.cfg.binding_contracts_enabled else None
+                )
+                guilty_choice = (
+                    False if bound_partner == accused else
+                    self.pol.vote_guilty(
+                        voter.knowledge, voter.archetype, accused,
+                        self.public_view(), self.cfg)
+                )
+                if guilty_choice:
                     guilty_voters.append(voter.seat)
                     if voter.seat != accused:
                         self.players[accused].knowledge.voted_against_me[voter.seat] = (
@@ -1427,6 +1554,8 @@ class Game:
             candidates = self.nominate()
         winner_faction = self.election(candidates)
         self.winning_faction = winner_faction
+        if self.cfg.binding_contracts_enabled:
+            self.resolve_binding_contracts("FINAL_SUPPORT")
         tax = self.cfg.assassin_survival_tax
         if tax and self.players[self.assassin_seat].alive:
             for q in self.living():
@@ -1479,8 +1608,18 @@ class Game:
         nominators = ranked[:max(2, self.cfg.candidate_count)]
         candidates: list[int] = []
         for nom in nominators:
-            pick = self.pol.nominate(nom.knowledge, [p.seat for p in eligible],
-                                     candidates, self.public_view(), nom.archetype)
+            eligible_seats = [p.seat for p in eligible]
+            bound_partner = (
+                self.contract_partner(nom.seat, "FINAL_SUPPORT")
+                if self.cfg.binding_contracts_enabled else None
+            )
+            pick = (
+                bound_partner
+                if bound_partner in eligible_seats and bound_partner not in candidates
+                else self.pol.nominate(
+                    nom.knowledge, eligible_seats,
+                    candidates, self.public_view(), nom.archetype)
+            )
             if pick is not None and pick not in candidates:
                 candidates.append(pick)
         if not candidates and eligible:
@@ -1525,8 +1664,15 @@ class Game:
         def count(options: list[int]) -> dict[int, int]:
             tally = {c: 0 for c in options}
             for voter, weight in ballots:
-                choice = self.pol.final_vote(
-                    voter.knowledge, options, voter.archetype)
+                bound_partner = (
+                    self.contract_partner(voter.seat, "FINAL_SUPPORT")
+                    if self.cfg.binding_contracts_enabled else None
+                )
+                choice = (
+                    bound_partner if bound_partner in options
+                    else self.pol.final_vote(
+                        voter.knowledge, options, voter.archetype)
+                )
                 if choice is not None:
                     tally[choice] = tally.get(choice, 0) + weight
             return tally
@@ -1654,6 +1800,9 @@ class Game:
             ambition_completion_by_goal=ambition_completion,
             zero_agency_players=zero_agency,
             wealth_top_share=top_share,
+            contracts_signed=len(self.binding_contracts),
+            contract_fees_paid=self.contract_fees_paid,
+            contract_parties_syndicate=self.contract_parties_syndicate,
         )
 
     def adjudicate(self, wf: str | None, magnate_win: bool,
