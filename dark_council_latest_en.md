@@ -469,6 +469,9 @@ Victory.
 ## 11.2 The Syndicate Stash
 
 The Stash begins at 0 and is tracked privately by the GM.
+Track the Stash in a written ledger; its full balance does not need to be represented by
+physical chips. When the Assassin withdraws Influence, the GM issues the corresponding
+chips.
 
 Influence in the Stash:
 
@@ -484,13 +487,17 @@ Influence in the Stash:
 At the start of every round, the GM publicly reads one Hit. A Hit describes
 the required victim by a trait, never by name.
 
-- **Success:** if the assassination victim meets the Hit, add 3 Influence from
+- **Success:** if the assassination victim meets the Hit, add **40 Influence** from
   the Bank to the Stash.
 - **Failure:** remove 3 Influence from the Stash. If the Stash contains less than 3,
   the current Assassin pays the shortfall from their personal Influence.
 
 Killing a player who does not match the Hit still resolves the assassination, but
 the Hit fails. Submitting no valid target also fails the Hit.
+
+Hits are the Syndicate's primary route to victory. The Section 12 thresholds are
+deliberately calibrated so the Syndicate usually needs all three Hits; Influence
+transferred by allies does not reliably replace a failed Hit.
 
 ## 11.4 Assassin: Assassinate
 
@@ -556,17 +563,17 @@ counts and 3 Magnates at odd player counts.
 
 | Players | Aristocrats / Reformers | Magnates | Magnate threshold | Assassin + Stash threshold |
 |---:|---:|---:|---:|---:|
-| 8 | 3 / 3 | 2 | 16 | 46 |
-| 9 | 3 / 3 | 3 | 24 | 44 |
-| 10 | 4 / 4 | 2 | 16 | 42 |
-| 11 | 4 / 4 | 3 | 24 | 42 |
-| 12 | 5 / 5 | 2 | 16 | 40 |
-| 13 | 5 / 5 | 3 | 24 | 40 |
-| 14 | 6 / 6 | 2 | 16 | 41 |
-| 15 | 6 / 6 | 3 | 24 | 39 |
+| 8 | 3 / 3 | 2 | 14 | 156 |
+| 9 | 3 / 3 | 3 | 24 | 154 |
+| 10 | 4 / 4 | 2 | 17 | 152 |
+| 11 | 4 / 4 | 3 | 28 | 152 |
+| 12 | 5 / 5 | 2 | 19 | 152 |
+| 13 | 5 / 5 | 3 | 29 | 152 |
+| 14 | 6 / 6 | 2 | 20 | 152 |
+| 15 | 6 / 6 | 3 | 29 | 150 |
 
-Simply: **Magnates need 16 if there are two of them, or 24 if there are three. The
-Assassin needs roughly 40, a little more at small tables.**
+Simply: **the Assassin needs roughly 152. For both economic victories, use the exact
+threshold in the table for the current player count.**
 
 ## 12.2 Hit deck
 

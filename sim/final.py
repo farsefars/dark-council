@@ -10,13 +10,19 @@ from .run import summarise
 ALL_COUNTS = [8, 9, 10, 11, 12, 13, 14, 15]
 GAMES = 2000
 
-# Recommended structure: Magnate threshold keys off the number of Magnates,
-# not the number of players; the Assassin threshold is flat.
-MAGNATE_BY_COUNT = {2: 16, 3: 24}
+# The larger Hit economy raises live circulation unevenly by table size, so both
+# economic thresholds are calibrated per supported player count.
+MAGNATE_BY_PLAYERS = {
+    8: 14, 9: 24, 10: 17, 11: 28,
+    12: 19, 13: 29, 14: 20, 15: 29,
+}
 # The Assassin's reachable total falls as the table grows (more competition for the
 # same Influence), so the threshold tracks player count rather than being flat.
-ASSASSIN_BY_PLAYERS = {8: 46, 9: 44, 10: 42, 11: 42, 12: 40, 13: 40, 14: 41, 15: 39}
-ASSASSIN_FLAT = 42
+ASSASSIN_BY_PLAYERS = {
+    8: 156, 9: 154, 10: 152, 11: 152,
+    12: 152, 13: 152, 14: 152, 15: 150,
+}
+ASSASSIN_FLAT = 152
 
 GOALS_V2 = dict(goals_v2=True, cap_goals=True, motive_deadline=2,
                 espionage_full_profile=True, espionage_targets=1,
@@ -28,17 +34,16 @@ GOALS_V2 = dict(goals_v2=True, cap_goals=True, motive_deadline=2,
 # replaces them.
 F7_FIX = dict(bounty_mode="none", confiscate_on_wipeout=True,
               guilty_vote_reward=5, guilty_vote_penalty=1,
-              promotion_reveals_evidence=True)
+              promotion_reveals_evidence=True, hit_payout=40)
 
 # Decisions validated under the persona model.
 PERSONA_FIXES = dict(candidate_count=3, tell_by_either=True, stash_withdraw_cap=2)
 
 
 def recommended_config(n: int, **overrides) -> Config:
-    magnates = SCALING[n][2]
     base = dict(expose_once=True, ghost_mode="private", kill_tell_scope="game",
                 reveal_after_nomination=True,
-                magnate_threshold=MAGNATE_BY_COUNT[magnates],
+                magnate_threshold=MAGNATE_BY_PLAYERS[n],
                 assassin_threshold=ASSASSIN_BY_PLAYERS[n],
                 private_phase_minutes=(30, 45, 60),
                 **GOALS_V2, **F7_FIX, **PERSONA_FIXES)
@@ -81,7 +86,7 @@ def main() -> None:
     print(f"  expose_once, ghost_mode=private, kill_tell_scope=game, goals v2,")
     print(f"  Stash untouchable + two-way, guilty stakes +5/-1, successor lead,")
     print(f"  Reveal after nomination, 3 Candidates, either member pays the tell,")
-    print(f"  magnate={MAGNATE_BY_COUNT}, assassin={ASSASSIN_BY_PLAYERS}")
+    print(f"  magnate={MAGNATE_BY_PLAYERS}, assassin={ASSASSIN_BY_PLAYERS}")
     stats = run_block(ALL_COUNTS, GAMES)
     show("headline balance, all supported counts", stats, ALL_COUNTS)
 
@@ -97,7 +102,7 @@ def main() -> None:
     focus = [13, 14, 15]
     axes = {
         "stipend": [1, 2, 3, 4],
-        "hit_payout": [1, 2, 3, 4, 5],
+        "hit_payout": [20, 30, 40, 50, 60],
         "launder_cap": [0, 1, 2, 3, 4],
         "kill_share": [0.25, 0.4, 0.5, 0.6],
         "expose_penalty": [2, 3, 4, 5],

@@ -20,7 +20,9 @@ from .engine import (
 )
 from .final import recommended_config
 from .chaos import ChaosConfig, chaos_policies
-from .exploits import EXPLOITS, ExploitPolicies
+from .exploits import (
+    EXPLOITS, ExploitPolicies, SyndicateFactionAlliancePolicies,
+)
 
 FAILURES: list[str] = []
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -91,7 +93,13 @@ def check_game(label: str, g: Game, res, n: int) -> None:
     check("auction_evidence_true", g.evidence_is_true(g.auction_evidence),
           f"{tag} {g.auction_evidence}")
 
-    # 5. Ghosts never end holding Influence.
+    # 5. Selected Hit events expose the exact legal-target count for agency audits.
+    for event in (event for event in res.events if event[2] == "HIT"):
+        seats = [value for value in str(event[5]).split(",") if value]
+        check("hit_option_count", int(event[4]) == len(seats),
+              f"{tag} event={event}")
+
+    # 6. Ghosts never end holding Influence.
     for p in g.players:
         if not p.alive:
             check("ghost_no_holdings", p.influence <= 0,
@@ -235,7 +243,7 @@ def check_no_duplicate_definitions() -> None:
     fails the gate."""
     import collections
     for name in ("engine.py", "policies.py", "validate.py", "final.py", "run.py",
-                 "ab_tests.py", "removal_probe.py"):
+                 "ab_tests.py", "removal_probe.py", "hit_economy.py"):
         path = os.path.join(HERE, name)
         with open(path, encoding="utf-8") as fh:
             tree = ast.parse(fh.read())
@@ -397,6 +405,71 @@ def check_published_rule_gates() -> None:
     g.check_conservation()
 
 
+def check_alliance_strategy() -> None:
+    policy = SyndicateFactionAlliancePolicies(ignore_hit=True, funding_cap=99)
+    g = Game(8, 45, recommended_config(8), policy)
+    policy.configure(g)
+    assassin = g.original_assassin
+    ally = next(
+        seat for seat in policy.allied_seats
+        if seat not in (assassin, g.accomplice_seat)
+    )
+    opponent = next(seat for seat in range(g.n) if seat not in policy.allied_seats)
+    public = g.public_view()
+    check("alliance_protects_assassin",
+          not policy.vote_guilty(
+              g.players[ally].knowledge,
+              g.players[ally].archetype,
+              assassin,
+              public,
+              g.cfg,
+          ),
+          f"ally={ally} assassin={assassin}")
+    check("opposition_votes_against_assassin",
+          policy.vote_guilty(
+              g.players[opponent].knowledge,
+              g.players[opponent].archetype,
+              assassin,
+              public,
+              g.cfg,
+          ),
+          f"opponent={opponent} assassin={assassin}")
+
+    candidates = [
+        (
+            p.seat,
+            p.influence,
+            p.faction == policy.allied_faction,
+            0.0,
+        )
+        for p in g.living()
+        if p.seat not in (g.assassin_seat, g.accomplice_seat)
+    ]
+    target, _ = policy.assassin_plan(
+        g.players[assassin].knowledge,
+        g.players[assassin].influence,
+        candidates,
+        public,
+        g.cfg,
+    )
+    check("alliance_ignores_hit_for_rival",
+          target is not None
+          and policy.factions[target] == policy.rival_faction,
+          f"target={target} faction={policy.factions.get(target)} "
+          f"rival={policy.rival_faction}")
+
+    original_faction = policy.allied_faction
+    g.players[g.original_assassin].alive = False
+    g.promote_accomplice()
+    policy._configured()
+    check("alliance_tracks_promotion",
+          policy.assassin_seat == g.accomplice_seat
+          and policy.allied_faction != original_faction
+          and g.original_assassin in policy.allied_seats,
+          f"assassin={policy.assassin_seat} faction={policy.allied_faction} "
+          f"allies={sorted(policy.allied_seats)}")
+
+
 def check_chaos_zero_equivalence() -> None:
     for n in (8, 13, 15):
         for seed in range(10):
@@ -457,6 +530,7 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
     check_no_duplicate_definitions()
     check_personas_are_distinguishable()
     check_published_rule_gates()
+    check_alliance_strategy()
     check_chaos_zero_equivalence()
     check_chaos_and_exploit_plumbing()
 
@@ -486,6 +560,20 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("canonical_private_phase_clock",
               cfg.private_phase_minutes == (30, 45, 60),
               f"n={n} minutes={cfg.private_phase_minutes}")
+        check("canonical_hit_payout", cfg.hit_payout == 40,
+              f"n={n} payout={cfg.hit_payout}")
+        check("canonical_magnate_threshold",
+              cfg.magnate_threshold == {
+                  8: 14, 9: 24, 10: 17, 11: 28,
+                  12: 19, 13: 29, 14: 20, 15: 29,
+              }[n],
+              f"n={n} threshold={cfg.magnate_threshold}")
+        check("canonical_assassin_threshold",
+              cfg.assassin_threshold == {
+                  8: 156, 9: 154, 10: 152, 11: 152,
+                  12: 152, 13: 152, 14: 152, 15: 150,
+              }[n],
+              f"n={n} threshold={cfg.assassin_threshold}")
         check("canonical_commerce",
               cfg.commerce_partners == 2
               and cfg.commerce_profit == 3

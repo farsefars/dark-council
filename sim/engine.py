@@ -41,14 +41,14 @@ BANK, STASH = "BANK", "STASH"
 
 # players -> (aristocrats, reformers, magnates, magnate_threshold, assassin_threshold)
 SCALING = {
-    8:  (3, 3, 2, 16, 46),
-    9:  (3, 3, 3, 24, 44),
-    10: (4, 4, 2, 16, 42),
-    11: (4, 4, 3, 24, 42),
-    12: (5, 5, 2, 16, 40),
-    13: (5, 5, 3, 24, 40),
-    14: (6, 6, 2, 16, 41),
-    15: (6, 6, 3, 24, 39),
+    8:  (3, 3, 2, 14, 156),
+    9:  (3, 3, 3, 24, 154),
+    10: (4, 4, 2, 17, 152),
+    11: (4, 4, 3, 28, 152),
+    12: (5, 5, 2, 19, 152),
+    13: (5, 5, 3, 29, 152),
+    14: (6, 6, 2, 20, 152),
+    15: (6, 6, 3, 29, 150),
 }
 
 HITS = [
@@ -77,7 +77,7 @@ class Config:
     interrogation_step: int = 1
     survivor_bonus: int = 3
     prosecutor_reward: int = 5
-    hit_payout: int = 3
+    hit_payout: int = 40
     hit_penalty: int = 3
     launder_cap: int = 2
     kill_share: float = 0.5
@@ -311,9 +311,6 @@ class Game:
         self.game_id = game_id or f"g{n_players}_{seed}"
 
         a, r, m, mag_thr, asn_thr = SCALING[n_players]
-        # Rules SS12.1: at odd major-faction counts the extra seat is assigned randomly.
-        if a != r and self.rng.random() < 0.5:
-            a, r = r, a
         self.magnate_threshold = self.cfg.magnate_threshold or mag_thr
         self.assassin_threshold = self.cfg.assassin_threshold or asn_thr
 
@@ -647,7 +644,16 @@ class Game:
                         and self.hit_matches(c, p)) >= 2]
         self.hit = self.rng.choice(valid) if valid else self.rng.choice(available)
         self.used_hits.append(self.hit)
-        self.events.append((self.game_id, self.round, "HIT", self.hit, 0, ""))
+        options = [
+            p.seat for p in self.living()
+            if p.seat != self.assassin_seat
+            and p.seat != self.accomplice_seat
+            and self.hit_matches(self.hit, p)
+        ]
+        self.events.append((
+            self.game_id, self.round, "HIT", self.hit, len(options),
+            ",".join(map(str, options)),
+        ))
 
     def hit_matches(self, hit: str, victim: Player) -> bool:
         if hit == "HIGH_SOCIETY":

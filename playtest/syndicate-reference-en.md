@@ -8,8 +8,8 @@ Give only to the Assassin and Accomplice.
   target is submitted, no one dies and the Hit fails.
 - **Payment tell:** either member must have physically given the victim at least
   1 Influence at any earlier point in the game.
-- **Hit:** success adds 3 to Stash; failure removes 3, and the Assassin pays
-  any shortfall.
+- **Hit:** success adds **40** to Stash; failure removes 3, and the Assassin pays
+  any shortfall. Winning usually requires completing all three Hits.
 - **Death income:** half the victim's positive Influence, rounded down, enters Stash.
 - **Accomplice:** may Launder up to 2 into Stash once per round.
 - **Current Assassin:** may withdraw up to 2 from Stash once per round.

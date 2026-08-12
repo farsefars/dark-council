@@ -14,7 +14,7 @@ from .engine import Config, SCALING, run_game
 from .run import COUNTS, summarise, wilson
 
 TARGET_MAGNATE = 0.35
-TARGET_SYNDICATE = 0.30
+TARGET_SYNDICATE = 0.35
 
 
 def quantile_threshold(values: list[int], target_rate: float) -> int:

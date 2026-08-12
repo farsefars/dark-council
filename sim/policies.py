@@ -365,6 +365,11 @@ def vote_guilty(k, persona, accused, public, cfg):
     if k.role in (ASSASSIN, ACCOMPLICE) and accused == k.partner:
         return False
     if accused in k.confirmed_syndicate:
+        # Knowing the hidden role does not erase political incentives. A player who
+        # also believes the Assassin shares their Faction may rationally protect them
+        # under non-exclusive victory.
+        if k.known_faction.get(accused) == k.faction:
+            return _rng.random() >= d["bloc_voting"]
         return True
     if accused in k.confirmed_clear:
         return False

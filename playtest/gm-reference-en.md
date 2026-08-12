@@ -2,7 +2,8 @@
 
 ## 1. Setup
 
-- Select the player-count row and randomly assign the extra major-faction seat.
+- Select the player-count row. Aristocrats and Reformers are always equal; record both
+  economic thresholds from that row.
 - Syndicate: exactly one Aristocrat + one Reformer; randomly assign Assassin/Accomplice.
 - Prepare five Evidence statements: four starting, one truthful Auction; exactly two
   of the four starting statements are false.
@@ -30,7 +31,8 @@ Announce when 5 minutes and 1 minute remain in every Private Phase.
 ## 3. Council flow
 
 1. Validate kill tell against the private register.
-2. Resolve assassination, death split/bequest, Hit success/failure.
+2. Resolve assassination, death split/bequest, and the Hit: success adds 40 to Stash;
+   failure removes 3.
 3. Ghosts agree on one Yes/No question in 60 seconds; answer privately.
 4. Open accusations, Expose, and Interrogations.
 5. After every Execution: announce only whether the victim was current Assassin;
@@ -91,8 +93,8 @@ the GM immediately after the transfer; the recipient can verify if disputed.
 
 ## Private Stash ledger
 
-Use a labelled envelope containing the Stash chips. The written balance must equal the
-physical envelope after every entry.
+Track the Stash in writing; its full balance does not need physical chips. When the
+Assassin withdraws Influence, issue the corresponding number of chips.
 
 | Round/time | In | Out | Reason | Assassin personal balance after | Stash balance | Initials |
 |---|---:|---:|---|---:|---:|---|
