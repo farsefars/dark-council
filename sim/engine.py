@@ -101,7 +101,9 @@ class Config:
     extortion_amount: int = 3
     espionage_targets: int = 2
     espionage_full_profile: bool = False
-    commerce_partners: int = 3
+    commerce_partners: int = 2
+    commerce_profit: int = 3
+    commerce_min_paid: int = 1
     motive_deadline: int = 1      # last round in which a Motive may be claimed
     ambition_deadline: int = 2
     private_phase_minutes: tuple[int, int, int] = (30, 30, 30)
@@ -156,9 +158,7 @@ class Knowledge:
     known_secrets: dict[int, str] = field(default_factory=dict)
     suspicion: dict[int, float] = field(default_factory=dict)
     partner: int | None = None          # syndicate only
-    received_from: dict[int, set[int]] = field(default_factory=dict)  # round -> seats
     traded_with: set[int] = field(default_factory=set)
-    reciprocal_traded_with: set[int] = field(default_factory=set)
     confirmed_clear: set[int] = field(default_factory=set)
     confirmed_syndicate: set[int] = field(default_factory=set)
     publicly_exposed: set[int] = field(default_factory=set)
@@ -931,14 +931,10 @@ class Game:
                     self._pay(t, p.seat, amt, "tribute")
 
     def _record_transfer(self, src: int, dst: int) -> None:
-        if dst in self.cumulative_transfers.get(src, set()):
-            self.players[src].knowledge.reciprocal_traded_with.add(dst)
-            self.players[dst].knowledge.reciprocal_traded_with.add(src)
         self.transfers_this_round.setdefault(dst, set()).add(src)
         self.cumulative_transfers.setdefault(dst, set()).add(src)
         self.players[src].knowledge.traded_with.add(dst)
         self.players[dst].knowledge.traded_with.add(src)
-        self.players[dst].knowledge.received_from.setdefault(self.round, set()).add(src)
 
     def donor_set(self, seat: int) -> list[int]:
         """Who the victim's Ghost can name as having paid them."""
@@ -1383,8 +1379,15 @@ class Game:
                           if self.players[s].ambition == v}
             return len(named) >= self.cfg.espionage_targets
         if p.motive == COMMERCE:
-            need = self.cfg.commerce_partners if self.cfg.goals_v2 else 3
-            return len(k.traded_with) >= need and bool(k.reciprocal_traded_with)
+            if not self.cfg.goals_v2:
+                return len(k.traded_with) >= 3
+            paid = sum(k.given_total.values())
+            received = sum(k.received_total.values())
+            return (
+                len(k.traded_with) >= self.cfg.commerce_partners
+                and paid >= self.cfg.commerce_min_paid
+                and received - paid >= self.cfg.commerce_profit
+            )
         return False
 
     def _ambition_met(self, p: Player) -> bool:

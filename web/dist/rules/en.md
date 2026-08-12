@@ -215,10 +215,12 @@ begins. Only the Diplomat's Public Pact is claimed publicly.
 - **Espionage:** privately name to the GM both the **Motive and the Ambition** of one
   other player, correctly. Nobody is told anyone else's Goals at setup, so this can
   only be done by talking to people.
-- **Commerce:** give or receive Influence in dealings with three different players
-  during Private Phases. At least one of those trades must be reciprocal: both players
-  gave at least 1 Influence to each other. The two directions of that reciprocal trade
-  may occur in different Private Phases.
+- **Commerce:** earn at least **3 Influence in net profit** from voluntary deals with
+  at least two different players during Private Phases. To complete the Goal, you must
+  also pay at least 1 Influence as part of those deals. Net profit is Influence
+  received from players minus Influence paid to players; payments and costs created by
+  other rules do not count. No separate ledger is required: when claiming the Goal,
+  honestly report your profit to the GM.
 
 ### Ambitions: claim before Round 3 begins
 

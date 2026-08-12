@@ -20,7 +20,8 @@ ASSASSIN_FLAT = 42
 
 GOALS_V2 = dict(goals_v2=True, cap_goals=True, motive_deadline=2,
                 espionage_full_profile=True, espionage_targets=1,
-                commerce_partners=3, extortion_amount=2)
+                commerce_partners=2, commerce_profit=3,
+                commerce_min_paid=1, extortion_amount=2)
 
 # The Stash is inherited wealth and survives execution; the room is rewarded for
 # catching the Assassin through personal stakes on the verdict and a lead on whoever

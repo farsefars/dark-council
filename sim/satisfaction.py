@@ -126,6 +126,12 @@ Round 1 to Round 3. {early_death:.1%} of simulated deaths occur in Round 1.
 |---|---:|
 {motive_rows}
 
+**Commerce warning:** its simulated completion rate is not a real-world difficulty
+estimate. The live rule is a trust-based claim about profit from negotiated deals, while
+the agents do not understand deal terms, broker information, or negotiate a margin. This
+number measures only how often their mechanical transfers accidentally satisfy the
+ledger condition. Use live playtest completion data for Commerce.
+
 ### Ambition completion
 
 | Ambition | Completion |

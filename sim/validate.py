@@ -339,17 +339,18 @@ def check_published_rule_gates() -> None:
               magnates == (2 if n % 2 == 0 else 3),
               f"n={n} magnates={magnates}")
 
-    # Commerce requires a reciprocal exchange, not three one-way gifts.
+    # Commerce requires actual broker margin, not transaction count.
     g = Game(8, 40, cfg)
     trader = g.players[0]
     trader.motive = COMMERCE
     trader.knowledge.motive = COMMERCE
-    for partner in (1, 2, 3):
-        g._pay(trader.seat, partner, 1, "test_one_way_gift")
-    check("commerce_rejects_one_way_gifts", not g._motive_met(trader, []),
-          f"traded_with={sorted(trader.knowledge.traded_with)}")
-    g._pay(1, trader.seat, 1, "test_reciprocal_trade")
-    check("commerce_accepts_reciprocal_trades", g._motive_met(trader, []),
+    g._pay(trader.seat, 1, 1, "test_broker_cost")
+    g._pay(2, trader.seat, 3, "test_insufficient_margin")
+    check("commerce_rejects_insufficient_profit", not g._motive_met(trader, []),
+          f"given={trader.knowledge.given_total} "
+          f"received={trader.knowledge.received_total}")
+    g._pay(2, trader.seat, 1, "test_broker_profit")
+    check("commerce_accepts_net_profit", g._motive_met(trader, []),
           f"given={trader.knowledge.given_total} "
           f"received={trader.knowledge.received_total}")
 
@@ -485,8 +486,12 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("canonical_private_phase_clock",
               cfg.private_phase_minutes == (30, 45, 60),
               f"n={n} minutes={cfg.private_phase_minutes}")
-        check("canonical_commerce_partners", cfg.commerce_partners == 3,
-              f"n={n} partners={cfg.commerce_partners}")
+        check("canonical_commerce",
+              cfg.commerce_partners == 2
+              and cfg.commerce_profit == 3
+              and cfg.commerce_min_paid == 1,
+              f"n={n} partners={cfg.commerce_partners} "
+              f"profit={cfg.commerce_profit} paid={cfg.commerce_min_paid}")
 
     for n in counts:
         for label, cfg in config_matrix(n).items():
