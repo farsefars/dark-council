@@ -90,6 +90,39 @@ class BuildTests(unittest.TestCase):
         data = json.loads(payload)
         self.assertEqual({str(value) for value in range(8, 16)}, set(data))
 
+    def test_feedback_clarifications_are_explicit(self) -> None:
+        ua = self.markdowns["ua"]
+        en = self.markdowns["en"]
+        self.assertRegex(
+            ua,
+            r"Вплив можна передавати скільки завгодно разів, але лише під час\s+"
+            r"Приватних фаз",
+        )
+        self.assertRegex(
+            en,
+            r"Influence may be transferred any number of times, but only during\s+"
+            r"Private Phases",
+        )
+        self.assertRegex(ua, r"обидва\s+гравці передали одне одному")
+        self.assertRegex(en, r"both players\s+gave at least 1 Influence to each other")
+        self.assertIn("взаємодії з трьома різними гравцями", ua)
+        self.assertIn("dealings with three different players", en)
+        self.assertRegex(ua, r"можуть відбутися в різних Приватних\s+фазах")
+        self.assertRegex(en, r"may occur in different Private Phases")
+        self.assertIn("Вбивця зобов'язаний подати одну чинну ціль", ua)
+        self.assertIn("The Assassin must submit one valid target", en)
+        self.assertIn("Заявляйте виконану Ціль приватно", ua)
+        self.assertIn("Claim a completed Goal privately", en)
+
+    def test_major_factions_are_equal_at_every_player_count(self) -> None:
+        for count, row in self.scaling["en"].items():
+            aristocrats, reformers = (
+                int(value.strip()) for value in row["factions"].split("/")
+            )
+            self.assertEqual(aristocrats, reformers, f"{count}-player setup")
+            expected_magnates = 2 if int(count) % 2 == 0 else 3
+            self.assertEqual(str(expected_magnates), row["magnates"])
+
     def test_visual_components_are_bilingual(self) -> None:
         self.assertEqual(16, self.page.count('class="goal-card '))
         self.assertEqual(20, self.page.count('class="economy-entry '))

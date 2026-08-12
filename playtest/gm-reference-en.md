@@ -21,8 +21,9 @@
 | 2 | +2 to each living player; announce Hit; Auction | Private 45 min → Council → Top 3 |
 | 3 | +2 to each living player; announce Hit | Private 60 min → Council → Final |
 
-During each Private Phase: transfers are legal; Assassin submits one target; Accomplice
-may Launder up to 2; current Assassin may withdraw up to 2 from the Stash.
+During each Private Phase: players may transfer any number of times; the Assassin must
+submit one valid target; the Accomplice may Launder up to 2; the current Assassin may
+withdraw up to 2 from the Stash.
 
 Announce when 5 minutes and 1 minute remain in every Private Phase.
 

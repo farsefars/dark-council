@@ -141,8 +141,12 @@ def transfers(k, archetype, influence, targets, public, cfg):
         return []
     trade, _, _, _ = _traits(archetype)
 
-    # Commerce needs three distinct partners; chase it early.
-    if k.motive == COMMERCE and len(k.traded_with) < 3:
+    # Commerce needs three partners and at least one reciprocal exchange.
+    commerce_open = (
+        len(k.traded_with) < cfg.commerce_partners
+        or not k.reciprocal_traded_with
+    )
+    if k.motive == COMMERCE and commerce_open:
         trade = max(trade, 0.9)
     if k.ambition == DIPLOMAT and len(k.traded_with) < 2:
         trade = max(trade, 0.7)
@@ -155,8 +159,19 @@ def transfers(k, archetype, influence, targets, public, cfg):
     out = []
     budget = max(0, influence - 3)
     n = 0
+    owes_return = [
+        seat for seat in targets
+        if k.motive == COMMERCE
+        and k.received_total.get(seat, 0) > 0
+        and seat not in k.reciprocal_traded_with
+    ]
+    if owes_return:
+        trade = max(trade, 0.75)
     while n < 3 and budget > 0 and _rng.random() < trade:
-        dst = _rng.choice(targets)
+        if owes_return:
+            dst = owes_return.pop(0)
+        else:
+            dst = _rng.choice(targets)
         amt = min(budget, _rng.randint(1, 2))
         out.append((dst, amt))
         budget -= amt

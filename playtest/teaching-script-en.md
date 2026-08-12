@@ -55,7 +55,9 @@ Auction statement is true. You may lie about Evidence normally, but after an Exe
 every holder reads the exact original wording.
 
 Your private card gives your Goals, Secret, and Starting Advantage. Follow the exact
-text; report a completed Goal to me by the end of Round 2.”
+text. Claim a completed Goal privately with me during a Private Phase or open Council
+discussion without interrupting an action or vote. The final opportunity is after the
+Round 2 Leaderboard and before Round 3 begins.”
 
 ## 4:30–5:10 — Death
 

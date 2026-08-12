@@ -375,7 +375,7 @@ def economy_visual(language: str) -> str:
         warning = (
             "A voluntary action requires enough Influence for its largest possible "
             "penalty: 2 to Expose, 1 to vote in an Interrogation. Influence may be "
-            "transferred only during the Private Phase."
+            "transferred any number of times, but only during Private Phases."
         )
     entries = "".join(
         f'<div class="economy-entry {"gain" if group == income else "cost"}">'

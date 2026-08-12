@@ -145,8 +145,8 @@ Influence totals of the Top 3 living players.
 ## 4. The Economy
 
 - **Currency:** Influence. One chip equals one Influence.
-- **Transfers:** players may physically transfer Influence during the Private Phase
-  only.
+- **Transfers:** Influence may be transferred any number of times, but only during
+  Private Phases.
 - **Payments:** Influence paid as a cost goes to the Bank unless a rule says
   otherwise.
 - **Ghosts:** cannot hold, receive, spend, or transfer Influence. Any future income is
@@ -202,17 +202,25 @@ the columns below are only a quick reference, not fixed pairs.
 | **+5 Motive** | Vanity | Wrath | Espionage | Commerce |
 | **+10 Ambition** | Collector | Radical | Blackmailer | Diplomat |
 
-### Motives: claim by the end of Round 2
+Claim a completed Goal privately with the GM during a Private Phase or open Council
+discussion. Do not interrupt an action resolution or vote. If a Goal is completed by
+a Council result or Leaderboard announcement, claim it immediately after that
+procedure. The final opportunity is after the Round 2 Leaderboard and before Round 3
+begins. Only the Diplomat's Public Pact is claimed publicly.
+
+### Motives: claim before Round 3 begins
 
 - **Vanity:** finish Round 1 or Round 2 on the Leaderboard.
 - **Wrath:** initiate an Interrogation, regardless of its result.
 - **Espionage:** privately name to the GM both the **Motive and the Ambition** of one
   other player, correctly. Nobody is told anyone else's Goals at setup, so this can
   only be done by talking to people.
-- **Commerce:** give Influence to or receive Influence from three different players
-  during Private Phases.
+- **Commerce:** give or receive Influence in dealings with three different players
+  during Private Phases. At least one of those trades must be reciprocal: both players
+  gave at least 1 Influence to each other. The two directions of that reciprocal trade
+  may occur in different Private Phases.
 
-### Ambitions: claim by the end of Round 2
+### Ambitions: claim before Round 3 begins
 
 - **Collector:** win the Auction.
 - **Radical:** vote Guilty on two different players who are then Executed.
@@ -222,7 +230,7 @@ the columns below are only a quick reference, not fixed pairs.
   Factions. All three players stand before the GM and publicly declare their Factions.
   The Pact succeeds only if all three declarations are truthful.
 
-Tell the GM as soon as you complete a Goal. The GM pays its reward after verifying it.
+The GM verifies the claimed Goal and pays its reward.
 
 ---
 
@@ -484,7 +492,9 @@ the Hit fails. Submitting no valid target also fails the Hit.
 
 ## 11.4 Assassin: Assassinate
 
-The Assassin must attempt one assassination per round.
+The Assassin must submit one valid target by the end of every Private Phase.
+Voluntarily skipping the assassination is not an option: submitting no target counts
+as a failed Hit.
 
 To make a valid assassination:
 
@@ -539,18 +549,18 @@ Existing Evidence does not change after Promotion.
 
 ## 12.1 Player-count scaling
 
-For an odd number of major-faction seats, randomly decide whether the Aristocrats or
-Reformers receive the extra player. Do this before assigning Roles.
+The Aristocrats and Reformers always have equal numbers. Use 2 Magnates at even player
+counts and 3 Magnates at odd player counts.
 
 | Players | Aristocrats / Reformers | Magnates | Magnate threshold | Assassin + Stash threshold |
 |---:|---:|---:|---:|---:|
 | 8 | 3 / 3 | 2 | 16 | 46 |
-| 9 | 4 / 3 | 2 | 16 | 44 |
+| 9 | 3 / 3 | 3 | 24 | 44 |
 | 10 | 4 / 4 | 2 | 16 | 42 |
 | 11 | 4 / 4 | 3 | 24 | 42 |
-| 12 | 5 / 4 | 3 | 24 | 40 |
+| 12 | 5 / 5 | 2 | 16 | 40 |
 | 13 | 5 / 5 | 3 | 24 | 40 |
-| 14 | 6 / 5 | 3 | 24 | 41 |
+| 14 | 6 / 6 | 2 | 16 | 41 |
 | 15 | 6 / 6 | 3 | 24 | 39 |
 
 Simply: **Magnates need 16 if there are two of them, or 24 if there are three. The

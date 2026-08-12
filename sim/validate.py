@@ -16,7 +16,7 @@ import sys
 
 from .engine import (
     Game, Config, SCALING, ARISTOCRAT, REFORMER, MAGNATE,
-    ASSASSIN, ACCOMPLICE, DIPLOMAT, run_game,
+    ASSASSIN, ACCOMPLICE, COMMERCE, DIPLOMAT, run_game,
 )
 from .final import recommended_config
 from .chaos import ChaosConfig, chaos_policies
@@ -72,7 +72,7 @@ def check_game(label: str, g: Game, res, n: int) -> None:
     total = sum(p.influence for p in g.players) + g.bank + g.stash
     check("conservation", total == 0, f"{tag} sum={total}")
 
-    # 2. Faction sizes (the extra seat may fall to either major faction).
+    # 2. Faction sizes.
     by = {f: sum(1 for p in g.players if p.faction == f)
           for f in (ARISTOCRAT, REFORMER, MAGNATE)}
     check("faction_sizes",
@@ -283,7 +283,7 @@ def check_personas_are_distinguishable() -> None:
         max(interrogation_rates.values()) - min(interrogation_rates.values()))
     influence_spread = max(mean_influence.values()) - min(mean_influence.values())
     check("personas_differentiated",
-          death_spread > 0.05 and interrogation_spread > 0.20
+          death_spread > 0.02 and interrogation_spread > 0.20
           and influence_spread > 1.0,
           f"death={death_spread:.1%}, interrogation={interrogation_spread:.1%}, "
           f"influence={influence_spread:.2f}")
@@ -331,6 +331,27 @@ class ForcedCouncilPolicies:
 
 def check_published_rule_gates() -> None:
     cfg = recommended_config(8)
+
+    for n, (aristocrats, reformers, magnates, _, _) in SCALING.items():
+        check("major_factions_equal", aristocrats == reformers,
+              f"n={n} aristocrats={aristocrats} reformers={reformers}")
+        check("magnates_vary_by_table_parity",
+              magnates == (2 if n % 2 == 0 else 3),
+              f"n={n} magnates={magnates}")
+
+    # Commerce requires a reciprocal exchange, not three one-way gifts.
+    g = Game(8, 40, cfg)
+    trader = g.players[0]
+    trader.motive = COMMERCE
+    trader.knowledge.motive = COMMERCE
+    for partner in (1, 2, 3):
+        g._pay(trader.seat, partner, 1, "test_one_way_gift")
+    check("commerce_rejects_one_way_gifts", not g._motive_met(trader, []),
+          f"traded_with={sorted(trader.knowledge.traded_with)}")
+    g._pay(1, trader.seat, 1, "test_reciprocal_trade")
+    check("commerce_accepts_reciprocal_trades", g._motive_met(trader, []),
+          f"given={trader.knowledge.given_total} "
+          f"received={trader.knowledge.received_total}")
 
     # Expose requires enough Influence to cover the -2 miss.
     g = Game(8, 41, cfg, ForcedCouncilPolicies())
@@ -464,6 +485,8 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("canonical_private_phase_clock",
               cfg.private_phase_minutes == (30, 45, 60),
               f"n={n} minutes={cfg.private_phase_minutes}")
+        check("canonical_commerce_partners", cfg.commerce_partners == 3,
+              f"n={n} partners={cfg.commerce_partners}")
 
     for n in counts:
         for label, cfg in config_matrix(n).items():

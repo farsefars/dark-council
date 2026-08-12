@@ -4,7 +4,8 @@ Give only to the Assassin and Accomplice.
 
 - You are one Aristocrat and one Reformer and know each other.
 - You cannot personally win with your cover Faction.
-- **Assassin:** attempt one assassination each round during the Private Phase.
+- **Assassin:** submit one valid target by the end of every Private Phase. If no valid
+  target is submitted, no one dies and the Hit fails.
 - **Payment tell:** either member must have physically given the victim at least
   1 Influence at any earlier point in the game.
 - **Hit:** success adds 3 to Stash; failure removes 3, and the Assassin pays

@@ -4,7 +4,7 @@
 
 1. **Influence:** your chips plus any debt recorded by the GM.
 2. **Faction:** Aristocrat, Reformer, or Magnate.
-3. **Goals:** your Motive (+5) and Ambition (+10), claim by end of Round 2.
+3. **Goals:** your Motive (+5) and Ambition (+10), claim privately before Round 3.
 4. **Secret:** can be Exposed once.
 5. **Information:** your Advantage, outsider clue, deals, and suspicions.
 
@@ -17,11 +17,15 @@
 ## Private Phase
 
 - Move around, talk, lie, bargain, and transfer Influence.
-- Influence may be transferred **only now**.
+- Influence may be transferred any number of times, but only during Private Phases.
 - Deals are not binding.
 - The GM gives warnings with 5 minutes and 1 minute remaining.
 - An ally may transfer Influence to clear your debt. Received Influence repays debt
   first.
+
+Claim a completed Goal privately with the GM during a Private Phase or open Council
+discussion without interrupting an action or vote. The final opportunity is after the
+Round 2 Leaderboard and before Round 3 begins.
 
 ## Ability to Pay and Bankruptcy
 

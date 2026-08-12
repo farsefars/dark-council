@@ -205,6 +205,10 @@ RULE_ASSERTIONS = {
         (6, r"щонайменше 2 Впливу"),
         (6, r"живі гравці.*щонайменше 1 Впливу"),
         (9, r"фіксує Банкрутство"),
+        (5, r"Заявляйте виконану Ціль приватно"),
+        (5, r"обидва\s+гравці передали одне одному"),
+        (11, r"Вбивця зобов'язаний подати одну чинну ціль"),
+        (12, r"Аристократів і Реформістів завжди однакова"),
     ],
     "en": [
         (1, r"\+2 Influence"),
@@ -231,6 +235,10 @@ RULE_ASSERTIONS = {
         (6, r"at least 2 Influence"),
         (6, r"living player.*at least 1 Influence"),
         (9, r"fixes Bankruptcy"),
+        (5, r"Claim a completed Goal privately"),
+        (5, r"both players\s+gave at least 1 Influence to each other"),
+        (11, r"The Assassin must submit one valid target"),
+        (12, r"Aristocrats and Reformers always have equal numbers"),
     ],
 }
 

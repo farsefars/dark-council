@@ -41,14 +41,14 @@ BANK, STASH = "BANK", "STASH"
 
 # players -> (aristocrats, reformers, magnates, magnate_threshold, assassin_threshold)
 SCALING = {
-    8:  (3, 3, 2, 26, 24),
-    9:  (4, 3, 2, 29, 25),
-    10: (4, 4, 2, 32, 26),
-    11: (4, 4, 3, 38, 27),
-    12: (5, 4, 3, 41, 28),
-    13: (5, 5, 3, 44, 29),
-    14: (6, 5, 3, 47, 30),
-    15: (6, 6, 3, 50, 30),
+    8:  (3, 3, 2, 16, 46),
+    9:  (3, 3, 3, 24, 44),
+    10: (4, 4, 2, 16, 42),
+    11: (4, 4, 3, 24, 42),
+    12: (5, 5, 2, 16, 40),
+    13: (5, 5, 3, 24, 40),
+    14: (6, 6, 2, 16, 41),
+    15: (6, 6, 3, 24, 39),
 }
 
 HITS = [
@@ -158,6 +158,7 @@ class Knowledge:
     partner: int | None = None          # syndicate only
     received_from: dict[int, set[int]] = field(default_factory=dict)  # round -> seats
     traded_with: set[int] = field(default_factory=set)
+    reciprocal_traded_with: set[int] = field(default_factory=set)
     confirmed_clear: set[int] = field(default_factory=set)
     confirmed_syndicate: set[int] = field(default_factory=set)
     publicly_exposed: set[int] = field(default_factory=set)
@@ -930,10 +931,14 @@ class Game:
                     self._pay(t, p.seat, amt, "tribute")
 
     def _record_transfer(self, src: int, dst: int) -> None:
+        if dst in self.cumulative_transfers.get(src, set()):
+            self.players[src].knowledge.reciprocal_traded_with.add(dst)
+            self.players[dst].knowledge.reciprocal_traded_with.add(src)
         self.transfers_this_round.setdefault(dst, set()).add(src)
         self.cumulative_transfers.setdefault(dst, set()).add(src)
         self.players[src].knowledge.traded_with.add(dst)
         self.players[dst].knowledge.traded_with.add(src)
+        self.players[dst].knowledge.received_from.setdefault(self.round, set()).add(src)
 
     def donor_set(self, seat: int) -> list[int]:
         """Who the victim's Ghost can name as having paid them."""
@@ -1378,10 +1383,8 @@ class Game:
                           if self.players[s].ambition == v}
             return len(named) >= self.cfg.espionage_targets
         if p.motive == COMMERCE:
-            # Only one Private Phase exists before the Round 1 deadline, so either the
-            # requirement or the deadline has to move.
             need = self.cfg.commerce_partners if self.cfg.goals_v2 else 3
-            return len(k.traded_with) >= need
+            return len(k.traded_with) >= need and bool(k.reciprocal_traded_with)
         return False
 
     def _ambition_met(self, p: Player) -> bool:
