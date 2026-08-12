@@ -139,6 +139,19 @@ class Config:
     assassin_survival_tax: int = 0
     magnate_threshold: int | None = None
     assassin_threshold: int | None = None
+    # --- economy recalibration candidates (all default to published behaviour) ---
+    # Where a dead player's remaining Influence goes. "single_heir" concentrates it on
+    # one player, which is what produces 90-chip stacks at the table.
+    bequest_mode: str = "single_heir"   # single_heir | split | bank
+    # "estate" funds Guilty-vote rewards from the executed player's confiscated
+    # Influence instead of minting new chips from the Bank.
+    guilty_reward_source: str = "bank"  # bank | estate
+    # "hits" scores the Syndicate on Hits completed rather than accumulated Influence.
+    syndicate_victory_mode: str = "influence"  # influence | hits
+    syndicate_hits_required: int = 3
+    # Under "hits", an optional Stash floor keeps the Syndicate economically constrained
+    # instead of free to dump every chip into vote-buying.
+    syndicate_stash_minimum: int = 0
     # behavioural band: scales goal-claim and trade propensity
     behaviour_band: str = "expected"  # pessimistic | expected | optimistic
     talkativeness: float = 1.0    # scales how much information is traded privately
@@ -291,6 +304,13 @@ class GameResult:
     ambition_completion_by_goal: dict[str, int] | None = None
     zero_agency_players: int = 0
     wealth_top_share: float = 0.0
+    # Physical table load: how many chips must simultaneously exist.
+    peak_player_chips: int = 0
+    peak_stash: int = 0
+    peak_single_holding: int = 0
+    bank_injected: int = 0
+    player_circulated: int = 0
+    votes_decisive: bool = False
 
     def innocent_win_rate(self) -> float:
         """Share of non-Syndicate players who personally won."""
@@ -354,6 +374,13 @@ class Game:
         self.debt_rescued = 0
         self.debt_by_cause: dict[str, int] = {}
         self.excluded_rounds: dict[int, set[int]] = {}
+        self.peak_player_chips = 0
+        self.peak_stash = 0
+        self.peak_single_holding = 0
+        self.bank_injected = 0
+        self.player_circulated = 0
+        self.pending_estate = 0
+        self.votes_decisive = False
 
         self.players = self._setup(a, r, m)
 
@@ -391,12 +418,36 @@ class Game:
             self.stash += amount
         self.ledger.append(
             (self.game_id, self.round, self.phase, str(src), str(dst), amount, reason))
+        if src == BANK and isinstance(dst, int):
+            self.bank_injected += amount
+        if isinstance(src, int) and isinstance(dst, int):
+            self.player_circulated += amount
+        self.track_table_load()
         if isinstance(src, int) and before is not None:
             after = self.players[src].influence
             newly_created = max(0, -after) - max(0, -before)
             if newly_created > 0:
                 self.debt_by_cause[reason] = self.debt_by_cause.get(reason, 0) + newly_created
         return amount
+
+    def track_table_load(self) -> None:
+        """Physical chips that must simultaneously exist on the table.
+
+        Debt is written down rather than held, so only positive balances need chips.
+        """
+        held = 0
+        richest = 0
+        for p in self.players:
+            if p.influence > 0:
+                held += p.influence
+                if p.influence > richest:
+                    richest = p.influence
+        if held > self.peak_player_chips:
+            self.peak_player_chips = held
+        if richest > self.peak_single_holding:
+            self.peak_single_holding = richest
+        if self.stash > self.peak_stash:
+            self.peak_stash = self.stash
 
     def check_conservation(self) -> None:
         total = sum(p.influence for p in self.players) + self.bank + self.stash
@@ -1027,10 +1078,23 @@ class Game:
         if amount > 0:
             skim = int(amount * share)
             self.move(victim.seat, to, skim, f"{cause.lower()}_skim")
+            self.pending_estate = skim if cause == "EXECUTED" else 0
             heirs = [q.seat for q in self.living() if q.seat != victim.seat]
-            if heirs:
+            remainder = victim.influence
+            if remainder > 0 and self.cfg.bequest_mode == "bank":
+                self.move(victim.seat, BANK, remainder, f"{cause.lower()}_escheat")
+            elif remainder > 0 and heirs and self.cfg.bequest_mode == "split":
+                # Spread the estate so no single player ends up stacking the table.
+                base, extra = divmod(remainder, len(heirs))
+                for i, seat in enumerate(sorted(heirs)):
+                    part = base + (1 if i < extra else 0)
+                    if part:
+                        self.move(victim.seat, seat, part, f"{cause.lower()}_bequest")
+            elif remainder > 0 and heirs:
                 heir = self.pol.choose_heir(victim.knowledge, heirs)
-                self.move(victim.seat, heir, victim.influence, f"{cause.lower()}_bequest")
+                self.move(victim.seat, heir, remainder, f"{cause.lower()}_bequest")
+        else:
+            self.pending_estate = 0
         victim.alive = False
         self.deaths_by_round[self.round] = self.deaths_by_round.get(self.round, 0) + 1
         self.events.append((self.game_id, self.round, cause, victim.seat, amount, victim.faction))
@@ -1208,14 +1272,27 @@ class Game:
 
     def settle_guilty_votes(self, guilty_voters: list[int], was_assassin: bool) -> None:
         """Personal stakes: being right about the Assassin pays, being wrong costs."""
-        for seat in guilty_voters:
-            voter = self.players[seat]
-            if not voter.alive:
-                continue          # Ghosts vote but cannot hold Influence
-            if was_assassin and self.cfg.guilty_vote_reward:
-                self.move(BANK, seat, self.cfg.guilty_vote_reward, "guilty_vote_reward")
-            elif not was_assassin and self.cfg.guilty_vote_penalty:
-                self.move(seat, BANK, self.cfg.guilty_vote_penalty, "guilty_vote_penalty")
+        payable = [seat for seat in guilty_voters if self.players[seat].alive]
+        if was_assassin and self.cfg.guilty_vote_reward and payable:
+            if self.cfg.guilty_reward_source == "estate":
+                # Closed loop: the executed player's confiscated Influence is what pays
+                # the room. Nothing new is minted.
+                pot = min(self.pending_estate,
+                          self.cfg.guilty_vote_reward * len(payable))
+                base, extra = divmod(pot, len(payable))
+                for i, seat in enumerate(payable):
+                    part = base + (1 if i < extra else 0)
+                    if part:
+                        self.move(BANK, seat, part, "guilty_vote_reward")
+            else:
+                for seat in payable:
+                    self.move(BANK, seat, self.cfg.guilty_vote_reward,
+                              "guilty_vote_reward")
+        elif not was_assassin and self.cfg.guilty_vote_penalty:
+            for seat in payable:
+                self.move(seat, BANK, self.cfg.guilty_vote_penalty,
+                          "guilty_vote_penalty")
+        self.pending_estate = 0
 
     def check_wipeout(self) -> None:
         """The Stash only falls to the room once the whole Syndicate is dead."""
@@ -1534,16 +1611,18 @@ class Game:
                     weight += extra
             ballots.append((p, weight))
 
-        def count(options: list[int]) -> dict[int, int]:
+        def count(options: list[int]) -> tuple[dict[int, int], list[tuple[int, int]]]:
             tally = {c: 0 for c in options}
+            picks: list[tuple[int, int]] = []
             for voter, weight in ballots:
                 choice = self.pol.final_vote(
                     voter.knowledge, options, voter.archetype)
                 if choice is not None:
                     tally[choice] = tally.get(choice, 0) + weight
-            return tally
+                    picks.append((choice, weight))
+            return tally, picks
 
-        tally = count(candidates)
+        tally, first_picks = count(candidates)
         if not tally or sum(tally.values()) == 0:
             return None
         self.events.append((self.game_id, self.round, "ELECTION_ROUND1",
@@ -1554,15 +1633,27 @@ class Game:
             shuffled = list(candidates)
             self.rng.shuffle(shuffled)
             finalists = sorted(shuffled, key=lambda c: tally[c], reverse=True)[:2]
-            tally = count(finalists)
+            tally, _ = count(finalists)
 
         top = max(tally.values())
         winners = [c for c, v in tally.items() if v == top]
         if len(winners) > 1:
-            tally = count(winners)
+            tally, _ = count(winners)
             top = max(tally.values())
             winners = [c for c, v in tally.items() if v == top]
         winner = self.rng.choice(winners)
+
+        # Would the same ballots, stripped of purchased votes, have elected the same
+        # Faction? This is the measurable value of Influence as an indirect win condition.
+        free_tally: dict[int, int] = {c: 0 for c in candidates}
+        for choice, _ in first_picks:
+            free_tally[choice] = free_tally.get(choice, 0) + 1
+        if free_tally:
+            free_top = max(free_tally.values())
+            free_winners = {c for c, v in free_tally.items() if v == free_top}
+            self.votes_decisive = self.players[winner].faction not in {
+                self.players[c].faction for c in free_winners
+            }
         total = sum(tally.values())
         share_bp = round(10_000 * tally[winner] / total) if total else 0
         self.events.append((self.game_id, self.round, "ELECTION", winner,
@@ -1601,7 +1692,12 @@ class Game:
     def result(self) -> GameResult:
         assassin = self.players[self.assassin_seat]
         assassin_total = max(0, assassin.influence) + self.stash if assassin.alive else 0
-        syndicate_win = assassin.alive and assassin_total >= self.assassin_threshold
+        if self.cfg.syndicate_victory_mode == "hits":
+            syndicate_win = (assassin.alive
+                             and self.hits_met >= self.cfg.syndicate_hits_required
+                             and self.stash >= self.cfg.syndicate_stash_minimum)
+        else:
+            syndicate_win = assassin.alive and assassin_total >= self.assassin_threshold
 
         magnate_total = sum(p.influence for p in self.players
                             if p.faction == MAGNATE and p.alive and p.influence > 0)
@@ -1666,6 +1762,12 @@ class Game:
             ambition_completion_by_goal=ambition_completion,
             zero_agency_players=zero_agency,
             wealth_top_share=top_share,
+            peak_player_chips=self.peak_player_chips,
+            peak_stash=self.peak_stash,
+            peak_single_holding=self.peak_single_holding,
+            bank_injected=self.bank_injected,
+            player_circulated=self.player_circulated,
+            votes_decisive=self.votes_decisive,
         )
 
     def adjudicate(self, wf: str | None, magnate_win: bool,
