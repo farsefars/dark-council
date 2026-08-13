@@ -16,7 +16,7 @@ import sys
 
 from .engine import (
     Game, Config, SCALING, ARISTOCRAT, REFORMER, MAGNATE,
-    ASSASSIN, ACCOMPLICE, COMMERCE, DIPLOMAT, run_game,
+    ASSASSIN, ACCOMPLICE, COMMERCE, DIPLOMAT, BANK, run_game,
 )
 from .final import recommended_config
 from .chaos import ChaosConfig, chaos_policies
@@ -71,6 +71,40 @@ def check_game(label: str, g: Game, res, n: int) -> None:
     # 1. Influence conservation.
     total = sum(p.influence for p in g.players) + g.bank + g.stash
     check("conservation", total == 0, f"{tag} sum={total}")
+    check(
+        "bank_injected_counter",
+        res.bank_injected == sum(
+            row[5] for row in res.ledger
+            if row[3] == BANK and row[4].isdigit()
+        ),
+        f"{tag} counter={res.bank_injected}",
+    )
+    check(
+        "bank_retired_counter",
+        res.bank_retired == sum(
+            row[5] for row in res.ledger
+            if row[3].isdigit() and row[4] == BANK
+        ),
+        f"{tag} counter={res.bank_retired}",
+    )
+    check(
+        "player_circulation_counter",
+        res.player_circulated == sum(
+            row[5] for row in res.ledger
+            if row[3].isdigit() and row[4].isdigit()
+        ),
+        f"{tag} counter={res.player_circulated}",
+    )
+    final_positive = [max(0, p.influence) for p in g.players]
+    check(
+        "physical_load_counters",
+        res.peak_total_chips >= sum(final_positive) + max(0, res.stash)
+        and res.peak_player_chips >= sum(final_positive)
+        and res.peak_single_holding >= max(final_positive, default=0)
+        and res.peak_stash >= max(0, res.stash),
+        f"{tag} players={res.peak_player_chips} richest={res.peak_single_holding} "
+        f"stash={res.peak_stash}",
+    )
 
     # 2. Faction sizes.
     by = {f: sum(1 for p in g.players if p.faction == f)

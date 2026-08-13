@@ -86,9 +86,24 @@ From the repository root:
 python -m sim.validate
 python -m sim.run
 python -m sim.exploits
+python -m sim.scorecard --games 100 --output design\baseline-scorecard.md
 ```
 
 Generated reports and ledgers are intentionally ignored by Git.
+
+`sim.scorecard` is the whole-system comparison gate. With no `--set` arguments it
+measures the frozen stable baseline. Candidate values are applied as one package and
+run on the same seeds:
+
+```powershell
+python -m sim.scorecard --games 100 --name "Candidate A" `
+  --set hit_payout=4 --set vote_cost=2
+```
+
+The output reports baseline, candidate, and delta across win viability, Influence flow,
+physical-token load, vote decisiveness, Assassin incentives, inheritance, information,
+negotiation, pacing, and complexity. Passing it qualifies a package for human testing;
+it does not prove the package is fun or clear.
 
 ## Satisfaction diagnostics
 

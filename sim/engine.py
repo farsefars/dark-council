@@ -291,6 +291,14 @@ class GameResult:
     ambition_completion_by_goal: dict[str, int] | None = None
     zero_agency_players: int = 0
     wealth_top_share: float = 0.0
+    peak_total_chips: int = 0
+    peak_player_chips: int = 0
+    peak_stash: int = 0
+    peak_single_holding: int = 0
+    bank_injected: int = 0
+    bank_retired: int = 0
+    player_circulated: int = 0
+    votes_decisive: bool = False
 
     def innocent_win_rate(self) -> float:
         """Share of non-Syndicate players who personally won."""
@@ -357,6 +365,14 @@ class Game:
         self.debt_rescued = 0
         self.debt_by_cause: dict[str, int] = {}
         self.excluded_rounds: dict[int, set[int]] = {}
+        self.peak_player_chips = 0
+        self.peak_total_chips = 0
+        self.peak_stash = 0
+        self.peak_single_holding = 0
+        self.bank_injected = 0
+        self.bank_retired = 0
+        self.player_circulated = 0
+        self.votes_decisive = False
 
         self.players = self._setup(a, r, m)
 
@@ -394,12 +410,31 @@ class Game:
             self.stash += amount
         self.ledger.append(
             (self.game_id, self.round, self.phase, str(src), str(dst), amount, reason))
+        if src == BANK and isinstance(dst, int):
+            self.bank_injected += amount
+        if isinstance(src, int) and dst == BANK:
+            self.bank_retired += amount
+        if isinstance(src, int) and isinstance(dst, int):
+            self.player_circulated += amount
+        self.track_table_load()
         if isinstance(src, int) and before is not None:
             after = self.players[src].influence
             newly_created = max(0, -after) - max(0, -before)
             if newly_created > 0:
                 self.debt_by_cause[reason] = self.debt_by_cause.get(reason, 0) + newly_created
         return amount
+
+    def track_table_load(self) -> None:
+        """Record physical-token load without affecting game decisions."""
+        positive = [p.influence for p in self.players if p.influence > 0]
+        self.peak_total_chips = max(
+            self.peak_total_chips, sum(positive) + max(0, self.stash)
+        )
+        self.peak_player_chips = max(self.peak_player_chips, sum(positive))
+        self.peak_single_holding = max(
+            self.peak_single_holding, max(positive, default=0)
+        )
+        self.peak_stash = max(self.peak_stash, self.stash)
 
     def check_conservation(self) -> None:
         total = sum(p.influence for p in self.players) + self.bank + self.stash
@@ -1528,16 +1563,18 @@ class Game:
                     weight += extra
             ballots.append((p, weight))
 
-        def count(options: list[int]) -> dict[int, int]:
+        def count(options: list[int]) -> tuple[dict[int, int], list[tuple[int, int]]]:
             tally = {c: 0 for c in options}
+            picks: list[tuple[int, int]] = []
             for voter, weight in ballots:
                 choice = self.pol.final_vote(
                     voter.knowledge, options, voter.archetype)
                 if choice is not None:
                     tally[choice] = tally.get(choice, 0) + weight
-            return tally
+                    picks.append((choice, weight))
+            return tally, picks
 
-        tally = count(candidates)
+        tally, first_picks = count(candidates)
         if not tally or sum(tally.values()) == 0:
             return None
         self.events.append((self.game_id, self.round, "ELECTION_ROUND1",
@@ -1548,15 +1585,25 @@ class Game:
             shuffled = list(candidates)
             self.rng.shuffle(shuffled)
             finalists = sorted(shuffled, key=lambda c: tally[c], reverse=True)[:2]
-            tally = count(finalists)
+            tally, _ = count(finalists)
 
         top = max(tally.values())
         winners = [c for c, v in tally.items() if v == top]
         if len(winners) > 1:
-            tally = count(winners)
+            tally, _ = count(winners)
             top = max(tally.values())
             winners = [c for c, v in tally.items() if v == top]
         winner = self.rng.choice(winners)
+
+        free_tally = {c: 0 for c in candidates}
+        for choice, _ in first_picks:
+            free_tally[choice] = free_tally.get(choice, 0) + 1
+        if free_tally:
+            free_top = max(free_tally.values())
+            free_winners = {c for c, votes in free_tally.items() if votes == free_top}
+            self.votes_decisive = self.players[winner].faction not in {
+                self.players[c].faction for c in free_winners
+            }
         total = sum(tally.values())
         share_bp = round(10_000 * tally[winner] / total) if total else 0
         self.events.append((self.game_id, self.round, "ELECTION", winner,
@@ -1660,6 +1707,14 @@ class Game:
             ambition_completion_by_goal=ambition_completion,
             zero_agency_players=zero_agency,
             wealth_top_share=top_share,
+            peak_total_chips=self.peak_total_chips,
+            peak_player_chips=self.peak_player_chips,
+            peak_stash=self.peak_stash,
+            peak_single_holding=self.peak_single_holding,
+            bank_injected=self.bank_injected,
+            bank_retired=self.bank_retired,
+            player_circulated=self.player_circulated,
+            votes_decisive=self.votes_decisive,
         )
 
     def adjudicate(self, wf: str | None, magnate_win: bool,
