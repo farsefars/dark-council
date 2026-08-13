@@ -105,6 +105,20 @@ physical-token load, vote decisiveness, Assassin incentives, inheritance, inform
 negotiation, pacing, and complexity. Passing it qualifies a package for human testing;
 it does not prove the package is fun or clear.
 
+Named whole-system packages are simulator-only configurations in `sim/packages.py`:
+they are calibrated only for the current 10-15-player reassessment range.
+
+```powershell
+python -m sim.scorecard --games 150 --package reward-compression
+python -m sim.scorecard --games 150 --package reward-compression --mode realistic
+python -m sim.exploits --package reward-compression --games 250 --players 13
+python -m sim.alliance --games 150 --package reward-compression
+```
+
+The alliance runner is deliberately pessimistic: a perfectly informed cover Faction
+funds and protects the Assassin while the Assassin abandons Hits to attack its rival.
+Use it to reject packages that make betrayal too safe, not to predict ordinary play.
+
 ## Satisfaction diagnostics
 
 ```powershell

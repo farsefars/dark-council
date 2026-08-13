@@ -1,7 +1,8 @@
 # Whole-system balance scorecard
 
-**Frozen baseline:** restored stable economy (`a581b50`).  
-**Sample:** 100 games x 6 player counts (10, 11, 12, 13, 14, 15); first seed 1900000.  
+**Frozen baseline:** restored stable economy (`a581b50`).
+**Sample:** 100 games x 6 player counts (10, 11, 12, 13, 14, 15); first seed 1900000.
+**Behaviour:** normal.
 **Method:** baseline and candidate use identical seeds. Simulation is a rejection test, not proof of fun or clarity.
 
 ## Headline scorecard
@@ -23,11 +24,11 @@
 | Richest holding worst | 64.00 |
 | Vote buyers/game | 1.52 |
 | Purchased votes/game | 3.34 |
-| Purchased votes decisive | 8.5% |
+| Purchased votes decisive | 19.2% |
 | Hit success | 95.1% |
 | Hit reward | 3.00 |
 | Effective Faction liquidity | 15.64 |
-| Hit/effective bribe | 0.19 |
+| Hit opportunity cost/effective bribe | 0.38 |
 | Correct-execution injection/game | 25.20 |
 | Deaths/game | 5.72 |
 | Inheritance/game | 28.02 |
@@ -43,9 +44,9 @@
 |---|---|---|
 | I1 Agency | **PASS** | 1.1% of players recorded no modelled agency |
 | I2 Inheritance | **PASS** | 28.0 Influence inherited per game |
-| I3 Physical playability | **FAIL** | p90 pool 179/250; p90 holding 42/30 |
-| I4 Assassin triangle | **FAIL** | Hit/effective bribe 0.19; execution reward 25.2; Assassin alive 73.5% |
-| I5 Influence matters | **FAIL** | Magnate 40.3%; purchased votes decisive 8.5%/20% |
+| I3 Physical playability | **FAIL** | pool p90/worst 179/257 (limits 220/250); holding p90/worst 42/64 (limits 30/50) |
+| I4 Assassin triangle | **FAIL** | Hit opportunity cost/effective bribe 0.38; execution reward 25.2; Assassin alive 73.5% |
+| I5 Influence matters | **PASS** | Magnate 40.3%; purchased votes decisive 19.2%/15% |
 | I6 Social over arithmetic | **PASS** | social transfers in 100.0% of games; 24.7 distinct directed pairs |
 | I7 Teachability | **PASS** | baseline adds no concepts |
 | I8 Symmetry and viability | **PASS** | A/R gap 2.7%; range 36.7%-50.2% |
@@ -72,7 +73,7 @@
 ## Interpretation limits
 
 - The scorecard measures modelled behaviour, not persuasion quality, enjoyment, clarity, or desire to replay.
-- `Hit/effective bribe` uses end-of-Council major-Faction liquidity averaged across all rounds, then discounts it by 50%. The timing and discount are explicit bargaining assumptions, not discovered facts.
-- `Purchased votes decisive` is conservative: it asks whether stripping paid weight from the same first-round choices changes the winning Faction.
+- `Hit opportunity cost/effective bribe` is success payout plus failure penalty, divided by end-of-Council major-Faction liquidity averaged across all rounds and discounted by 50%. The timing and discount are explicit bargaining assumptions, not discovered facts.
+- `Purchased votes decisive` uses a paired replay with the same seed and policy decisions, suppressing only paid vote weight and spending.
 - Complexity and teachability require manual rules review for every candidate.
 - Acceptance thresholds are guardrails. They must be revised from live-playtest evidence rather than tuned until a preferred package passes.

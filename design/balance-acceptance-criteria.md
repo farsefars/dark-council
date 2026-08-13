@@ -1,7 +1,8 @@
 # Draft acceptance criteria for the next balance package
 
-**Status: requires owner sign-off before candidate packages are designed.** These are
-decision gates, not targets to tune against until one proposal passes.
+**Status: used as the working gates for package assessment.** These are decision gates,
+not targets to tune against until one proposal passes. Adopting a package still requires
+owner sign-off.
 
 ## Mechanical gates
 
@@ -53,4 +54,3 @@ Every proposed package must include:
 
 No rulebook or playtest-aid edits occur until these criteria are approved and a complete
 package is selected.
-

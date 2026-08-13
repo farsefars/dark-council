@@ -20,7 +20,7 @@ from .engine import (
 )
 from .final import recommended_config
 from .chaos import ChaosConfig, chaos_policies
-from .exploits import EXPLOITS, ExploitPolicies
+from .exploits import EXPLOITS, ExploitPolicies, run_alliance_game
 
 FAILURES: list[str] = []
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +46,10 @@ def config_matrix(n: int) -> dict[str, Config]:
         "runoff": recommended_config(n, election_mode="runoff"),
         "escalating_votes": recommended_config(
             n, vote_purchase_mode="escalating"),
+        "package_flags": recommended_config(
+            n, bequest_mode="three_heirs", leaderboard_tribute=2,
+            syndicate_hits_required=2, candidates_declare=True,
+            election_mode="runoff"),
         "minimal_systems": recommended_config(
             n, hits_enabled=False, private_transfers_enabled=False,
             goals_enabled=False, auction_enabled=False, expose_enabled=False,
@@ -541,6 +545,84 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
         check("determinism",
               a.ledger == b.ledger and a.syndicate_win == b.syndicate_win
               and a.magnate_total == b.magnate_total, f"n={n}")
+
+    # Default-off package mechanics are independently testable.
+    inheritance = Game(
+        10, 71, recommended_config(10, bequest_mode="two_heirs")
+    )
+    victim = inheritance.players[0]
+    inheritance.kill(victim, BANK, 0.5, "EXECUTED")
+    bequests = [
+        row for row in inheritance.ledger if row[6] == "executed_bequest"
+    ]
+    check(
+        "two_heir_split",
+        len(bequests) == 2
+        and len({row[4] for row in bequests}) == 2
+        and sum(row[5] for row in bequests) == 2,
+        str(bequests),
+    )
+
+    three_heirs = Game(
+        10, 74, recommended_config(10, bequest_mode="three_heirs")
+    )
+    victim = three_heirs.players[0]
+    victim.influence = 8
+    three_heirs.kill(victim, BANK, 0.25, "EXECUTED")
+    three_rows = [
+        row for row in three_heirs.ledger if row[6] == "executed_bequest"
+    ]
+    check(
+        "three_heir_split",
+        len(three_rows) == 3
+        and len({row[4] for row in three_rows}) == 3
+        and sorted(row[5] for row in three_rows) == [2, 2, 2],
+        str(three_rows),
+    )
+
+    tribute = Game(
+        10, 72, recommended_config(10, leaderboard_tribute=2)
+    )
+    tribute.round = 1
+    tribute.resolve_leaderboard_tribute()
+    tribute_rows = [
+        row for row in tribute.ledger if row[6] == "leaderboard_tribute"
+    ]
+    check(
+        "leaderboard_tribute",
+        len(tribute_rows) == 3 and all(row[5] == 2 for row in tribute_rows),
+        str(tribute_rows),
+    )
+
+    hybrid = Game(
+        10, 73, recommended_config(
+            10, assassin_threshold=1, syndicate_hits_required=2
+        )
+    )
+    hybrid.players[hybrid.assassin_seat].influence = 10
+    hybrid.hits_met = 1
+    check("hybrid_rejects_one_hit", not hybrid.result().syndicate_win, "")
+    hybrid.hits_met = 2
+    check("hybrid_accepts_two_hits", hybrid.result().syndicate_win, "")
+
+    alliance = run_alliance_game(
+        10, 75, recommended_config(10), ignore_hit=True
+    )
+    check(
+        "alliance_stress_runs",
+        alliance.allied_faction in (ARISTOCRAT, REFORMER)
+        and alliance.original_assassin in range(10),
+        str(alliance),
+    )
+
+    suppressed = run_game(
+        10, 76, recommended_config(10, suppress_vote_purchase_effect=True)
+    )
+    check(
+        "vote_purchase_counterfactual_suppressed",
+        not any(row[6] == "vote_purchase" for row in suppressed.ledger),
+        str([row for row in suppressed.ledger if row[6] == "vote_purchase"]),
+    )
 
     # Config plumbing: overrides must reach the victory check.
     res = run_game(13, 7, recommended_config(13, magnate_threshold=1,

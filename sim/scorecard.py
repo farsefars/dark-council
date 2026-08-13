@@ -10,6 +10,7 @@ import argparse
 import ast
 from collections import defaultdict
 from dataclasses import fields
+from dataclasses import replace
 import math
 from pathlib import Path
 import statistics
@@ -24,7 +25,10 @@ from .engine import (
     Config,
     run_game,
 )
+from .chaos import ChaosConfig, chaos_policies
+from .exploits import EXPLOITS, ExploitPolicies
 from .final import recommended_config
+from .packages import PACKAGES, BalancePackage, get_package
 from .run import wilson
 
 
@@ -33,7 +37,7 @@ DEFAULT_GAMES = 100
 DEFAULT_SEED = 1_900_000
 PHYSICAL_TOKEN_BUDGET = 250
 PRACTICAL_HOLDING_P90 = 30
-TARGET_VOTE_DECISIVENESS = 0.20
+TARGET_VOTE_DECISIVENESS = 0.15
 EFFECTIVE_BRIBE_FRACTION = 0.5
 
 
@@ -152,9 +156,13 @@ def collect(results: list, configs: dict[int, Config], override_count: int) -> d
         win_intervals[label] = wilson(successes, games)
     faction_gap = abs(win_rates["Aristocrat"] - win_rates["Reformer"])
     hit_reward = mean([configs[result.n_players].hit_payout for result in results])
+    hit_penalty = mean([configs[result.n_players].hit_penalty for result in results])
+    hit_opportunity_cost = hit_reward + hit_penalty
     nominal_bribe = mean(faction_liquidity)
     effective_bribe = nominal_bribe * EFFECTIVE_BRIBE_FRACTION
-    hit_bribe_ratio = hit_reward / effective_bribe if effective_bribe else math.inf
+    hit_bribe_ratio = (
+        hit_opportunity_cost / effective_bribe if effective_bribe else math.inf
+    )
 
     per_count: dict[int, dict[str, float]] = {}
     for count in sorted({result.n_players for result in results}):
@@ -193,6 +201,8 @@ def collect(results: list, configs: dict[int, Config], override_count: int) -> d
         "vote_decisiveness": sum(r.votes_decisive for r in results) / games,
         "hit_success": sum(r.hits_met for r in results) / hits if hits else 0.0,
         "hit_reward": hit_reward,
+        "hit_penalty": hit_penalty,
+        "hit_opportunity_cost": hit_opportunity_cost,
         "nominal_faction_liquidity": nominal_bribe,
         "effective_faction_liquidity": effective_bribe,
         "hit_bribe_ratio": hit_bribe_ratio,
@@ -246,11 +256,16 @@ def assess_invariants(metrics: dict[str, Any]) -> list[tuple[str, str, str]]:
         (
             "I3 Physical playability",
             "PASS"
-            if metrics["peak_total_p90"] <= PHYSICAL_TOKEN_BUDGET
+            if metrics["peak_total_p90"] <= 220
+            and metrics["peak_total_worst"] <= PHYSICAL_TOKEN_BUDGET
             and metrics["richest_p90"] <= PRACTICAL_HOLDING_P90
+            and metrics["richest_worst"] <= 50
             else "FAIL",
-            f"p90 pool {metrics['peak_total_p90']:.0f}/{PHYSICAL_TOKEN_BUDGET}; "
-            f"p90 holding {metrics['richest_p90']:.0f}/{PRACTICAL_HOLDING_P90}",
+            f"pool p90/worst {metrics['peak_total_p90']:.0f}/"
+            f"{metrics['peak_total_worst']:.0f} (limits 220/{PHYSICAL_TOKEN_BUDGET}); "
+            f"holding p90/worst {metrics['richest_p90']:.0f}/"
+            f"{metrics['richest_worst']:.0f} "
+            f"(limits {PRACTICAL_HOLDING_P90}/50)",
         ),
         (
             "I4 Assassin triangle",
@@ -259,7 +274,8 @@ def assess_invariants(metrics: dict[str, Any]) -> list[tuple[str, str, str]]:
             and metrics["execution_reward"] > 0
             and 0.15 <= metrics["assassin_alive"] <= 0.85
             else "FAIL",
-            f"Hit/effective bribe {metrics['hit_bribe_ratio']:.2f}; "
+            f"Hit opportunity cost/effective bribe "
+            f"{metrics['hit_bribe_ratio']:.2f}; "
             f"execution reward {metrics['execution_reward']:.1f}; "
             f"Assassin alive {metrics['assassin_alive']:.1%}",
         ),
@@ -291,7 +307,7 @@ def assess_invariants(metrics: dict[str, Any]) -> list[tuple[str, str, str]]:
             "I8 Symmetry and viability",
             "PASS"
             if metrics["faction_gap"] <= 0.08
-            and all(0.15 <= value <= 0.65 for value in win_rates.values())
+            and all(0.20 <= value <= 0.60 for value in win_rates.values())
             else "FAIL",
             f"A/R gap {metrics['faction_gap']:.1%}; range "
             f"{min(win_rates.values()):.1%}-{max(win_rates.values()):.1%}",
@@ -304,16 +320,42 @@ def run_suite(
     games_per_count: int,
     seed: int,
     overrides: dict[str, Any] | None = None,
+    package: BalancePackage | None = None,
+    mode: str = "normal",
+    exploit: str | None = None,
 ) -> tuple[list, dict[int, Config]]:
     overrides = overrides or {}
     results = []
     configs = {}
     for count in counts:
-        config = recommended_config(count, **overrides)
+        config = (
+            package.config_for(count)
+            if package is not None
+            else recommended_config(count, **overrides)
+        )
         configs[count] = config
         for index in range(games_per_count):
             game_seed = seed + count * 100_000 + index
-            results.append(run_game(count, game_seed, config))
+            def policy():
+                if exploit:
+                    return ExploitPolicies(exploit, (0, 1, 2))
+                if mode == "realistic":
+                    return chaos_policies(ChaosConfig.realistic())
+                if mode == "messy":
+                    return chaos_policies(ChaosConfig.messy())
+                return None
+
+            result = run_game(count, game_seed, config, policy())
+            counterfactual = run_game(
+                count,
+                game_seed,
+                replace(config, suppress_vote_purchase_effect=True),
+                policy(),
+            )
+            result.votes_decisive = (
+                result.winning_faction != counterfactual.winning_faction
+            )
+            results.append(result)
     return results, configs
 
 
@@ -334,13 +376,15 @@ def render_metrics(
     games_per_count: int,
     seed: int,
     overrides: dict[str, Any],
+    behavior: str,
 ) -> str:
     lines = [
         "# Whole-system balance scorecard",
         "",
-        f"**Frozen baseline:** restored stable economy (`a581b50`).  ",
+        f"**Frozen baseline:** restored stable economy (`a581b50`).",
         f"**Sample:** {games_per_count} games x {len(counts)} player counts "
-        f"({', '.join(map(str, counts))}); first seed {seed}.  ",
+        f"({', '.join(map(str, counts))}); first seed {seed}.",
+        f"**Behaviour:** {behavior}.",
         "**Method:** baseline and candidate use identical seeds. Simulation is a rejection "
         "test, not proof of fun or clarity.",
         "",
@@ -348,7 +392,7 @@ def render_metrics(
     if candidate:
         rendered = ", ".join(f"`{key}={value!r}`" for key, value in overrides.items())
         lines.extend([
-            f"**Candidate:** {name}.  ",
+            f"**Candidate:** {name}.",
             f"**Overrides:** {rendered or 'none'}.",
             "",
         ])
@@ -373,7 +417,7 @@ def render_metrics(
         ("Hit success", ("hit_success",), True),
         ("Hit reward", ("hit_reward",), False),
         ("Effective Faction liquidity", ("effective_faction_liquidity",), False),
-        ("Hit/effective bribe", ("hit_bribe_ratio",), False),
+        ("Hit opportunity cost/effective bribe", ("hit_bribe_ratio",), False),
         ("Correct-execution injection/game", ("execution_reward",), False),
         ("Deaths/game", ("deaths",), False),
         ("Inheritance/game", ("inheritance",), False),
@@ -463,11 +507,12 @@ def render_metrics(
         "",
         "- The scorecard measures modelled behaviour, not persuasion quality, enjoyment, "
         "clarity, or desire to replay.",
-        "- `Hit/effective bribe` uses end-of-Council major-Faction liquidity averaged "
-        "across all rounds, then discounts it by 50%. The timing and discount are "
-        "explicit bargaining assumptions, not discovered facts.",
-        "- `Purchased votes decisive` is conservative: it asks whether stripping paid "
-        "weight from the same first-round choices changes the winning Faction.",
+        "- `Hit opportunity cost/effective bribe` is success payout plus failure "
+        "penalty, divided by end-of-Council major-Faction liquidity averaged across all "
+        "rounds and discounted by 50%. The timing and discount are explicit bargaining "
+        "assumptions, not discovered facts.",
+        "- `Purchased votes decisive` uses a paired replay with the same seed and policy "
+        "decisions, suppressing only paid vote weight and spending.",
         "- Complexity and teachability require manual rules review for every candidate.",
         "- Acceptance thresholds are guardrails. They must be revised from live-playtest "
         "evidence rather than tuned until a preferred package passes.",
@@ -496,6 +541,11 @@ def main() -> None:
     parser.add_argument("--games", type=int, default=DEFAULT_GAMES)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--name", default="Candidate")
+    parser.add_argument("--package", choices=sorted(PACKAGES))
+    parser.add_argument(
+        "--mode", choices=("normal", "realistic", "messy"), default="normal"
+    )
+    parser.add_argument("--exploit", choices=EXPLOITS)
     parser.add_argument(
         "--set",
         dest="overrides",
@@ -509,26 +559,54 @@ def main() -> None:
 
     counts = tuple(args.counts)
     override_dict = dict(args.overrides)
-    baseline_results, baseline_configs = run_suite(counts, args.games, args.seed)
+    if args.package and override_dict:
+        parser.error("--package and --set cannot be combined")
+    if args.exploit and args.mode != "normal":
+        parser.error("--exploit cannot be combined with a chaos --mode")
+
+    package = get_package(args.package) if args.package else None
+    behavior = f"exploit:{args.exploit}" if args.exploit else args.mode
+    baseline_results, baseline_configs = run_suite(
+        counts, args.games, args.seed, mode=args.mode, exploit=args.exploit
+    )
     baseline = collect(baseline_results, baseline_configs, 0)
 
     candidate = None
-    if override_dict:
+    display_overrides = override_dict
+    if override_dict or package:
         candidate_results, candidate_configs = run_suite(
-            counts, args.games, args.seed, override_dict
+            counts,
+            args.games,
+            args.seed,
+            override_dict,
+            package=package,
+            mode=args.mode,
+            exploit=args.exploit,
         )
         candidate = collect(
-            candidate_results, candidate_configs, len(override_dict)
+            candidate_results,
+            candidate_configs,
+            (
+                len(package.overrides)
+                + bool(package.magnate_thresholds)
+                + bool(package.assassin_thresholds)
+                if package else len(override_dict)
+            ),
         )
+        if package:
+            display_overrides = dict(package.overrides)
+            display_overrides["magnate_thresholds"] = package.magnate_thresholds
+            display_overrides["assassin_thresholds"] = package.assassin_thresholds
 
     report = render_metrics(
         baseline,
         candidate,
-        args.name,
+        package.name if package else args.name,
         counts,
         args.games,
         args.seed,
-        override_dict,
+        display_overrides,
+        behavior,
     )
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

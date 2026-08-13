@@ -139,6 +139,12 @@ class Config:
     assassin_survival_tax: int = 0
     magnate_threshold: int | None = None
     assassin_threshold: int | None = None
+    # Whole-system package experiments. Defaults preserve the published rules.
+    bequest_mode: str = "single_heir"  # single_heir | two_heirs | three_heirs
+    leaderboard_tribute: int = 0
+    leaderboard_tribute_count: int = 3
+    syndicate_hits_required: int = 0
+    suppress_vote_purchase_effect: bool = False
     # behavioural band: scales goal-claim and trade propensity
     behaviour_band: str = "expected"  # pessimistic | expected | optimistic
     talkativeness: float = 1.0    # scales how much information is traded privately
@@ -666,6 +672,8 @@ class Game:
                 self.auction()
             self.private_phase()
             self.council()
+            if rnd < self.cfg.rounds:
+                self.resolve_leaderboard_tribute()
             self.snapshot()
             self.check_conservation()
         self.final()
@@ -1058,8 +1066,24 @@ class Game:
             self.move(victim.seat, to, skim, f"{cause.lower()}_skim")
             heirs = [q.seat for q in self.living() if q.seat != victim.seat]
             if heirs:
-                heir = self.pol.choose_heir(victim.knowledge, heirs)
-                self.move(victim.seat, heir, victim.influence, f"{cause.lower()}_bequest")
+                heir_limit = {
+                    "single_heir": 1,
+                    "two_heirs": 2,
+                    "three_heirs": 3,
+                }.get(self.cfg.bequest_mode)
+                if heir_limit is None:
+                    raise ValueError(f"unknown bequest mode: {self.cfg.bequest_mode}")
+                selected: list[int] = []
+                while len(selected) < min(heir_limit, len(heirs)):
+                    available = [seat for seat in heirs if seat not in selected]
+                    selected.append(self.pol.choose_heir(victim.knowledge, available))
+                remaining = victim.influence
+                base, extra = divmod(remaining, len(selected))
+                for index, heir in enumerate(selected):
+                    self.move(
+                        victim.seat, heir, base + (1 if index < extra else 0),
+                        f"{cause.lower()}_bequest",
+                    )
         victim.alive = False
         self.deaths_by_round[self.round] = self.deaths_by_round.get(self.round, 0) + 1
         self.events.append((self.game_id, self.round, cause, victim.seat, amount, victim.faction))
@@ -1369,6 +1393,20 @@ class Game:
                         self.stage_public_pact(p)
                     self.move(BANK, p.seat, self.cfg.ambition_reward, "ambition_claim")
 
+    def resolve_leaderboard_tribute(self) -> None:
+        """Optional package sink: announced leaders return Influence to the Bank."""
+        amount = self.cfg.leaderboard_tribute
+        if amount <= 0:
+            return
+        self.phase = "LEADERBOARD"
+        leaders = self.leaderboard()[:self.cfg.leaderboard_tribute_count]
+        for seat in leaders:
+            self.move(seat, BANK, amount, "leaderboard_tribute")
+        self.events.append((
+            self.game_id, self.round, "LEADERBOARD_TRIBUTE",
+            len(leaders), amount, ",".join(map(str, leaders)),
+        ))
+
     def pact_partners(self, p: Player) -> list[int]:
         """Two living players from the two other Factions who would stand with you."""
         by_faction: dict[str, list[int]] = {}
@@ -1554,7 +1592,7 @@ class Game:
                 extra = self.pol.buy_votes(p.knowledge, p.archetype, p.influence,
                                            candidates, self.cfg)
                 extra = max(0, min(extra, self.max_affordable_votes(p.influence)))
-                if extra:
+                if extra and not self.cfg.suppress_vote_purchase_effect:
                     cost = self.vote_purchase_cost(extra)
                     self.move(p.seat, BANK, cost, "vote_purchase")
                     self.events.append((self.game_id, self.round, "VOTE_PURCHASE",
@@ -1563,18 +1601,16 @@ class Game:
                     weight += extra
             ballots.append((p, weight))
 
-        def count(options: list[int]) -> tuple[dict[int, int], list[tuple[int, int]]]:
+        def count(options: list[int]) -> dict[int, int]:
             tally = {c: 0 for c in options}
-            picks: list[tuple[int, int]] = []
             for voter, weight in ballots:
                 choice = self.pol.final_vote(
                     voter.knowledge, options, voter.archetype)
                 if choice is not None:
                     tally[choice] = tally.get(choice, 0) + weight
-                    picks.append((choice, weight))
-            return tally, picks
+            return tally
 
-        tally, first_picks = count(candidates)
+        tally = count(candidates)
         if not tally or sum(tally.values()) == 0:
             return None
         self.events.append((self.game_id, self.round, "ELECTION_ROUND1",
@@ -1585,25 +1621,16 @@ class Game:
             shuffled = list(candidates)
             self.rng.shuffle(shuffled)
             finalists = sorted(shuffled, key=lambda c: tally[c], reverse=True)[:2]
-            tally, _ = count(finalists)
+            tally = count(finalists)
 
         top = max(tally.values())
         winners = [c for c, v in tally.items() if v == top]
         if len(winners) > 1:
-            tally, _ = count(winners)
+            tally = count(winners)
             top = max(tally.values())
             winners = [c for c, v in tally.items() if v == top]
         winner = self.rng.choice(winners)
 
-        free_tally = {c: 0 for c in candidates}
-        for choice, _ in first_picks:
-            free_tally[choice] = free_tally.get(choice, 0) + 1
-        if free_tally:
-            free_top = max(free_tally.values())
-            free_winners = {c for c, votes in free_tally.items() if votes == free_top}
-            self.votes_decisive = self.players[winner].faction not in {
-                self.players[c].faction for c in free_winners
-            }
         total = sum(tally.values())
         share_bp = round(10_000 * tally[winner] / total) if total else 0
         self.events.append((self.game_id, self.round, "ELECTION", winner,
@@ -1642,7 +1669,11 @@ class Game:
     def result(self) -> GameResult:
         assassin = self.players[self.assassin_seat]
         assassin_total = max(0, assassin.influence) + self.stash if assassin.alive else 0
-        syndicate_win = assassin.alive and assassin_total >= self.assassin_threshold
+        syndicate_win = (
+            assassin.alive
+            and assassin_total >= self.assassin_threshold
+            and self.hits_met >= self.cfg.syndicate_hits_required
+        )
 
         magnate_total = sum(p.influence for p in self.players
                             if p.faction == MAGNATE and p.alive and p.influence > 0)

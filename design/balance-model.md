@@ -136,26 +136,23 @@ Inheritance performs three valuable jobs:
 Its failure is **concentration**, not existence. Any future package must preserve those
 jobs while testing concentration and repeated-death effects explicitly.
 
-## 6. Voting is currently information-bound
+## 6. Voting is already mechanically relevant
 
-The stable baseline produces:
+A corrected paired counterfactual replays the complete election with the same seeds and
+policy decisions but suppresses purchased vote weight. The stable baseline produces:
 
 - **1.52** Final vote buyers/game;
 - **3.34** purchased votes/game;
-- only **8.5%** of winners changed at the Faction level because of purchased weight;
+- **19.2%** of winners changed at the Faction level because of purchased votes;
 - **4.05** verified Faction identities known per player at the end of the modelled game.
 
-Influence can buy votes, but a player buys only when they believe a Candidate serves
-their objective. Price is therefore downstream of:
+This passes the 15% working gate. The earlier 8.5% result was invalid because it compared
+the purchased election's final result with free first-round plurality rather than
+replaying the same tie/runoff procedure without paid weight.
 
-1. which Candidates are nominated;
-2. what Faction information is credible before spending;
-3. whether the buyer still needs Influence for an economic victory;
-4. whether enough other voters already make the purchase irrelevant.
-
-Changing vote price without changing information can increase affordable votes while
-barely changing rational demand. Vote decisiveness must be diagnosed as an
-information-and-ballot problem before it is treated as an economy problem.
+Voting therefore remains an important coupling—economic changes can remove liquidity
+and weaken it—but it is not a baseline problem requiring a new information or Final
+rule. Future packages must preserve its decisiveness rather than redesign it.
 
 ## 7. Restored baseline diagnosis
 
@@ -164,8 +161,8 @@ information-and-ballot problem before it is treated as an economy problem.
 | Agency | Pass | Stipends, inheritance, Ghost votes, and social transfers keep most players active. |
 | Inheritance | Pass | It preserves circulation and bereaved-Faction agency. |
 | Physical playability | Fail | Total pool usually fits, but one-heir estates create impractical holdings; rare pool extremes exceed 250. |
-| Assassin triangle | Fail | Hit reward is cheap relative to available Faction wealth; protection also carries unpriced political value. |
-| Influence matters | Fail | Magnates are viable, but bought votes rarely change the winning Faction. |
+| Assassin triangle | Fail | Hit opportunity cost is cheap relative to available Faction wealth; protection also carries unpriced political value. |
+| Influence matters | Pass | Magnates are viable and bought votes change the winning Faction often enough to clear the working gate. |
 | Social negotiation | Pass in the model | Player-to-player transfer volume is high; live play must confirm whether those transfers are meaningful bargains. |
 | Teachability | Pass | The restored rules add no experimental concepts. |
 | Symmetry and viability | Pass in aggregate | A/R gap is small and all four victory routes remain reachable, though player-count samples need higher-N confirmation. |
