@@ -13,9 +13,12 @@ Give only to the Assassin and Accomplice.
 - **Death income:** half the victim's positive Influence, rounded down, enters Stash.
 - **Accomplice:** may Launder up to 2 into Stash once per round.
 - **Current Assassin:** may withdraw up to 2 from Stash once per round.
-- **Inheritance:** Stash survives Promotion and is split only if both of you die.
+- **Inheritance:** Stash survives Promotion. If both of you die, it is split equally
+  among the living, rounded down; any remainder returns to Bank.
 - **Promotion:** if Assassin is Executed, Accomplice becomes Assassin; GM gives the
   room one true lead about the successor.
+- If the Accomplice is already a Ghost, there is no Promotion and the Syndicate
+  cannot win.
 - **Victory:** current Assassin must be alive; personal Influence + Stash must reach
   the player-count threshold. You win together.
 

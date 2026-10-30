@@ -349,7 +349,7 @@ def economy_visual(language: str) -> str:
             ("−2", "Неправильне Викриття", spend),
             ("−1", "Якщо Страчено Невинного — кожному, хто голосував «Винен»", spend),
             ("4, далі +1", "Почати Допит", spend),
-            ("1 / 3", "Додатковий голос за Розкриття / на Фінальних Виборах", spend),
+            ("1 / 3", "Додатковий голос за Розкриття Фракції / на Фінальних Виборах", spend),
         ]
         warning = (
             "Добровільна дія дозволена лише за наявності Впливу на найбільший "
@@ -370,7 +370,7 @@ def economy_visual(language: str) -> str:
             ("−2", "Incorrect Expose", spend),
             ("−1", "Innocent executed: each living Guilty vote", spend),
             ("4, then +1", "Initiate an Interrogation", spend),
-            ("1 / 3", "Extra Reveal vote / Final vote", spend),
+            ("1 / 3", "Extra Faction Reveal vote / Final vote", spend),
         ]
         warning = (
             "A voluntary action requires enough Influence for its largest possible "
@@ -488,9 +488,9 @@ def goals_matrix(language: str, section: Section) -> str:
         )
     heading = "Особисті Цілі: мала й велика" if language == "ua" else "Personal Goals: small and large"
     deadline = (
-        "Заявіть виконання до кінця Раунду 2"
+        "Заявіть виконання до початку Раунду 3"
         if language == "ua"
-        else "Claim completion by the end of Round 2"
+        else "Claim completion before Round 3 begins"
     )
     return (
         f'<section class="experience-block goals-visual"><p class="chapter-kicker">{html.escape(deadline)}</p>'

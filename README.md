@@ -72,6 +72,20 @@ npm test
 They check both languages at desktop, tablet, mobile and print sizes; click every
 table-of-contents link; and exercise glossary hover, keyboard and touch behaviour.
 
+## Generate a verified private deal
+
+The setup generator produces a GM master key and individual Ukrainian/English player
+cards while validating Faction counts, Syndicate placement, Goal caps, outside-Faction
+clues, and the five-Evidence/two-false budget:
+
+```powershell
+Set-Location playtest
+python -m unittest -v test_generate_deal.py
+python generate_deal.py --players 12 --seed 20261031
+```
+
+Generated `playtest/deal-*` files contain live-game spoilers and are ignored by Git.
+
 ## Repository structure
 
 ```text

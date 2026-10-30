@@ -156,7 +156,7 @@ class BuildTests(unittest.TestCase):
             r"негайно погашає борг",
             r"найбільший негайний штраф",
             r"для спроби Викриття потрібно мати щонайменше 2 Впливу",
-            r"для участі в голосуванні на Допиті потрібно мати щонайменше 1 Впливу",
+            r"для участі в голосуванні на Допиті потрібно мати щонайменше 1 Вплив",
             r"перед висуванням Кандидатів",
             r"стає \*\*Банкрутом\*\* на весь",
             r"особисто не отримує Перемогу Фракції",
@@ -171,7 +171,10 @@ class BuildTests(unittest.TestCase):
         for pattern in expected:
             self.assertRegex(player, re.compile(pattern, re.IGNORECASE))
         final = find_section(self.sections["ua"], 9).body
-        self.assertLess(final.index("### 9.1 Кандидати"), final.index("### 9.2 Розкриття"))
+        self.assertLess(
+            final.index("### 9.1 Кандидати"),
+            final.index("### 9.2 Розкриття Фракції"),
+        )
         wins = find_section(self.sections["ua"], 10).body
         for faction in ("Аристократи", "Реформісти", "Магнати", "Синдикат"):
             self.assertIn(faction, wins)
@@ -181,19 +184,19 @@ class BuildTests(unittest.TestCase):
         en = self.markdowns["en"]
         self.assertNotIn("можуть позбавити", ua)
         self.assertNotIn("can make a player personally ineligible", en)
-        self.assertIn("позбавляють\nгравця особистого права", ua)
+        self.assertIn("втрачає особисте право", ua)
         self.assertIn("make a player\npersonally ineligible", en)
-        self.assertIn("Наслідок, описаний без слова «може», застосовується завжди", ua)
+        self.assertIn("Усі наслідки без слова «може» є обов'язковими", ua)
         self.assertIn('A consequence stated without "may" always applies', en)
-        self.assertIn("Живий гравець із меншим балансом не подає голосу", ua)
+        self.assertIn("Живий гравець із меншим балансом не голосує", ua)
         self.assertIn("A living player with less does not cast a vote", en)
 
     def test_hit_tooltip_matches_public_rule(self) -> None:
         ua_hit = next(
             entry["definition"] for entry in build.GLOSSARY["ua"] if entry["id"] == "hit"
         )
-        self.assertIn("Замовлення на вбивство для Синдикату", ua_hit)
-        self.assertIn("ніколи не вказує на конкретного гравця", ua_hit)
+        self.assertIn("Публічне завдання на вбивство для Синдикату", ua_hit)
+        self.assertIn("ніколи — конкретного гравця", ua_hit)
         self.assertEqual("Замовлення", next(
             entry["term"] for entry in build.GLOSSARY["ua"] if entry["id"] == "hit"
         ))
@@ -206,6 +209,16 @@ class BuildTests(unittest.TestCase):
         self.assertNotRegex(self.markdowns["en"], r"\bContracts?\b")
         self.assertIn("### 3.1 Замовлення", self.markdowns["ua"])
         self.assertIn("### 3.1 Hit", self.markdowns["en"])
+
+    def test_player_facing_terms_do_not_overlap(self) -> None:
+        self.assertIn("Extortionist", self.markdowns["en"])
+        self.assertNotIn("Blackmailer", self.markdowns["en"])
+        self.assertIn("Вимагач", self.markdowns["ua"])
+        self.assertNotIn("Шантажист", self.markdowns["ua"])
+        self.assertIn("| Нагорода | Жадібність | Справедливість | Інтриги | Союзи |",
+                      self.markdowns["ua"])
+        self.assertIn("### 9.2 Faction Reveal", self.markdowns["en"])
+        self.assertIn("### 9.2 Розкриття Фракції", self.markdowns["ua"])
 
     def test_rulebook_excludes_pruned_editorial_prose(self) -> None:
         retired = (
@@ -231,6 +244,16 @@ class BuildTests(unittest.TestCase):
         self.assertIn("30 minutes in Round 1, 45 minutes in Round 2", self.markdowns["en"])
         self.assertIn("60 minutes\nin Round 3", self.markdowns["en"])
         self.assertIn("5 minutes and 1 minute remain", self.markdowns["en"])
+
+    def test_teaching_scripts_match_round_clock_and_execution_rewards(self) -> None:
+        playtest = Path(build.ROOT) / "playtest"
+        ua = (playtest / "teaching-script-ua.md").read_text(encoding="utf-8")
+        en = (playtest / "teaching-script-en.md").read_text(encoding="utf-8")
+        self.assertIn("30, 45 і 60 хвилин", ua)
+        self.assertIn("30, 45 and 60 minutes", en)
+        self.assertNotIn("30, 20", ua + en)
+        self.assertIn("повертає вартість Допиту", ua)
+        self.assertIn("gets the Interrogation cost\nback", en)
 
     def test_responsive_print_and_motion_modes_exist(self) -> None:
         css = (Path(build.HERE) / "theme.css").read_text(encoding="utf-8")

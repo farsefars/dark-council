@@ -4,18 +4,17 @@ The stable economy was restored from `a581b50`. These issues were deliberately
 reintroduced with that exact tree and are recorded rather than silently mixed into the
 revert.
 
-## R1 - GM setup wording contradicts the scaling table
+## R1 - GM setup wording contradicted the scaling table — resolved
 
 `playtest/gm-reference-en.md` and `playtest/gm-reference-ua.md` tell the GM to randomly
 assign an extra major-Faction seat. The current scaling table always assigns equal
 Aristocrat and Reformer counts, so there is no extra seat to assign.
 
 **Effect:** documentation only; no balance or simulation effect.  
-**Proposed later fix:** remove the stale instruction and tell the GM to use the selected
-row's equal Faction counts. This should be a separate one-line rules-aid correction, not
-part of an economy package.
+**Resolution:** the stale instruction was removed from both rulebooks and GM references;
+the GM now uses the selected row exactly.
 
-## R2 - Unreachable random seat-swap branch
+## R2 - Unreachable random seat-swap branch — resolved
 
 `sim/engine.py` contains:
 
@@ -27,9 +26,9 @@ if a != r and self.rng.random() < 0.5:
 No current `SCALING` row has unequal Aristocrat and Reformer counts, so the branch cannot
 run.
 
-**Effect:** none in the current rules. It is dead code and a misleading description of
+**Effect:** none in the current rules. It was dead code and a misleading description of
 the setup.  
-**Proposed later fix:** remove it with R1 after the documentation correction is approved.
+**Resolution:** the branch was removed with R1.
 
 ## R3 - The stable engine lacked whole-system measurements
 
@@ -40,4 +39,3 @@ player circulation, or whether purchased votes changed the winning Faction.
 assessment.  
 **Resolution:** passive counters and `sim/scorecard.py` now measure these values. No
 decision branches read the counters.
-

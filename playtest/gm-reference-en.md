@@ -2,7 +2,8 @@
 
 ## 1. Setup
 
-- Select the player-count row and randomly assign the extra major-faction seat.
+- Use the selected player-count row exactly; Aristocrats and Reformers are always
+  equal.
 - Syndicate: exactly one Aristocrat + one Reformer; randomly assign Assassin/Accomplice.
 - Prepare five Evidence statements: four starting, one truthful Auction; exactly two
   of the four starting statements are false.
@@ -48,6 +49,7 @@ Announce when 5 minutes and 1 minute remain in every Private Phase.
 - Wrong Execution: each living Guilty voter -1.
 - Assassin Execution: refund initiator's cost; initiator +5; each living Guilty voter +5.
 - Executed Influence: half rounded down to Bank, remainder bequeathed.
+- If the victim has 0 or negative Influence, move no Influence.
 
 ### Expose
 
@@ -61,13 +63,19 @@ Announce when 5 minutes and 1 minute remain in every Private Phase.
    Bankrupt for the entire Final.
 2. Top three living players by Influence each nominate a different living,
    non-Bankrupt Candidate.
-3. All players privately choose one Reveal target; living players may publicly buy
-   extra Reveal votes for 1 each; reveal all tied leaders.
+3. All players privately choose one Faction Reveal target; living players may publicly
+   buy extra votes for 1 each; reveal all tied leaders.
 4. Every player, including Bankrupt players and Ghosts, receives one secret Election
    vote; living players may buy extras for 3 each.
 5. Resolve tie with another secret ballot among tied Candidates; purchased votes remain.
-6. Check in order: Assassin+Stash; living Magnate Influence; winning Candidate's
+6. Check in order: Assassin+Stash; remaining combined Magnate Influence; winning Candidate's
    Faction; personal ineligibility.
+
+If nominators are tied at the cutoff, hold one public vote among them; resolve another
+tie randomly. If fewer than three eligible Candidates exist, use every available one.
+
+If no one bids in the Round 2 Auction, repeat it after the Private Phase with an
+opening bid of 0.
 
 ## 5. Full end narration
 

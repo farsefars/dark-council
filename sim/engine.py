@@ -96,7 +96,7 @@ class Config:
     expose_once: bool = False
     kill_tell_scope: str = "round"  # round (as written) | game (cumulative)
     # --- goal rules ---
-    goals_v2: bool = False        # rewritten Espionage + Blackmailer
+    goals_v2: bool = False        # rewritten Espionage + Extortionist
     cap_goals: bool = False       # deal capped goals no more often than there are slots
     extortion_amount: int = 3
     espionage_targets: int = 2
@@ -325,9 +325,6 @@ class Game:
         self.game_id = game_id or f"g{n_players}_{seed}"
 
         a, r, m, mag_thr, asn_thr = SCALING[n_players]
-        # Rules SS12.1: at odd major-faction counts the extra seat is assigned randomly.
-        if a != r and self.rng.random() < 0.5:
-            a, r = r, a
         self.magnate_threshold = self.cfg.magnate_threshold or mag_thr
         self.assassin_threshold = self.cfg.assassin_threshold or asn_thr
 
@@ -361,6 +358,7 @@ class Game:
         self.received_this_phase: dict[int, dict[int, int]] = {}
         self.received_total: dict[int, dict[int, int]] = {}
         self.auction_evidence: str | None = None
+        self.auction_pending_fallback = False
         self.ghost_vote_spent: set[int] = set()
         self.eligible_vote_opportunities = 0
         self.vote_exclusions = 0
@@ -671,6 +669,8 @@ class Game:
             if rnd == 2 and self.cfg.auction_enabled:
                 self.auction()
             self.private_phase()
+            if rnd == 2 and self.auction_pending_fallback:
+                self.auction(opening_bid=0, fallback=True)
             self.council()
             if rnd < self.cfg.rounds:
                 self.resolve_leaderboard_tribute()
@@ -711,16 +711,18 @@ class Game:
             return not victim.interrogated and not victim.secret_exposed
         return False
 
-    def auction(self) -> None:
+    def auction(self, opening_bid: int = 1, fallback: bool = False) -> bool:
         self.phase = "AUCTION"
         bids = {}
         for p in self.living():
             bid = self.pol.auction_bid(p.knowledge, p.archetype, p.influence,
                                        self.public_view(), self.cfg)
-            if bid >= 1:
+            if bid >= opening_bid:
                 bids[p.seat] = bid
         if not bids:
-            return
+            if not fallback:
+                self.auction_pending_fallback = True
+            return False
         top = max(bids.values())
         winners = [s for s, b in bids.items() if b == top]
         winner = self.rng.choice(winners)
@@ -729,7 +731,16 @@ class Game:
         w.won_auction = True
         w.holds_evidence = True
         w.knowledge.evidence.append(self.auction_evidence)
-        self.events.append((self.game_id, self.round, "AUCTION", winner, top, self.auction_evidence))
+        self.auction_pending_fallback = False
+        self.events.append((
+            self.game_id,
+            self.round,
+            "AUCTION",
+            winner,
+            top,
+            f"{self.auction_evidence}:fallback={int(fallback)}",
+        ))
+        return True
 
     def private_phase(self) -> None:
         self.phase = "PRIVATE"
@@ -957,7 +968,7 @@ class Game:
                 if k.known_secrets.get(q.seat) == value:
                     k.suspect(q.seat, 0.50)
 
-    # ---------------- extortion (rewritten Blackmailer) ----------------
+    # ---------------- extortion (Extortionist Ambition) ----------------
 
     def extortion_phase(self) -> None:
         if not self.cfg.goals_v2:
@@ -1281,11 +1292,19 @@ class Game:
         if not recipients:
             return
         share, remainder = divmod(self.stash, len(recipients))
-        for i, q in enumerate(recipients):
-            amt = share + (1 if i < remainder else 0)
-            if amt:
-                self.move(STASH, q.seat, amt, "stash_wipeout")
-        self.events.append((self.game_id, self.round, "SYNDICATE_WIPEOUT", 0, 0, ""))
+        for q in recipients:
+            if share:
+                self.move(STASH, q.seat, share, "stash_wipeout")
+        if remainder:
+            self.move(STASH, BANK, remainder, "stash_wipeout_remainder")
+        self.events.append((
+            self.game_id,
+            self.round,
+            "SYNDICATE_WIPEOUT",
+            len(recipients),
+            remainder,
+            "equal_rounded_down",
+        ))
 
     def pay_bounty(self, prosecutor: Player) -> None:
         """F7: give innocents a reason to actually hunt the Assassin."""
@@ -1555,7 +1574,15 @@ class Game:
         if not eligible:
             return []
         ranked = sorted(self.living(), key=lambda p: -p.influence)
-        nominators = ranked[:max(2, self.cfg.candidate_count)]
+        count = max(2, self.cfg.candidate_count)
+        if len(ranked) > count and ranked[count - 1].influence == ranked[count].influence:
+            boundary = ranked[count - 1].influence
+            fixed = [p for p in ranked if p.influence > boundary]
+            tied = [p for p in ranked if p.influence == boundary]
+            self.rng.shuffle(tied)
+            nominators = fixed + tied[:count - len(fixed)]
+        else:
+            nominators = ranked[:count]
         candidates: list[int] = []
         for nom in nominators:
             pick = self.pol.nominate(nom.knowledge, [p.seat for p in eligible],

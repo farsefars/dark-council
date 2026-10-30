@@ -24,8 +24,8 @@ Bankruptcy fixed at the start of the Final and Syndicate membership **make a pla
 personally ineligible for a Faction Victory**. The rest of that player's Faction
 remains eligible to win.
 
-If the real Assassin is Executed, everyone who voted Guilty gains +5 Influence, and
-the GM announces a true lead about the surviving Syndicate member.
+If the real Assassin is Executed, each living player who voted Guilty gains
++5 Influence, and the GM announces a true lead about the surviving Syndicate member.
 
 ### What should I read?
 
@@ -187,8 +187,8 @@ Final. That player:
 - does not personally receive a Faction Victory, even if their Faction wins.
 
 The rest of the Faction remains eligible to win. A Bankrupt player still participates
-in the Reveal and Final Election and retains one free vote in each. Bankruptcy status
-does not change after the Final begins.
+in the Faction Reveal and Final Election and retains one free vote in each. Bankruptcy
+status does not change after the Final begins.
 
 ---
 
@@ -197,10 +197,10 @@ does not change after the Final begins.
 Every player receives one Motive and one Ambition. They are assigned independently;
 the columns below are only a quick reference, not fixed pairs.
 
-| Reward | Greed | Justice | Secrets | Alliances |
+| Reward | Greed | Justice | Intrigue | Alliances |
 |---|---|---|---|---|
 | **+5 Motive** | Vanity | Wrath | Espionage | Commerce |
-| **+10 Ambition** | Collector | Radical | Blackmailer | Diplomat |
+| **+10 Ambition** | Collector | Radical | Extortionist | Diplomat |
 
 Claim a completed Goal privately with the GM during a Private Phase or open Council
 discussion. Do not interrupt an action resolution or vote. If a Goal is completed by
@@ -226,7 +226,7 @@ begins. Only the Diplomat's Public Pact is claimed publicly.
 
 - **Collector:** win the Auction.
 - **Radical:** vote Guilty on two different players who are then Executed.
-- **Blackmailer:** extortion — receive at least **2 Influence** from each of two
+- **Extortionist:** receive at least **2 Influence** from each of two
   different players over the course of the game.
 - **Diplomat:** form a Public Pact with two players who belong to the other two
   Factions. All three players stand before the GM and publicly declare their Factions.
@@ -245,7 +245,7 @@ The GM verifies the claimed Goal and pays its reward.
 Only a living player who has at least 2 Influence before declaring the guess may
 attempt to Expose a Secret.
 
-Publicly name a player and guess their Secret.
+Publicly name another living player and guess their Secret.
 
 - **Correct:** the target loses 4 Influence; you gain 1 Influence.
 - **Incorrect:** you lose 2 Influence.
@@ -267,19 +267,23 @@ Interrogation costs 1 more than the previous one.
 2. The accused may make a final statement.
 3. Every Ghost and every living player who has at least 1 Influence when voting begins
    votes publicly. A living player with less does not cast a vote. This rule also
-   applies to the accused.
+   applies to the initiator and the accused. If paying the Interrogation cost leaves
+   the initiator with 0 Influence, the initiator cannot vote in that Interrogation.
 4. A strict majority of all votes cast is required for Execution. A tie fails.
 
 | Result | Consequence |
 |---|---|
 | The vote fails | The accused survives and gains +3 Influence. The initiator's cost is not refunded. |
-| The vote passes; the accused is not the Assassin | The accused is Executed. The initiator's cost is not refunded and there is no reward. Everyone who voted Guilty loses **1 Influence**. |
-| The vote passes; the accused is the Assassin | The accused is Executed. The initiator's cost is refunded and the initiator gains +5 Influence. Everyone who voted Guilty gains **+5 Influence**. |
+| The vote passes; the accused is not the Assassin | The accused is Executed. The initiator's cost is not refunded and there is no reward. Each living player who voted Guilty loses **1 Influence**. |
+| The vote passes; the accused is the Assassin | The accused is Executed. The initiator's cost is refunded and the initiator gains +5 Influence. Each living player who voted Guilty gains **+5 Influence**. |
 
 Ghosts neither gain nor lose Influence for their vote.
 
 After an Execution, the GM publicly states only whether the executed player was the
-current Assassin.
+current Assassin. If that player was the current Assassin and the Accomplice is alive,
+the Accomplice immediately becomes the new Assassin. The GM then announces one true
+statement about that surviving Syndicate member — their Motive, Ambition, Secret, or
+Starting Advantage. This lead does not count toward the five Evidence pieces.
 
 Then resolve the mandatory Evidence disclosure in Section 7.
 
@@ -310,6 +314,9 @@ There are exactly **five** pieces of Evidence:
 - Exactly **two of the five are false**.
 - The Auction Evidence is always truthful.
 
+Secret Intelligence is a different Starting Advantage. It is not part of the
+five-statement Evidence pool and is never forced into the public disclosure.
+
 Evidence refers to the **Syndicate**, not only to the original Assassin. A truthful
 statement may describe either the Assassin or the Accomplice.
 
@@ -334,11 +341,11 @@ word for word.
 
 When a player is Assassinated or Executed:
 
-1. Resolve half of their Influence, rounded down:
+1. Resolve half of their positive Influence, rounded down:
    - if Assassinated, move it to the Syndicate Stash;
    - if Executed, return it to the Bank.
-2. The victim immediately gives all remaining Influence to one living player of their
-   choice.
+2. The victim immediately gives all remaining positive Influence to one living player
+   of their choice. If their balance is 0 or below, no Influence moves.
 3. The victim becomes a Ghost.
 
 A Ghost:
@@ -370,13 +377,18 @@ Each nomination must create a different Candidate. If players are tied for a
 nominating position, all players make a single public vote among the tied contenders to
 decide who receives the nomination right. The GM resolves another tie randomly.
 
-### 9.2 Reveal
+If fewer than three living non-Bankrupt players are available, every available player
+becomes a Candidate and unused nomination rights are skipped. If none are available,
+skip the Election; no Faction Candidate victory is awarded.
+
+### 9.2 Faction Reveal
 
 1. Every player, including Ghosts, privately gives the GM the name of one player whose
    Faction they want revealed. It may be a Candidate or anyone else.
-2. Each player has one free Reveal vote.
-3. Living players may publicly buy additional Reveal votes for 1 Influence each.
-4. The GM reveals the Faction of the player with the most Reveal votes.
+2. Each player has one free Faction Reveal vote.
+3. Living players may publicly buy additional Faction Reveal votes for 1 Influence
+   each.
+4. The GM reveals the Faction of the player with the most Faction Reveal votes.
 
 If there is a tie, reveal every tied player's Faction.
 
@@ -477,7 +489,9 @@ Influence in the Stash:
 - counts toward the Syndicate Victory;
 - may be withdrawn by the current Assassin, up to 2 per round, to spend;
 - **passes intact to the promoted Accomplice** if the Assassin is Executed; and
-- is confiscated and split among the living **only if both Syndicate members are dead**.
+- is confiscated and split equally among the living, rounded down, **only if both
+  Syndicate members are dead**. Any remainder returns to the Bank. If nobody is
+  living, the whole Stash returns to the Bank.
 
 ## 11.3 Hits
 
@@ -510,7 +524,8 @@ To make a valid assassination:
 At the beginning of the Council:
 
 1. The GM announces the victim.
-2. Half of the victim's Influence, rounded down, enters the Stash.
+2. Half of the victim's positive Influence, rounded down, enters the Stash. If the
+   victim's balance is 0 or below, nothing enters the Stash.
 3. Resolve the rest of Death and Ghosts.
 4. The GM announces whether the Hit succeeded.
 
@@ -534,7 +549,7 @@ The new Assassin:
 
 - gains Assassinate;
 - inherits the Stash **in full** and the Syndicate Victory condition; and
-- keeps their original Faction, Motive, Ambition, Secret, and Evidence.
+- keeps their original Faction, Motive, Ambition, Secret, and Starting Advantage.
 
 When an Assassin is Executed, the GM immediately announces one **true** statement
 about the surviving Syndicate member — their Motive, Ambition, Secret, or Starting
@@ -544,6 +559,9 @@ The original Assassin becomes a Ghost and now shares the Accomplice's objective:
 win if the new Assassin wins.
 
 Existing Evidence does not change after Promotion.
+
+If the Accomplice is already a Ghost when the Assassin is Executed, no Promotion
+occurs. The Syndicate can no longer win, and the Stash is resolved under Section 11.2.
 
 ---
 
@@ -570,8 +588,10 @@ Assassin needs roughly 40, a little more at small tables.**
 
 ## 12.2 Hit deck
 
-Choose one Hit per round. Do not repeat a Hit in the same game. Only use a
-Hit if at least two valid assassination targets can currently qualify.
+Choose one Hit per round. Do not repeat a Hit in the same game. Only use a Hit if at
+least two living players can match its printed victim trait. Ignore the qualifying
+transfer requirement when selecting the Hit; apply it only to the Assassin's submitted
+target at the end of the Private Phase.
 
 Eligibility is checked at the end of the Private Phase unless the card says otherwise.
 Across the three rounds, avoid repeatedly selecting Hits that concentrate pressure
@@ -606,7 +626,6 @@ other Syndicate member.
 ## 12.4 Setup checklist
 
 - [ ] Select the scaling row for the player count.
-- [ ] Randomize the larger major Faction if needed.
 - [ ] Assign exactly one Aristocrat and one Reformer to the Syndicate.
 - [ ] Assign the Assassin and Accomplice between those two players.
 - [ ] Prepare four Starting Evidence statements and one Auction statement.

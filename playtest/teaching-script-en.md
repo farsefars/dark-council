@@ -16,7 +16,7 @@ personal Influence plus their Stash. More than one group can win.”
 ## 1:00–1:45 — The loop
 
 “Each round starts with a public Hit, then a Private Phase, then Council. The Private
-Phases last 30, 20 and 60 minutes; I will warn you with 5 minutes and 1 minute
+Phases last 30, 45 and 60 minutes; I will warn you with 5 minutes and 1 minute
 remaining. Rounds 1 and 2 reveal the Top 3. Living players receive +2 at the start of
 Rounds 2 and 3. Round 2 also has an Auction; I will explain it then.”
 
@@ -46,7 +46,9 @@ An Interrogation accuses the current Assassin. Cost starts at 4 and rises by 1.
 Every Ghost and every living player with at least 1 Influence votes. A strict
 majority Executes. A failed vote gives the accused +3. If an Innocent is Executed,
 every living Guilty voter loses 1. If the Assassin is Executed, the initiator and
-every living Guilty voter gain 5. The outcome table stays visible.”
+every living Guilty voter gain 5; the initiator also gets the Interrogation cost
+back. If the Accomplice is alive, they become the new Assassin and I announce one
+true lead about them. The outcome table stays visible.”
 
 ## 3:45–4:30 — Information
 
@@ -69,7 +71,7 @@ the first death happens.”
 ## 5:10–6:00 — Final overview and check
 
 “At the end, wealth controls nominations: the three richest living players nominate
-three Candidates. Then the room Reveals one Faction and holds a secret election.
+three Candidates. Then the room holds a Faction Reveal and a secret election.
 Influence can buy votes, and spent Influence is gone before economic victories are checked.
 I will teach the exact procedure immediately before the Final.
 
