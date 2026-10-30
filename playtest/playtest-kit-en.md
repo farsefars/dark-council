@@ -21,7 +21,8 @@ missed by more than 20% of players is a Level 1 failure.
 8. An Innocent is Executed. What happens to each living player who voted Guilty?
 9. How many Evidence statements exist, and how many are false?
 10. Name two things a Ghost may still do and one thing a Ghost may not do.
-11. In the Final, which happens first: the Bankruptcy check, nominations, or Reveal?
+11. In the Final, which happens first: the Bankruptcy check, nominations, or Faction
+    Reveal?
 12. Explain your Faction's victory condition in one sentence.
 
 ### Answer key
@@ -37,7 +38,7 @@ missed by more than 20% of players is a Level 1 failure.
 9. Five total; exactly two false. Auction Evidence is truthful.
 10. May vote in Interrogations/Final and join the shared private Ghost question; may
    not hold, receive, spend, transfer Influence, or initiate an Interrogation.
-11. The GM fixes Bankruptcy first, then nominations happen, then Reveal.
+11. The GM fixes Bankruptcy first, then nominations happen, then Faction Reveal.
 12. Compare with the player's Faction card/rules.
 
 Record only the score and missed question numbers:
@@ -94,7 +95,7 @@ Use 0–100%; this avoids changing the vote.
 
 ## F. Final record
 
-| Nominators | Candidates | Reveal target(s) | Extra Reveal votes bought | Final vote purchases by player | Round-1 tally | Runoff/tie tally | Winner | Winner share |
+| Nominators | Candidates | Faction Reveal target(s) | Extra Faction Reveal votes bought | Final vote purchases by player | Round-1 tally | Runoff/tie tally | Winner | Winner share |
 |---|---|---|---|---|---|---|---|---:|
 | | | | | | | | | |
 

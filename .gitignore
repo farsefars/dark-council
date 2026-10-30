@@ -5,5 +5,7 @@ web/qa/screenshots/
 sim/output/
 sim/*.db
 sim/ledgers/
+playtest/deal-*/
+playtest/deal-*.md
 .DS_Store
 Thumbs.db

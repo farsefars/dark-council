@@ -16,7 +16,7 @@ import sys
 
 from .engine import (
     Game, Config, SCALING, ARISTOCRAT, REFORMER, MAGNATE,
-    ASSASSIN, ACCOMPLICE, COMMERCE, DIPLOMAT, BANK, run_game,
+    ASSASSIN, ACCOMPLICE, COMMERCE, DIPLOMAT, BANK, STASH, run_game,
 )
 from .final import recommended_config
 from .chaos import ChaosConfig, chaos_policies
@@ -494,6 +494,43 @@ def run_checks(counts=(8, 11, 13, 15), seeds=range(25)) -> None:
     check_policy_isolation()
     check_no_duplicate_definitions()
     check_personas_are_distinguishable()
+
+    # Canonical edge cases that small Monte Carlo samples may not hit.
+    from . import policies as base_policies
+
+    class PolicyProxy:
+        PERSONAS = base_policies.PERSONAS
+
+        def __getattr__(self, name):
+            return getattr(base_policies, name)
+
+    no_bid = PolicyProxy()
+    no_bid.auction_bid = lambda *args, **kwargs: 0
+    fallback = Game(8, 701, recommended_config(8), policy_module=no_bid)
+    fallback.round = 2
+    first = fallback.auction()
+    second = fallback.auction(opening_bid=0, fallback=True)
+    check(
+        "auction_zero_bid_fallback",
+        not first and second and not fallback.auction_pending_fallback,
+        f"first={first} second={second}",
+    )
+
+    wipeout = Game(8, 702, recommended_config(8))
+    wipeout.move(BANK, STASH, 13, "test_stash")
+    wipeout.players[wipeout.original_assassin].alive = False
+    wipeout.players[wipeout.accomplice_seat].alive = False
+    wipeout.check_wipeout()
+    shares = [row[5] for row in wipeout.ledger if row[6] == "stash_wipeout"]
+    remainder = [
+        row[5] for row in wipeout.ledger
+        if row[6] == "stash_wipeout_remainder"
+    ]
+    check(
+        "stash_wipeout_equal_rounded_down",
+        shares and len(set(shares)) == 1 and remainder == [1] and wipeout.stash == 0,
+        f"shares={shares} remainder={remainder} stash={wipeout.stash}",
+    )
     check_published_rule_gates()
     check_chaos_zero_equivalence()
     check_chaos_and_exploit_plumbing()

@@ -6,7 +6,8 @@
 2. **Faction:** Aristocrat, Reformer, or Magnate.
 3. **Goals:** your Motive (+5) and Ambition (+10), claim privately before Round 3.
 4. **Secret:** can be Exposed once.
-5. **Information:** your Advantage, outsider clue, deals, and suspicions.
+5. **Information:** your Starting Advantage, named player outside your Faction, deals,
+   and suspicions.
 
 ## Game flow
 
@@ -42,9 +43,9 @@ Round 2 Leaderboard and before Round 3 begins.
 2. Ghosts ask one shared private Yes/No question.
 3. Open discussion, Expose, and Interrogations.
 
-### Expose
+### Expose a Secret
 
-Name a player and Secret. Correct: target -4, you +1. Wrong: you -2.
+Name another living player and Secret. Correct: target -4, you +1. Wrong: you -2.
 A correctly Exposed Secret cannot be scored again.
 
 ### Interrogation
@@ -59,7 +60,9 @@ Strict majority; tie fails.
 | Assassin Executed | Initiator gets cost back and +5; each living Guilty voter +5 |
 
 After any Execution, the GM says only whether the player was current Assassin, and
-all Evidence holders read their exact original statements.
+all Evidence holders read their exact original statements. If the current Assassin
+was Executed and the Accomplice is alive, the Accomplice becomes the new Assassin and
+the GM announces one true lead about them.
 
 ## Death and Ghosts
 
@@ -71,14 +74,15 @@ all Evidence holders read their exact original statements.
 ## Final
 
 1. Three richest living players nominate three different living, non-Bankrupt Candidates.
-2. Everyone gets one private Reveal vote; living players may buy extras for 1.
+2. Everyone gets one private Faction Reveal vote; living players may publicly buy
+   extras for 1.
 3. Everyone gets one secret Election vote; living players may buy extras for 3.
 4. Vote spending is removed before Magnate/Syndicate totals are checked.
 
 ## Victory
 
 - **Aristocrat/Reformer:** your Faction's Candidate wins.
-- **Magnate:** living Magnates finish with the required combined Influence.
+- **Magnate:** the remaining combined Magnate Influence reaches the threshold.
 - **Declared Bankrupt or Syndicate:** you do not personally receive a Faction Victory;
   the rest of that Faction remains eligible to win.
 
