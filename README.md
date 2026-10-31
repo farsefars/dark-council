@@ -84,7 +84,7 @@ python -m unittest -v test_generate_deal.py
 python generate_deal.py --players 12 --seed 20261031
 ```
 
-For an experience-balanced 11-player Discord deal, provide:
+For an experience-balanced 11- or 12-player Discord deal, provide:
 
 ```csv
 Name,Experienced
@@ -99,10 +99,13 @@ Then run:
 python generate_deal.py --roster-file roster.csv --seed 20261031 --discord-ua
 ```
 
-For the supported `8 experienced / 3 new` roster, the generator places one new
-Innocent in each Faction team, keeps both Syndicate roles with experienced players,
-gives new players distinct lower-overhead Goals, spreads starting Evidence across all
-Factions, and writes copy-ready Discord messages plus individual `.txt` files.
+Supported experience-balanced rosters are `8 experienced / 3 new` at 11 players and
+`8 experienced / 4 new` at 12 players. The generator keeps both Syndicate roles with
+experienced players, balances the major-Faction teams, assigns both 12-player Magnate
+roles to experienced brokers, gives new players lower-overhead Goals, and spreads
+starting Evidence across all Factions. Ukrainian Discord DMs deliberately omit secret
+Roles and Starting Advantages, which the GM delivers in person; the generated pack
+contains separate copy-ready messages and Ukrainian GM reference tables.
 
 Generated `playtest/deal-*` files contain live-game spoilers and are ignored by Git.
 

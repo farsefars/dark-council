@@ -123,7 +123,7 @@ GOAL_TEXT = {
         ),
         "WRATH": "Ініціювати Допит незалежно від його результату.",
         "ESPIONAGE": (
-            "Приватно правильно назвати Ведучому і Мотив, і Амбіцію одного "
+            "Приватно й безпомилково назвати Ведучому і Мотив, і Амбіцію одного "
             "іншого гравця."
         ),
         "COMMERCE": (
@@ -277,7 +277,7 @@ def _diversify_new_player_goals(
     experienced: list[bool] | None,
     allowed: tuple[str, ...],
 ) -> None:
-    """Give the three new players distinct, accessible objectives."""
+    """Spread accessible objectives across new players as evenly as possible."""
     if experienced is None:
         return
     new_seats = [seat for seat, value in enumerate(experienced) if not value]
@@ -335,10 +335,16 @@ def _deal_factions_and_roles(
             if faction == REFORMER
         ])
     else:
-        if n != 11 or Counter(experienced) != Counter({True: 8, False: 3}):
+        experience_counts = Counter(experienced)
+        supported = {
+            11: Counter({True: 8, False: 3}),
+            12: Counter({True: 8, False: 4}),
+        }
+        if n not in supported or experience_counts != supported[n]:
             raise ValueError(
                 "experience-balanced dealing currently requires exactly "
-                "11 players: 8 experienced and 3 new"
+                "11 players (8 experienced / 3 new) or "
+                "12 players (8 experienced / 4 new)"
             )
         new_seats = [seat for seat, value in enumerate(experienced) if not value]
         experienced_seats = [seat for seat, value in enumerate(experienced) if value]
@@ -346,15 +352,19 @@ def _deal_factions_and_roles(
         rng.shuffle(experienced_seats)
 
         factions = [""] * n
-        novice_factions = [ARISTOCRAT, REFORMER, MAGNATE]
+        if n == 11:
+            novice_factions = [ARISTOCRAT, REFORMER, MAGNATE]
+        else:
+            novice_factions = [ARISTOCRAT, ARISTOCRAT, REFORMER, REFORMER]
         rng.shuffle(novice_factions)
         for seat, faction in zip(new_seats, novice_factions):
             factions[seat] = faction
 
+        novice_counts = Counter(novice_factions)
         remaining = {
-            ARISTOCRAT: aristocrats - 1,
-            REFORMER: reformers - 1,
-            MAGNATE: magnates - 1,
+            ARISTOCRAT: aristocrats - novice_counts[ARISTOCRAT],
+            REFORMER: reformers - novice_counts[REFORMER],
+            MAGNATE: magnates - novice_counts[MAGNATE],
         }
         experienced_factions = [
             faction
@@ -618,15 +628,29 @@ def validate_deal(deal: Deal) -> list[str]:
         errors.append("new players cannot receive Syndicate roles")
 
     if any(player.experienced is not None for player in deal.players):
-        for faction in (ARISTOCRAT, REFORMER, MAGNATE):
+        expected_experience = (
+            {
+                ARISTOCRAT: Counter({True: 2, False: 1}),
+                REFORMER: Counter({True: 2, False: 1}),
+                MAGNATE: Counter({True: 2, False: 1}),
+            }
+            if deal.n == 11
+            else {
+                ARISTOCRAT: Counter({True: 2, False: 2}),
+                REFORMER: Counter({True: 2, False: 2}),
+                MAGNATE: Counter({True: 2}),
+            }
+        )
+        for faction, expected in expected_experience.items():
             innocent_team = [
                 player for player in deal.players
                 if player.faction == faction and player.role == INNOCENT
             ]
             experience = Counter(player.experienced for player in innocent_team)
-            if experience != Counter({True: 2, False: 1}):
+            if experience != expected:
                 errors.append(
-                    f"{faction} Innocent team is not 2 experienced + 1 new"
+                    f"{faction} Innocent experience split is {experience}; "
+                    f"expected {expected}"
                 )
 
     if sum(player.ambition == "COLLECTOR" for player in deal.players) > 1:
@@ -763,6 +787,24 @@ def _victory_text(player: Player, deal: Deal, language: str) -> str:
     )
 
 
+def _faction_victory_text(player: Player, deal: Deal, language: str) -> str:
+    """Public Faction condition only; never reveal a player's secret Role."""
+    if player.faction == MAGNATE:
+        if language == "en":
+            return (
+                f"The remaining combined Magnate Influence must reach "
+                f"{deal.magnate_threshold} after Final spending."
+            )
+        return (
+            f"Після витрат у Фіналі сумарний Вплив Магнатів має досягти "
+            f"{deal.magnate_threshold}."
+        )
+    faction = LABELS[language][player.faction]
+    if language == "en":
+        return f"A {faction} Candidate must win the Final Election."
+    return f"На Фінальних Виборах має перемогти Кандидат-{faction}."
+
+
 def render_player_card(deal: Deal, player: Player, language: str) -> str:
     label = LABELS[language]
     name = deal.name(player.seat, language)
@@ -879,29 +921,44 @@ def render_gm_master(deal: Deal, language: str) -> str:
         if language == "en"
         else "**ЛИШЕ ДЛЯ ВЕДУЧОГО — не надсилайте цей розділ або весь пакет гравцям.**"
     )
-    lines = [
-        f"# {title}",
-        "",
-        warning,
-        "",
-        f"- **Seed:** `{deal.seed}`",
-        f"- **Faction counts:** {label[ARISTOCRAT]} {faction_counts[ARISTOCRAT]} · "
-        f"{label[REFORMER]} {faction_counts[REFORMER]} · "
-        f"{label[MAGNATE]} {faction_counts[MAGNATE]}",
-        f"- **Magnate threshold:** {deal.magnate_threshold}",
-        f"- **Assassin + Stash threshold:** {deal.syndicate_threshold}",
-        f"- **Assassin:** {deal.name(deal.assassin.seat, language)} "
-        f"({label[deal.assassin.faction]})",
-        f"- **Accomplice:** {deal.name(deal.accomplice.seat, language)} "
-        f"({label[deal.accomplice.faction]})",
-        "",
-        "## Evidence Key" if language == "en" else "## Ключ Доказів",
-        "",
-        "| # | Location | Statement | Truth |"
-        if language == "en"
-        else "| # | Де знаходиться | Твердження | Істинність |",
-        "|---:|---|---|---|",
-    ]
+    lines = [f"# {title}", "", warning, ""]
+    if language == "en":
+        lines.extend([
+            f"- **Seed:** `{deal.seed}`",
+            f"- **Faction counts:** {label[ARISTOCRAT]} "
+            f"{faction_counts[ARISTOCRAT]} · {label[REFORMER]} "
+            f"{faction_counts[REFORMER]} · {label[MAGNATE]} "
+            f"{faction_counts[MAGNATE]}",
+            f"- **Magnate threshold:** {deal.magnate_threshold}",
+            f"- **Assassin + Stash threshold:** {deal.syndicate_threshold}",
+            f"- **Assassin:** {deal.name(deal.assassin.seat, language)} "
+            f"({label[deal.assassin.faction]})",
+            f"- **Accomplice:** {deal.name(deal.accomplice.seat, language)} "
+            f"({label[deal.accomplice.faction]})",
+            "",
+            "## Evidence Key",
+            "",
+            "| # | Location | Statement | Truth |",
+        ])
+    else:
+        lines.extend([
+            f"- **Код роздачі:** `{deal.seed}`",
+            f"- **Склад Фракцій:** {label[ARISTOCRAT]} "
+            f"{faction_counts[ARISTOCRAT]} · {label[REFORMER]} "
+            f"{faction_counts[REFORMER]} · {label[MAGNATE]} "
+            f"{faction_counts[MAGNATE]}",
+            f"- **Поріг Магнатів:** {deal.magnate_threshold}",
+            f"- **Поріг Вбивці + Криївки:** {deal.syndicate_threshold}",
+            f"- **Вбивця:** {deal.name(deal.assassin.seat, language)} "
+            f"({label[deal.assassin.faction]})",
+            f"- **Спільник:** {deal.name(deal.accomplice.seat, language)} "
+            f"({label[deal.accomplice.faction]})",
+            "",
+            "## Ключ Доказів",
+            "",
+            "| # | Де знаходиться | Твердження | Істинність |",
+        ])
+    lines.append("|---:|---|---|---|")
     for index, statement in enumerate(deal.evidence, 1):
         location = (
             "Round 2 Auction"
@@ -929,7 +986,7 @@ def render_gm_master(deal: Deal, language: str) -> str:
         "Outsider clue | Advantage |"
         if language == "en"
         else "| Місце / Гравець | Досвід | Фракція | Роль | Мотив | Амбіція | "
-        "Секрет | Зачіпка | Перевага |",
+        "Секрет | Гравець з іншої Фракції | Перевага |",
         "|---|---|---|---|---|---|---|---|---|",
     ])
     for player in deal.players:
@@ -941,9 +998,20 @@ def render_gm_master(deal: Deal, language: str) -> str:
             advantage += (
                 f": {deal.name(target.seat, language)} = {label[target.secret]}"
             )
+        experience_label = (
+            "Досвідчений"
+            if player.experienced and language == "ua"
+            else "Новачок"
+            if player.experienced is False and language == "ua"
+            else "Y"
+            if player.experienced
+            else "N"
+            if player.experienced is False
+            else "—"
+        )
         lines.append(
             f"| {player.seat + 1} / {deal.name(player.seat, language)} | "
-            f"{'Y' if player.experienced else 'N' if player.experienced is False else '—'} | "
+            f"{experience_label} | "
             f"{label[player.faction]} | {label[player.role]} | "
             f"{label[player.motive]} | {label[player.ambition]} | "
             f"{label[player.secret]} | {deal.name(player.outsider, language)} | "
@@ -1013,27 +1081,12 @@ def render_discord_dm_ua(deal: Deal, player: Player) -> str:
     lines = [
         f"**Темна Рада — приватна картка для {name}**",
         "",
-        "Не пересилай це повідомлення іншим гравцям.",
+        "Не пересилайте це повідомлення іншим гравцям.",
         "",
         f"**Фракція:** {label[player.faction]}",
-        f"**Роль:** {label[player.role]}",
-        f"**Стартовий Вплив:** 4",
-        f"**Як перемогти:** {_victory_text(player, deal, 'ua')}",
+        f"**Як перемагає Ваша Фракція:** "
+        f"{_faction_victory_text(player, deal, 'ua')}",
     ]
-    if player.role in (ASSASSIN, ACCOMPLICE):
-        partner = deal.accomplice if player.role == ASSASSIN else deal.assassin
-        lines.extend([
-            "",
-            "## Синдикат",
-            f"**Твій напарник:** {deal.name(partner.seat, 'ua')} "
-            f"({label[partner.role]})",
-            "- Щоб убити гравця, ти або напарник маєте раніше передати йому "
-            "щонайменше 1 Вплив.",
-            "- Успішне Замовлення: +3 до Криївки. Провал: -3; нестачу платить Вбивця.",
-            "- Спільник може Відмити до 2 Впливу в Криївку за раунд.",
-            "- Чинний Вбивця може зняти до 2 Впливу з Криївки за раунд.",
-            "- Якщо Вбивцю Страчено, живий Спільник стає новим Вбивцею.",
-        ])
     lines.extend([
         "",
         f"## Мотив (+5): {label[player.motive]}",
@@ -1045,30 +1098,13 @@ def render_discord_dm_ua(deal: Deal, player: Player) -> str:
         "**Дедлайн Цілей:** заявити Ведучому до початку Раунду 3.",
         "",
         f"## Секрет: {label[player.secret]}",
-        "Якщо інший гравець правильно Викриє твій Секрет, ти втрачаєш 4 Впливу, "
-        "а він отримує +1.",
+        "Якщо інший гравець правильно Викриє Ваш Секрет, Ви втрачаєте 4 Впливу, "
+        "а цей гравець отримує +1.",
         "",
         "## Зачіпка про Фракцію",
-        f"**{outsider} точно НЕ належить до твоєї Фракції.**",
+        f"**{outsider} не належить до Вашої Фракції.**",
         "",
-        f"## Стартова Перевага: {label[player.advantage]}",
-    ])
-    if player.advantage == EVIDENCE:
-        statement = deal.evidence[player.evidence_index or 0]
-        lines.extend([
-            evidence_text(statement, "ua"),
-            "",
-            "Цей Доказ може бути хибним. Збережи точне формулювання: після будь-якої "
-            "Страти ти мусиш зачитати його публічно дослівно.",
-        ])
-    else:
-        target = deal.players[player.intel_target or 0]
-        lines.append(
-            f"Секрет {deal.secret_subject(target.seat, 'ua')} — "
-            f"**{label[target.secret]}**. Це гарантовано правдива інформація."
-        )
-    lines.extend([
-        "",
+        "Стартові 4 фішки Впливу Ви отримаєте особисто перед Раундом 1.",
         "Повна пам'ятка: https://farsefars.github.io/dark-council/",
     ])
     return "\n".join(lines)
@@ -1076,6 +1112,10 @@ def render_discord_dm_ua(deal: Deal, player: Player) -> str:
 
 def render_discord_pack_ua(deal: Deal) -> str:
     parts = [
+        render_gm_discord_reference_ua(deal),
+        "",
+        "---",
+        "",
         "# Публічне повідомлення",
         "",
         "```md",
@@ -1094,6 +1134,87 @@ def render_discord_pack_ua(deal: Deal) -> str:
             "```",
         ])
     return "\n".join(parts) + "\n"
+
+
+def render_gm_discord_reference_ua(deal: Deal) -> str:
+    label = LABELS["ua"]
+    faction_counts = Counter(player.faction for player in deal.players)
+    lines = [
+        "# ЛИШЕ ДЛЯ ВЕДУЧОГО — коротка довідка",
+        "",
+        "## Пороги й таймінг",
+        "",
+        "| Параметр | Значення |",
+        "|---|---|",
+        f"| Склад Фракцій | {faction_counts[ARISTOCRAT]} Аристократів · "
+        f"{faction_counts[REFORMER]} Реформістів · {faction_counts[MAGNATE]} Магнати |",
+        f"| Поріг Магнатів | {deal.magnate_threshold} |",
+        f"| Поріг Вбивці + Криївки | {deal.syndicate_threshold} |",
+        "| Вартість Допиту | 4, 5, 6… |",
+        "| Приватні фази | 30 / 45 / 60 хв |",
+        "| Докази | 5 усього; рівно 2 хибні; Аукціонний Доказ правдивий |",
+        "",
+        "## Що повідомити кожному особисто",
+        "",
+        "| № | Гравець | Фракція | Таємна Роль | Стартова Перевага |",
+        "|---:|---|---|---|---|",
+    ]
+    for player in deal.players:
+        if player.advantage == EVIDENCE:
+            statement = deal.evidence[player.evidence_index or 0]
+            truth = "ПРАВДА" if statement.is_true else "ХИБА"
+            advantage = (
+                f"**Доказ [{truth}]:** {evidence_text(statement, 'ua')}"
+            )
+        else:
+            target = deal.players[player.intel_target or 0]
+            advantage = (
+                f"**Компромат:** Секрет {deal.secret_subject(target.seat, 'ua')} — "
+                f"**{label[target.secret]}**"
+            )
+        lines.append(
+            f"| {player.seat + 1} | {deal.name(player.seat, 'ua')} | "
+            f"{label[player.faction]} | **{label[player.role]}** | {advantage} |"
+        )
+
+    auction = next(statement for statement in deal.evidence if statement.auction)
+    lines.extend([
+        "",
+        f"**Аукціонний Доказ (Раунд 2, ПРАВДА):** "
+        f"{evidence_text(auction, 'ua')}",
+        "",
+        "## Повна зведена таблиця",
+        "",
+        "| № | Гравець | Досвід | Фракція | Роль | Мотив (+5) | Амбіція (+10) | "
+        "Секрет | Гравець з іншої Фракції | Перевага |",
+        "|---:|---|---|---|---|---|---|---|---|---|",
+    ])
+    for player in deal.players:
+        advantage = label[player.advantage]
+        if player.advantage == EVIDENCE:
+            statement = deal.evidence[player.evidence_index or 0]
+            advantage += f" ({'ПРАВДА' if statement.is_true else 'ХИБА'})"
+        else:
+            target = deal.players[player.intel_target or 0]
+            advantage += (
+                f": {deal.name(target.seat, 'ua')} = {label[target.secret]}"
+            )
+        lines.append(
+            f"| {player.seat + 1} | {deal.name(player.seat, 'ua')} | "
+            f"{'Досвідчений' if player.experienced else 'Новачок'} | "
+            f"{label[player.faction]} | "
+            f"{label[player.role]} | {label[player.motive]} | "
+            f"{label[player.ambition]} | {label[player.secret]} | "
+            f"{deal.name(player.outsider, 'ua')} | {advantage} |"
+        )
+    lines.extend([
+        "",
+        "## Замовлення на старті",
+        "",
+    ])
+    for round_number, hit in enumerate(deal.hits, 1):
+        lines.append(f"{round_number}. **{HITS[hit]['ua']}**")
+    return "\n".join(lines)
 
 
 def write_discord_ua(deal: Deal, output_dir: Path) -> list[Path]:

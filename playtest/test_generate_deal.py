@@ -16,6 +16,8 @@ from generate_deal import (
     render_combined,
     render_discord_dm_ua,
     render_discord_pack_ua,
+    render_gm_discord_reference_ua,
+    render_gm_master,
     validate_deal,
     write_deal,
     write_discord_ua,
@@ -193,7 +195,16 @@ class DealGeneratorTests(unittest.TestCase):
             message = render_discord_dm_ua(deal, player)
             self.assertIn(deal.name(player.seat, "ua"), message)
             self.assertIn("**Фракція:**", message)
-            self.assertIn("**Роль:**", message)
+            self.assertNotIn("**Роль:**", message)
+            self.assertNotIn("## Синдикат", message)
+            self.assertNotIn("Стартова Перевага:", message)
+            self.assertNotIn("Стартову Перевагу", message)
+            self.assertNotIn("Компромат:", message)
+            self.assertNotIn("Цей Доказ", message)
+            self.assertNotIn("Невинний", message)
+            self.assertNotIn("Вбивця", message)
+            self.assertNotIn("Спільник", message)
+            self.assertIn("**Як перемагає Ваша Фракція:**", message)
             self.assertLessEqual(len(message), 2_000)
         with tempfile.TemporaryDirectory() as directory:
             written = write_discord_ua(deal, Path(directory))
@@ -206,6 +217,76 @@ class DealGeneratorTests(unittest.TestCase):
                     "discord-01-Vladka-ua.txt",
                 ).exists()
             )
+
+    def test_12_player_experience_balance_and_clean_discord_output(self) -> None:
+        names = [
+            "Vladka", "Marta", "Pavlushka", "Taya", "Violetta", "Vlada",
+            "Anton", "Max", "Stefa", "Sofiyka", "Darynka", "Inna",
+        ]
+        experienced = [
+            True, False, True, True, True, True,
+            False, True, False, True, True, False,
+        ]
+        for seed in range(64):
+            deal = generate_deal(12, 600_000 + seed, names, experienced)
+            syndicate = [
+                player for player in deal.players
+                if player.role != "INNOCENT"
+            ]
+            self.assertTrue(all(player.experienced for player in syndicate))
+            for faction in (ARISTOCRAT, REFORMER):
+                innocent_team = [
+                    player for player in deal.players
+                    if player.faction == faction and player.role == "INNOCENT"
+                ]
+                self.assertEqual(
+                    Counter({True: 2, False: 2}),
+                    Counter(player.experienced for player in innocent_team),
+                )
+            magnates = [
+                player for player in deal.players
+                if player.faction == MAGNATE
+            ]
+            self.assertEqual(2, len(magnates))
+            self.assertTrue(all(player.experienced for player in magnates))
+            new_players = [
+                player for player in deal.players if player.experienced is False
+            ]
+            self.assertTrue(all(player.motive != "ESPIONAGE" for player in new_players))
+            self.assertTrue(all(player.ambition != "DIPLOMAT" for player in new_players))
+
+        deal = generate_deal(12, 20261031, names, experienced)
+        gm = render_gm_discord_reference_ua(deal)
+        self.assertIn("## Що повідомити кожному особисто", gm)
+        self.assertIn("## Повна зведена таблиця", gm)
+        self.assertIn("Аукціонний Доказ", gm)
+        self.assertIn("| Поріг Магнатів | 16 |", gm)
+        master = render_gm_master(deal, "ua")
+        for english_label in (
+            "Seed",
+            "Faction counts",
+            "Magnate threshold",
+            "Assassin + Stash threshold",
+            "| Y |",
+            "| N |",
+        ):
+            self.assertNotIn(english_label, master)
+        self.assertIn("Код роздачі", master)
+        self.assertIn("Досвідчений", master)
+        self.assertIn("Новачок", master)
+        for player in deal.players:
+            message = render_discord_dm_ua(deal, player)
+            self.assertNotIn("**Роль:**", message)
+            self.assertNotIn("## Синдикат", message)
+            self.assertNotIn("Стартова Перевага:", message)
+            self.assertNotIn("Стартову Перевагу", message)
+            self.assertNotIn("Невинний", message)
+            self.assertNotIn("Вбивця", message)
+            self.assertNotIn("Спільник", message)
+            self.assertIn("**Фракція:**", message)
+            self.assertIn("## Мотив (+5)", message)
+            self.assertIn("## Амбіція (+10)", message)
+            self.assertIn("## Секрет:", message)
 
 
 if __name__ == "__main__":
