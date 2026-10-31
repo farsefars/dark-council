@@ -735,7 +735,12 @@ def write_or_check(*, check: bool) -> None:
     if check:
         stale = [path for path, content in artifacts.items() if not path.exists() or read(path) != content]
         if stale:
-            paths = ", ".join(str(path.relative_to(HERE)) for path in stale)
+            paths = ", ".join(
+                str(path.relative_to(ROOT))
+                if path.is_relative_to(ROOT)
+                else str(path)
+                for path in stale
+            )
             raise SystemExit(f"Generated output is stale or missing ({paths}); run python build.py")
         print(f"OK: {len(artifacts)} generated artifacts are current and all validation gates passed")
         return
