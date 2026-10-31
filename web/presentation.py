@@ -140,6 +140,7 @@ GLOSSARY = {
         {"id": "motive", "term": "Мотив", "pattern": r"Мотив(?:у|ом|і|и|ів|ам|ами|ах)?", "definition": "Мала особиста Ціль, за яку гравець отримує +5 Впливу."},
         {"id": "ambition", "term": "Амбіція", "pattern": r"Амбіці(?:я|ї|ю|єю|ям|ями|ях)", "definition": "Велика особиста Ціль, за яку гравець отримує +10 Впливу."},
         {"id": "reveal", "term": "Розкриття Фракції", "pattern": r"Розкритт(?:я|ю|і|ям|ями|ях)", "definition": "Фінальне голосування, після якого Ведучий публічно оголошує Фракцію обраного гравця."},
+        {"id": "secret", "term": "Секрет", "pattern": r"Секрет(?:у|ів|а|и|ом|і|ам|ами|ах)?", "definition": "Секрет: Шантаж, Зрада, Корупція або Єресь. Використовується для Викриття Секрету"},
     ],
     "en": [
         {"id": "influence", "term": "Influence", "pattern": r"Influence", "definition": "The game's physical currency: one chip equals one Influence."},
@@ -160,6 +161,7 @@ GLOSSARY = {
         {"id": "motive", "term": "Motive", "pattern": r"Motives?", "definition": "A small personal Goal worth +5 Influence."},
         {"id": "ambition", "term": "Ambition", "pattern": r"Ambitions?", "definition": "A large personal Goal worth +10 Influence."},
         {"id": "reveal", "term": "Faction Reveal", "pattern": r"(?:Faction )?Reveal", "definition": "The Final vote that publicly reveals one chosen player's Faction."},
+        {"id": "secret", "term": "Secret", "pattern": r"Secret(?:s)?", "definition": "A Secret: Blackmail, Treason, Corruption, or Heresy. Can be used to Expose a Secret"},
     ],
 }
 
