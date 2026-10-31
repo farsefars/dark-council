@@ -14,8 +14,11 @@ from generate_deal import (
     evidence_is_true,
     generate_deal,
     render_combined,
+    render_discord_dm_ua,
+    render_discord_pack_ua,
     validate_deal,
     write_deal,
+    write_discord_ua,
 )
 
 
@@ -111,6 +114,98 @@ class DealGeneratorTests(unittest.TestCase):
     def test_bad_name_count_fails(self) -> None:
         with self.assertRaisesRegex(ValueError, "expected 12 names"):
             generate_deal(12, 1, ["Only one"])
+
+    def test_11_player_experience_balance(self) -> None:
+        names = [
+            "Vladka", "Marta", "Pavlushka", "Taya", "Violetta", "Vlada",
+            "Anton", "Max", "Stefa", "Sofiyka", "Darynka",
+        ]
+        experienced = [
+            True, False, True, True, True, True,
+            False, True, False, True, True,
+        ]
+        for seed in range(64):
+            deal = generate_deal(11, 500_000 + seed, names, experienced)
+            syndicate = [
+                player for player in deal.players
+                if player.role != "INNOCENT"
+            ]
+            self.assertTrue(all(player.experienced for player in syndicate))
+            for faction in (ARISTOCRAT, REFORMER, MAGNATE):
+                innocent_team = [
+                    player for player in deal.players
+                    if player.faction == faction and player.role == "INNOCENT"
+                ]
+                self.assertEqual(
+                    Counter({True: 2, False: 1}),
+                    Counter(player.experienced for player in innocent_team),
+                )
+            new_players = [
+                player for player in deal.players if player.experienced is False
+            ]
+            self.assertTrue(all(player.motive != "ESPIONAGE" for player in new_players))
+            self.assertTrue(all(player.ambition != "DIPLOMAT" for player in new_players))
+            self.assertEqual(3, len({player.motive for player in new_players}))
+            self.assertEqual(3, len({player.ambition for player in new_players}))
+            evidence_factions = Counter(
+                deal.players[item.owner].faction
+                for item in deal.evidence
+                if not item.auction and item.owner is not None
+            )
+            self.assertEqual(
+                {ARISTOCRAT, REFORMER, MAGNATE},
+                set(evidence_factions),
+            )
+            self.assertLessEqual(max(evidence_factions.values()), 2)
+            evidence_owners = [
+                item.owner for item in deal.evidence
+                if not item.auction and item.owner is not None
+            ]
+            self.assertLessEqual(
+                sum(
+                    deal.players[seat].role != "INNOCENT"
+                    for seat in evidence_owners
+                ),
+                1,
+            )
+            self.assertTrue(any(
+                item.is_true
+                and item.owner is not None
+                and deal.players[item.owner].role == "INNOCENT"
+                for item in deal.evidence
+                if not item.auction
+            ))
+
+    def test_discord_output_is_copyable_and_under_message_limit(self) -> None:
+        names = [
+            "Vladka", "Marta", "Pavlushka", "Taya", "Violetta", "Vlada",
+            "Anton", "Max", "Stefa", "Sofiyka", "Darynka",
+        ]
+        experienced = [
+            True, False, True, True, True, True,
+            False, True, False, True, True,
+        ]
+        deal = generate_deal(11, 20261031, names, experienced)
+        pack = render_discord_pack_ua(deal)
+        self.assertIn("# Публічне повідомлення", pack)
+        self.assertEqual(12, pack.count("```md"))
+        for player in deal.players:
+            message = render_discord_dm_ua(deal, player)
+            self.assertIn(deal.name(player.seat, "ua"), message)
+            self.assertIn("**Фракція:**", message)
+            self.assertIn("**Роль:**", message)
+            self.assertLessEqual(len(message), 2_000)
+        with tempfile.TemporaryDirectory() as directory:
+            written = write_discord_ua(deal, Path(directory))
+            self.assertEqual(13, len(written))
+            self.assertTrue(Path(directory, "deal-11p-discord-ua.md").exists())
+            self.assertTrue(
+                Path(
+                    directory,
+                    "deal-11p-private",
+                    "discord-01-Vladka-ua.txt",
+                ).exists()
+            )
 
 
 if __name__ == "__main__":

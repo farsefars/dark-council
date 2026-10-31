@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import random
 import secrets
 from collections import Counter
@@ -171,6 +172,7 @@ class Player:
     secret: str
     outsider: int
     advantage: str
+    experienced: bool | None = None
     evidence_index: int | None = None
     intel_target: int | None = None
 
@@ -242,6 +244,180 @@ def _deal_goals(
         counts[choice] += 1
     rng.shuffle(result)
     return result[:n]
+
+
+def _move_hard_goals_off_new_players(
+    rng: random.Random,
+    goals: list[str],
+    experienced: list[bool] | None,
+    hard_goal: str,
+) -> None:
+    """Give first-time players a lower-overhead private objective when possible."""
+    if experienced is None:
+        return
+    new_seats = [
+        seat for seat, is_experienced in enumerate(experienced)
+        if not is_experienced and goals[seat] == hard_goal
+    ]
+    experienced_seats = [
+        seat for seat, is_experienced in enumerate(experienced)
+        if is_experienced and goals[seat] != hard_goal
+    ]
+    rng.shuffle(experienced_seats)
+    for new_seat, experienced_seat in zip(new_seats, experienced_seats):
+        goals[new_seat], goals[experienced_seat] = (
+            goals[experienced_seat],
+            goals[new_seat],
+        )
+
+
+def _diversify_new_player_goals(
+    rng: random.Random,
+    goals: list[str],
+    experienced: list[bool] | None,
+    allowed: tuple[str, ...],
+) -> None:
+    """Give the three new players distinct, accessible objectives."""
+    if experienced is None:
+        return
+    new_seats = [seat for seat, value in enumerate(experienced) if not value]
+    novice_counts = Counter(goals[seat] for seat in new_seats)
+    missing = [goal for goal in allowed if novice_counts[goal] == 0]
+    rng.shuffle(missing)
+    for goal in missing:
+        duplicate_seat = next(
+            (
+                seat for seat in new_seats
+                if novice_counts[goals[seat]] > 1
+            ),
+            None,
+        )
+        donor_seat = next(
+            (
+                seat for seat, value in enumerate(experienced)
+                if value and goals[seat] == goal
+            ),
+            None,
+        )
+        if duplicate_seat is None or donor_seat is None:
+            continue
+        old_goal = goals[duplicate_seat]
+        goals[duplicate_seat], goals[donor_seat] = (
+            goals[donor_seat],
+            goals[duplicate_seat],
+        )
+        novice_counts[old_goal] -= 1
+        novice_counts[goal] += 1
+
+
+def _deal_factions_and_roles(
+    rng: random.Random,
+    n: int,
+    aristocrats: int,
+    reformers: int,
+    magnates: int,
+    experienced: list[bool] | None,
+) -> tuple[list[str], list[str]]:
+    if experienced is None:
+        factions = (
+            [ARISTOCRAT] * aristocrats
+            + [REFORMER] * reformers
+            + [MAGNATE] * magnates
+        )
+        rng.shuffle(factions)
+        roles = [INNOCENT] * n
+        aristocrat_seat = rng.choice([
+            seat for seat, faction in enumerate(factions)
+            if faction == ARISTOCRAT
+        ])
+        reformer_seat = rng.choice([
+            seat for seat, faction in enumerate(factions)
+            if faction == REFORMER
+        ])
+    else:
+        if n != 11 or Counter(experienced) != Counter({True: 8, False: 3}):
+            raise ValueError(
+                "experience-balanced dealing currently requires exactly "
+                "11 players: 8 experienced and 3 new"
+            )
+        new_seats = [seat for seat, value in enumerate(experienced) if not value]
+        experienced_seats = [seat for seat, value in enumerate(experienced) if value]
+        rng.shuffle(new_seats)
+        rng.shuffle(experienced_seats)
+
+        factions = [""] * n
+        novice_factions = [ARISTOCRAT, REFORMER, MAGNATE]
+        rng.shuffle(novice_factions)
+        for seat, faction in zip(new_seats, novice_factions):
+            factions[seat] = faction
+
+        remaining = {
+            ARISTOCRAT: aristocrats - 1,
+            REFORMER: reformers - 1,
+            MAGNATE: magnates - 1,
+        }
+        experienced_factions = [
+            faction
+            for faction, count in remaining.items()
+            for _ in range(count)
+        ]
+        rng.shuffle(experienced_factions)
+        for seat, faction in zip(experienced_seats, experienced_factions):
+            factions[seat] = faction
+
+        aristocrat_seat = rng.choice([
+            seat for seat in experienced_seats
+            if factions[seat] == ARISTOCRAT
+        ])
+        reformer_seat = rng.choice([
+            seat for seat in experienced_seats
+            if factions[seat] == REFORMER
+        ])
+
+        roles = [INNOCENT] * n
+
+    syndicate_seats = [aristocrat_seat, reformer_seat]
+    rng.shuffle(syndicate_seats)
+    roles[syndicate_seats[0]] = ASSASSIN
+    roles[syndicate_seats[1]] = ACCOMPLICE
+    return factions, roles
+
+
+def _choose_evidence_holders(
+    rng: random.Random,
+    factions: list[str],
+    roles: list[str],
+    experienced: list[bool] | None,
+) -> list[int]:
+    """Spread Evidence across all Factions; prefer experienced readers."""
+    holders = []
+    for faction in (ARISTOCRAT, REFORMER, MAGNATE):
+        pool = [
+            seat for seat, player_faction in enumerate(factions)
+            if player_faction == faction
+            and roles[seat] == INNOCENT
+            and (experienced is None or experienced[seat])
+        ]
+        if not pool:
+            pool = [
+                seat for seat, player_faction in enumerate(factions)
+                if player_faction == faction and roles[seat] == INNOCENT
+            ]
+        if not pool:
+            pool = [
+                seat for seat, player_faction in enumerate(factions)
+                if player_faction == faction
+            ]
+        holders.append(rng.choice(pool))
+
+    fourth_pool = [
+        seat for seat in range(len(factions))
+        if seat not in holders and (experienced is None or experienced[seat])
+    ]
+    if not fourth_pool:
+        fourth_pool = [seat for seat in range(len(factions)) if seat not in holders]
+    holders.append(rng.choice(fourth_pool))
+    return holders
 
 
 def _false_options(kind: str, actual: set[str]) -> list[str]:
@@ -321,38 +497,49 @@ def generate_deal(
     n: int,
     seed: int,
     names: list[str] | None = None,
+    experienced: list[bool] | None = None,
 ) -> Deal:
     if n not in SCALING:
         raise ValueError("player count must be between 8 and 15")
     if names is not None and len(names) != n:
         raise ValueError(f"expected {n} names, received {len(names)}")
+    if experienced is not None and len(experienced) != n:
+        raise ValueError(f"expected {n} experience flags, received {len(experienced)}")
     rng = random.Random(seed)
     aristocrats, reformers, magnates, magnate_threshold, syndicate_threshold = (
         SCALING[n]
     )
-    factions = (
-        [ARISTOCRAT] * aristocrats
-        + [REFORMER] * reformers
-        + [MAGNATE] * magnates
+    factions, roles = _deal_factions_and_roles(
+        rng,
+        n,
+        aristocrats,
+        reformers,
+        magnates,
+        experienced,
     )
-    rng.shuffle(factions)
     motives = _deal_goals(rng, MOTIVES, n, {"VANITY": 3})
     ambitions = _deal_goals(rng, AMBITIONS, n, {"COLLECTOR": 1})
+    _move_hard_goals_off_new_players(rng, motives, experienced, "ESPIONAGE")
+    _move_hard_goals_off_new_players(rng, ambitions, experienced, "DIPLOMAT")
+    _diversify_new_player_goals(
+        rng,
+        motives,
+        experienced,
+        ("VANITY", "WRATH", "COMMERCE"),
+    )
+    _diversify_new_player_goals(
+        rng,
+        ambitions,
+        experienced,
+        ("COLLECTOR", "RADICAL", "BLACKMAILER"),
+    )
     secrets_dealt = [rng.choice(SECRETS) for _ in range(n)]
-
-    roles = [INNOCENT] * n
-    aristocrat_seat = rng.choice(
-        [seat for seat, faction in enumerate(factions) if faction == ARISTOCRAT]
+    evidence_holders = _choose_evidence_holders(
+        rng,
+        factions,
+        roles,
+        experienced,
     )
-    reformer_seat = rng.choice(
-        [seat for seat, faction in enumerate(factions) if faction == REFORMER]
-    )
-    syndicate_seats = [aristocrat_seat, reformer_seat]
-    rng.shuffle(syndicate_seats)
-    roles[syndicate_seats[0]] = ASSASSIN
-    roles[syndicate_seats[1]] = ACCOMPLICE
-
-    evidence_holders = rng.sample(range(n), 4)
     players = []
     for seat in range(n):
         outsider = rng.choice(
@@ -373,6 +560,9 @@ def generate_deal(
                 outsider=outsider,
                 advantage=(
                     EVIDENCE if seat in evidence_holders else SECRET_INTEL
+                ),
+                experienced=(
+                    experienced[seat] if experienced is not None else None
                 ),
             )
         )
@@ -424,6 +614,20 @@ def validate_deal(deal: Deal) -> list[str]:
         errors.append("Syndicate must be one Aristocrat and one Reformer")
     if any(player.faction == MAGNATE for player in syndicate):
         errors.append("Magnate cannot be in the Syndicate")
+    if any(player.experienced is False for player in syndicate):
+        errors.append("new players cannot receive Syndicate roles")
+
+    if any(player.experienced is not None for player in deal.players):
+        for faction in (ARISTOCRAT, REFORMER, MAGNATE):
+            innocent_team = [
+                player for player in deal.players
+                if player.faction == faction and player.role == INNOCENT
+            ]
+            experience = Counter(player.experienced for player in innocent_team)
+            if experience != Counter({True: 2, False: 1}):
+                errors.append(
+                    f"{faction} Innocent team is not 2 experienced + 1 new"
+                )
 
     if sum(player.ambition == "COLLECTOR" for player in deal.players) > 1:
         errors.append("Collector cap exceeded")
@@ -460,6 +664,26 @@ def validate_deal(deal: Deal) -> list[str]:
     owners = [statement.owner for statement in starting]
     if len(set(owners)) != 4 or None in owners:
         errors.append("starting Evidence must have four different owners")
+    evidence_factions = Counter(
+        deal.players[owner].faction for owner in owners if owner is not None
+    )
+    if set(evidence_factions) != {ARISTOCRAT, REFORMER, MAGNATE}:
+        errors.append("starting Evidence must reach every Faction")
+    if max(evidence_factions.values(), default=0) > 2:
+        errors.append("no Faction may hold more than two starting Evidence pieces")
+    syndicate_evidence = sum(
+        deal.players[owner].role in (ASSASSIN, ACCOMPLICE)
+        for owner in owners if owner is not None
+    )
+    if syndicate_evidence > 1:
+        errors.append("at most one Syndicate member may hold starting Evidence")
+    if not any(
+        statement.is_true
+        and statement.owner is not None
+        and deal.players[statement.owner].role == INNOCENT
+        for statement in starting
+    ):
+        errors.append("at least one truthful starting Evidence must be held by an Innocent")
 
     valid_hits = {
         "OLD_GUARD": sum(
@@ -701,12 +925,12 @@ def render_gm_master(deal: Deal, language: str) -> str:
         "",
         "## Player Setup Table" if language == "en" else "## Таблиця гравців",
         "",
-        "| Seat / Player | Faction | Role | Motive | Ambition | Secret | "
+        "| Seat / Player | Exp. | Faction | Role | Motive | Ambition | Secret | "
         "Outsider clue | Advantage |"
         if language == "en"
-        else "| Місце / Гравець | Фракція | Роль | Мотив | Амбіція | Секрет | "
-        "Зачіпка | Перевага |",
-        "|---|---|---|---|---|---|---|---|",
+        else "| Місце / Гравець | Досвід | Фракція | Роль | Мотив | Амбіція | "
+        "Секрет | Зачіпка | Перевага |",
+        "|---|---|---|---|---|---|---|---|---|",
     ])
     for player in deal.players:
         advantage = label[player.advantage]
@@ -719,6 +943,7 @@ def render_gm_master(deal: Deal, language: str) -> str:
             )
         lines.append(
             f"| {player.seat + 1} / {deal.name(player.seat, language)} | "
+            f"{'Y' if player.experienced else 'N' if player.experienced is False else '—'} | "
             f"{label[player.faction]} | {label[player.role]} | "
             f"{label[player.motive]} | {label[player.ambition]} | "
             f"{label[player.secret]} | {deal.name(player.outsider, language)} | "
@@ -756,6 +981,141 @@ def render_combined(deal: Deal, language: str) -> str:
     for player in deal.players:
         parts.append("---\n\n" + render_player_card(deal, player, language))
     return "\n".join(parts)
+
+
+def render_public_discord_ua(deal: Deal) -> str:
+    faction_counts = Counter(player.faction for player in deal.players)
+    return "\n".join([
+        "**Темна Рада — стартова інформація**",
+        "",
+        f"Нас **{deal.n} гравців**:",
+        f"- Аристократи: **{faction_counts[ARISTOCRAT]}**",
+        f"- Реформісти: **{faction_counts[REFORMER]}**",
+        f"- Магнати: **{faction_counts[MAGNATE]}** "
+        f"(поріг перемоги: **{deal.magnate_threshold} Впливу**)",
+        "- Синдикат: **1 Вбивця + 1 Спільник** "
+        "(один Аристократ і один Реформіст; Магнати не входять до Синдикату)",
+        f"- Поріг Синдикату: **{deal.syndicate_threshold}** "
+        "(особистий Вплив чинного Вбивці + Криївка)",
+        "- У грі **5 Доказів**, рівно **2 з них хибні**. "
+        "Доказ з Аукціону завжди правдивий.",
+        "",
+        "Правила: https://farsefars.github.io/dark-council/",
+        "",
+        "Я надішлю кожному приватне повідомлення. Не пересилайте свою картку іншим.",
+    ])
+
+
+def render_discord_dm_ua(deal: Deal, player: Player) -> str:
+    label = LABELS["ua"]
+    name = deal.name(player.seat, "ua")
+    outsider = deal.name(player.outsider, "ua")
+    lines = [
+        f"**Темна Рада — приватна картка для {name}**",
+        "",
+        "Не пересилай це повідомлення іншим гравцям.",
+        "",
+        f"**Фракція:** {label[player.faction]}",
+        f"**Роль:** {label[player.role]}",
+        f"**Стартовий Вплив:** 4",
+        f"**Як перемогти:** {_victory_text(player, deal, 'ua')}",
+    ]
+    if player.role in (ASSASSIN, ACCOMPLICE):
+        partner = deal.accomplice if player.role == ASSASSIN else deal.assassin
+        lines.extend([
+            "",
+            "## Синдикат",
+            f"**Твій напарник:** {deal.name(partner.seat, 'ua')} "
+            f"({label[partner.role]})",
+            "- Щоб убити гравця, ти або напарник маєте раніше передати йому "
+            "щонайменше 1 Вплив.",
+            "- Успішне Замовлення: +3 до Криївки. Провал: -3; нестачу платить Вбивця.",
+            "- Спільник може Відмити до 2 Впливу в Криївку за раунд.",
+            "- Чинний Вбивця може зняти до 2 Впливу з Криївки за раунд.",
+            "- Якщо Вбивцю Страчено, живий Спільник стає новим Вбивцею.",
+        ])
+    lines.extend([
+        "",
+        f"## Мотив (+5): {label[player.motive]}",
+        GOAL_TEXT["ua"][player.motive],
+        "",
+        f"## Амбіція (+10): {label[player.ambition]}",
+        GOAL_TEXT["ua"][player.ambition],
+        "",
+        "**Дедлайн Цілей:** заявити Ведучому до початку Раунду 3.",
+        "",
+        f"## Секрет: {label[player.secret]}",
+        "Якщо інший гравець правильно Викриє твій Секрет, ти втрачаєш 4 Впливу, "
+        "а він отримує +1.",
+        "",
+        "## Зачіпка про Фракцію",
+        f"**{outsider} точно НЕ належить до твоєї Фракції.**",
+        "",
+        f"## Стартова Перевага: {label[player.advantage]}",
+    ])
+    if player.advantage == EVIDENCE:
+        statement = deal.evidence[player.evidence_index or 0]
+        lines.extend([
+            evidence_text(statement, "ua"),
+            "",
+            "Цей Доказ може бути хибним. Збережи точне формулювання: після будь-якої "
+            "Страти ти мусиш зачитати його публічно дослівно.",
+        ])
+    else:
+        target = deal.players[player.intel_target or 0]
+        lines.append(
+            f"Секрет {deal.secret_subject(target.seat, 'ua')} — "
+            f"**{label[target.secret]}**. Це гарантовано правдива інформація."
+        )
+    lines.extend([
+        "",
+        "Повна пам'ятка: https://farsefars.github.io/dark-council/",
+    ])
+    return "\n".join(lines)
+
+
+def render_discord_pack_ua(deal: Deal) -> str:
+    parts = [
+        "# Публічне повідомлення",
+        "",
+        "```md",
+        render_public_discord_ua(deal),
+        "```",
+    ]
+    for player in deal.players:
+        parts.extend([
+            "",
+            "---",
+            "",
+            f"# DM — {deal.name(player.seat, 'ua')}",
+            "",
+            "```md",
+            render_discord_dm_ua(deal, player),
+            "```",
+        ])
+    return "\n".join(parts) + "\n"
+
+
+def write_discord_ua(deal: Deal, output_dir: Path) -> list[Path]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    prefix = f"deal-{deal.n}p"
+    private_dir = output_dir / f"{prefix}-private"
+    private_dir.mkdir(parents=True, exist_ok=True)
+    combined = output_dir / f"{prefix}-discord-ua.md"
+    combined.write_text(render_discord_pack_ua(deal), encoding="utf-8")
+    written = [combined]
+    public = private_dir / "discord-public-ua.txt"
+    public.write_text(render_public_discord_ua(deal), encoding="utf-8")
+    written.append(public)
+    for player in deal.players:
+        safe_name = "".join(
+            char if char.isalnum() or char in ("-", "_") else "-"
+            for char in deal.name(player.seat, "ua")
+        ).strip("-")
+        path = private_dir / f"discord-{player.seat + 1:02d}-{safe_name}-ua.txt"
+        path.write_text(render_discord_dm_ua(deal, player), encoding="utf-8")
+        written.append(path)
+    return written
 
 
 def write_deal(deal: Deal, output_dir: Path) -> list[Path]:
@@ -797,6 +1157,29 @@ def _parse_names(args) -> list[str] | None:
     return None
 
 
+def _parse_roster(path: str | None) -> tuple[list[str] | None, list[bool] | None]:
+    if not path:
+        return None, None
+    with Path(path).open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    if not rows or not {"Name", "Experienced"} <= set(rows[0]):
+        raise ValueError("roster CSV must have Name and Experienced columns")
+    names = [row["Name"].strip() for row in rows]
+    experienced = []
+    for row in rows:
+        value = row["Experienced"].strip().casefold()
+        if value in {"y", "yes", "true", "1"}:
+            experienced.append(True)
+        elif value in {"n", "no", "false", "0"}:
+            experienced.append(False)
+        else:
+            raise ValueError(
+                f"invalid Experienced value for {row['Name']!r}: "
+                f"{row['Experienced']!r}"
+            )
+    return names, experienced
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--players", type=int, default=12)
@@ -804,15 +1187,29 @@ def main() -> None:
     parser.add_argument("--names", help="comma-separated player names")
     parser.add_argument("--names-file", help="UTF-8 file with one player name per line")
     parser.add_argument(
+        "--roster-file",
+        help="UTF-8 CSV with Name and Experienced (Y/N) columns",
+    )
+    parser.add_argument(
+        "--discord-ua",
+        action="store_true",
+        help="write Ukrainian Discord copy blocks and individual text files",
+    )
+    parser.add_argument(
         "--output-dir",
         default=str(Path(__file__).resolve().parent),
     )
     args = parser.parse_args()
-    names = _parse_names(args)
+    roster_names, experienced = _parse_roster(args.roster_file)
+    if roster_names is not None and (args.names or args.names_file):
+        raise ValueError("use --roster-file or --names/--names-file, not both")
+    names = roster_names or _parse_names(args)
     n = len(names) if names else args.players
     seed = args.seed if args.seed is not None else secrets.randbits(32)
-    deal = generate_deal(n, seed, names)
+    deal = generate_deal(n, seed, names, experienced)
     written = write_deal(deal, Path(args.output_dir))
+    if args.discord_ua:
+        written.extend(write_discord_ua(deal, Path(args.output_dir)))
     print(
         f"Generated verified {n}-player deal with seed {seed}: "
         f"{len(written)} files"

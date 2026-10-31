@@ -84,6 +84,26 @@ python -m unittest -v test_generate_deal.py
 python generate_deal.py --players 12 --seed 20261031
 ```
 
+For an experience-balanced 11-player Discord deal, provide:
+
+```csv
+Name,Experienced
+Vladka,Y
+Marta,N
+...
+```
+
+Then run:
+
+```powershell
+python generate_deal.py --roster-file roster.csv --seed 20261031 --discord-ua
+```
+
+For the supported `8 experienced / 3 new` roster, the generator places one new
+Innocent in each Faction team, keeps both Syndicate roles with experienced players,
+gives new players distinct lower-overhead Goals, spreads starting Evidence across all
+Factions, and writes copy-ready Discord messages plus individual `.txt` files.
+
 Generated `playtest/deal-*` files contain live-game spoilers and are ignored by Git.
 
 ## Repository structure
